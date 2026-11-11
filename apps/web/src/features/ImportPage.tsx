@@ -32,7 +32,7 @@ interface Report {
   new_classes?: number;
 }
 
-const KINDS = ["program", "editions", "item_bank", "roster", "responses", "grades"];
+const KINDS = ["program", "editions", "item_bank", "roster", "responses", "assignments", "grades"];
 
 export function ImportWizard({ fixedTarget, onCommitted, kindProp }: { fixedTarget?: "current"; onCommitted?: (j: JobOut) => void; kindProp?: string }) {
   const { t } = useI18n();

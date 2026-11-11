@@ -25,9 +25,10 @@ from sqlalchemy.orm import Session
 from .. import models as m
 from ..db import new_id
 
-STRICT_KINDS = {"program", "editions", "item_bank"}
-KINDS = ("program", "editions", "item_bank", "roster")
-ORDER = ["program", "editions", "item_bank", "roster", "responses"]
+STRICT_KINDS = {"program", "editions", "item_bank", "assignments"}
+KINDS = ("program", "editions", "item_bank", "roster", "assignments")
+ORDER = ["program", "editions", "item_bank", "roster", "responses", "assignments"]
+OPTIONAL_KINDS = {"assignments"}  # without it the assessment scope is inferred from sittings and labelled as such
 
 # field: (required, description, example)
 FIELD_DOCS: dict[str, dict[str, tuple[bool, str, str]]] = {
@@ -93,6 +94,13 @@ FIELD_DOCS: dict[str, dict[str, tuple[bool, str, str]]] = {
         "period_start": (False, "Начало использования (ГГГГ-ММ-ДД)", "2025-09-01"),
         "period_end": (False, "Окончание использования (ГГГГ-ММ-ДД)", "2026-05-31"),
     },
+    # Optional stage: which classes an assessment was *assigned* to (from the school's schedule/order), so that a class
+    # with no sitting records at all is visible. Without it the scope is only inferred from sittings and reported so.
+    "assignments": {
+        "assessment_code": (True, "Код проведения проверки (уже загружено с ответами)", "POST-2026"),
+        "class_code": (True, "Код класса, которому проверка была назначена", "SCH-1-5A"),
+        "note": (False, "Основание назначения (приказ, график)", "График проверок, приказ №12"),
+    },
 }
 
 RESPONSES_DOCS = {
@@ -117,6 +125,7 @@ DEPENDENCY_TEXT = {
     "editions": "Сначала загрузите список изданий.",
     "item_bank": "Сначала загрузите банк заданий и формы проверок.",
     "roster": "Сначала загрузите состав: школы, классы и учеников.",
+    "responses": "Сначала загрузите ответы: проведения проверок создаются вместе с ними.",
 }
 
 CODE_RE = re.compile(r"^[\w\-.:/ ]{1,60}$", re.UNICODE)
@@ -135,17 +144,21 @@ def project_status(session: Session, dataset: m.Dataset) -> dict:
     n_editions = len(session.scalars(select(m.TextbookEdition.id).where(m.TextbookEdition.org_id == dataset.org_id)).all())
     n_learners = len(session.scalars(select(m.Learner.id).where(m.Learner.dataset_id == dataset.id)).all())
     n_responses = session.query(m.Response).filter(m.Response.dataset_id == dataset.id).count()
+    from .. import measurement_models as mm
+
+    n_assign = session.query(mm.AssessmentCohort).filter(mm.AssessmentCohort.dataset_id == dataset.id).count()
     done = {"program": n_topics > 0, "editions": n_editions > 0, "item_bank": n_forms > 0, "roster": n_learners > 0,
-            "responses": n_responses > 0}
-    requires = {"program": [], "editions": [], "item_bank": ["program"], "roster": [], "responses": ["program", "item_bank"]}
+            "responses": n_responses > 0, "assignments": n_assign > 0}
+    requires = {"program": [], "editions": [], "item_bank": ["program"], "roster": [], "responses": ["program", "item_bank"],
+                "assignments": ["responses"]}
     stages = []
     for k in ORDER:
         missing = [d for d in requires[k] if not done[d]]
-        stages.append({"kind": k, "done": done[k], "blocked_by": missing,
+        stages.append({"kind": k, "done": done[k], "optional": k in OPTIONAL_KINDS, "blocked_by": missing,
                        "blocked_message": " ".join(DEPENDENCY_TEXT[d] for d in missing) or None})
     return {"dataset_id": dataset.id, "stages": stages,
             "counts": {"topics": n_topics, "forms": n_forms, "items": n_items, "editions": n_editions,
-                       "learners": n_learners, "responses": n_responses}}
+                       "learners": n_learners, "responses": n_responses, "assignments": n_assign}}
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +194,8 @@ def validate_full(session: Session, dataset: m.Dataset, org_id: str, kind: str, 
         for f in spec["required"]:
             if not r.values.get(f):
                 r.errors.append({"code": "missing_required", "field": f})
-    {"program": _v_program, "editions": _v_editions, "item_bank": _v_item_bank, "roster": _v_roster}[kind](
+    {"program": _v_program, "editions": _v_editions, "item_bank": _v_item_bank, "roster": _v_roster,
+     "assignments": _v_assignments}[kind](
         session, dataset, org_id, rows, blocking)
     accepted = [r for r in rows if not r.errors]
     rejected = [r for r in rows if r.errors]
@@ -464,13 +478,41 @@ def _v_roster(session, dataset, org_id, rows, blocking) -> None:
         blocking.append({"code": "missing_dependency", "dependency": "editions", "message": DEPENDENCY_TEXT["editions"]})
 
 
+def _v_assignments(session, dataset, org_id, rows, blocking) -> None:
+    from .. import measurement_models as mm
+
+    assessments = {a.code: a.id for a in session.scalars(select(m.Assessment).where(m.Assessment.dataset_id == dataset.id))}
+    cohorts = {c.code: c.id for c in session.scalars(select(m.Cohort).where(m.Cohort.dataset_id == dataset.id))}
+    if not assessments:
+        blocking.append({"code": "missing_dependency", "dependency": "responses", "message": DEPENDENCY_TEXT["responses"]})
+    existing = set(session.execute(select(mm.AssessmentCohort.assessment_id, mm.AssessmentCohort.cohort_id)
+                                   .where(mm.AssessmentCohort.dataset_id == dataset.id)).all())
+    seen = set()
+    for r in rows:
+        v = r.values
+        for f in ("assessment_code", "class_code"):
+            _ok_code(r, f)
+        a, c = assessments.get(v.get("assessment_code")), cohorts.get(v.get("class_code"))
+        if v.get("assessment_code") and a is None:
+            r.errors.append({"code": "unknown_assessment", "field": "assessment_code", "value": v["assessment_code"]})
+        if v.get("class_code") and c is None:
+            r.errors.append({"code": "unknown_class", "field": "class_code", "value": v["class_code"]})
+        key = (v.get("assessment_code"), v.get("class_code"))
+        if key in seen:
+            r.errors.append({"code": "duplicate_row", "field": "class_code"})
+        seen.add(key)
+        if a and c and (a, c) in existing:
+            r.errors.append({"code": "already_assigned", "field": "class_code"})
+
+
 # ---------------------------------------------------------------------------
 # Commit
 # ---------------------------------------------------------------------------
 
 
 def commit(session: Session, dataset: m.Dataset, batch: m.ImportBatch, kind: str, accepted: list) -> dict:
-    fn = {"program": _c_program, "editions": _c_editions, "item_bank": _c_item_bank, "roster": _c_roster}[kind]
+    fn = {"program": _c_program, "editions": _c_editions, "item_bank": _c_item_bank, "roster": _c_roster,
+          "assignments": _c_assignments}[kind]
     return fn(session, dataset, batch, accepted)
 
 
@@ -627,6 +669,21 @@ def _c_roster(session, dataset, batch, rows) -> dict:
                 exposures += 1
     return {"learners_created": len(ctx.learners) - before, "classes": len(ctx.cohorts), "schools": len(ctx.schools),
             "exposures": exposures}
+
+
+def _c_assignments(session, dataset, batch, rows) -> dict:
+    from .. import measurement_models as mm
+
+    assessments = {a.code: a.id for a in session.scalars(select(m.Assessment).where(m.Assessment.dataset_id == dataset.id))}
+    cohorts = {c.code: c.id for c in session.scalars(select(m.Cohort).where(m.Cohort.dataset_id == dataset.id))}
+    n = 0
+    for r in rows:
+        v = r.values
+        session.add(mm.AssessmentCohort(org_id=dataset.org_id, dataset_id=dataset.id, assessment_id=assessments[v["assessment_code"]],
+                                        cohort_id=cohorts[v["class_code"]], source="import", created_by=batch.created_by,
+                                        note=(v.get("note") or f"Импорт {batch.filename}")[:500]))
+        n += 1
+    return {"assignments_created": n, "assessments": len({r.values["assessment_code"] for r in rows})}
 
 
 def _year(s: str | None) -> int:

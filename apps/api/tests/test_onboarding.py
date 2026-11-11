@@ -34,7 +34,7 @@ def _commit(c, H, batch_id):
 def test_templates_are_downloadable_with_instructions(fresh_client):
     c = fresh_client
     t = c.get("/api/v1/imports/templates").json()
-    assert t["order"] == ["program", "editions", "item_bank", "roster", "responses"]
+    assert t["order"] == ["program", "editions", "item_bank", "roster", "responses", "assignments"]
     for k in t["order"]:
         x = c.get(f"/api/v1/imports/templates/{k}", params={"format": "xlsx"})
         wb = load_workbook(io.BytesIO(x.content))
@@ -80,7 +80,23 @@ def test_empty_org_imports_a_real_project_and_runs_the_whole_path(fresh_client):
         assert again["id"] == j["id"]
     q = c.get(f"/api/v1/datasets/{did}/quality", headers=H).json()
     assert q["data_level"] == "pre_post_with_exposure" and q["counts"]["learners"] == 240
-    assert all(st["done"] for st in q["project"]["stages"])
+    assert all(st["done"] or st["optional"] for st in q["project"]["stages"])
+
+    # assessment scope: without explicit assignments it is only inferred from sittings (and labelled so)
+    def scopes():
+        lst = c.get("/api/v1/quality/assessments", params={"dataset_id": did}, headers=H).json()["assessments"]
+        return {a["assessment"]["code"]: (a["denominators"]["assignment_scope"], a["denominators"]["assigned_is_exact"]) for a in lst}
+
+    assert set(scopes().values()) == {("inferred_from_sittings", False)}
+    text = (EX / "6_assignments.csv").read_text(encoding="utf-8")
+    bad = text + "EX-POST-2026,NO-SUCH-CLASS,x\n"
+    v = _validate(c, H, did, "assignments", bad.encode())
+    assert v["report"]["strict"] and v["report"]["commit_allowed"] is False and "unknown_class" in v["report"]["errors_by_code"]
+    v = _validate(c, H, did, "assignments", text.encode(), "6_assignments.csv")
+    assert v["rows_rejected"] == 0 and _commit(c, H, v["id"])["status"] == "succeeded"
+    assert set(scopes().values()) == {("explicit", True)}
+    again = _validate(c, H, did, "assignments", (text.replace("(пример)", "(повтор)")).encode(), "again.csv")
+    assert again["report"]["commit_allowed"] is False and "already_assigned" in again["report"]["errors_by_code"]
     # re-importing the same programme file is refused
     v = _validate(c, H, did, "program", (EX / "1_program.csv").read_bytes())
     assert v["report"]["duplicate_of_batch"] or v["report"]["commit_allowed"] is False

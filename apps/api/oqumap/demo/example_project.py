@@ -1,6 +1,6 @@
 """Filled example of a complete project for the onboarding templates (synthetic, deterministic).
 
-Writes data/templates/example_project/{1_program,2_editions,3_item_bank,4_roster,5_responses}.csv.
+Writes data/templates/example_project/{1_program,2_editions,3_item_bank,4_roster,5_responses,6_assignments}.csv.
 Uses its own codes (EX-*, no demo identifiers): 3 topics, 6 objectives, 12 items, a pre- and a post-form,
 2 editions, 2 schools × 6 classes × 20 learners. Run: ``python -m oqumap.demo.example_project``.
 """
@@ -108,6 +108,11 @@ def build() -> dict[str, str]:
                         resp.append([lc, acode, form, code, 1, "answered", ans, d])
     files["4_roster.csv"] = _csv(roster)
     files["5_responses.csv"] = _csv(resp)
+    # optional stage 6: explicit assignment of each assessment to classes (from the network's assessment schedule)
+    classes = sorted({r[2] for r in roster[1:]})
+    assessments = sorted({r[1] for r in resp[1:]})
+    files["6_assignments.csv"] = _csv([["assessment_code", "class_code", "note"]]
+                                      + [[a, c, "График проверок сети (пример)"] for a in assessments for c in classes])
     return files
 
 
@@ -120,7 +125,8 @@ def write(out: Path = OUT) -> list[Path]:
         paths.append(p)
     (out / "README.md").write_text(
         "# Пример проекта для импорта\n\nСинтетический пример (EX-*), загружается по порядку: 1_program → 2_editions → "
-        "3_item_bank → 4_roster → 5_responses. Создан `python -m oqumap.demo.example_project`.\n", encoding="utf-8")
+        "3_item_bank → 4_roster → 5_responses → 6_assignments (необязательно: назначения проверок классам; без него охват "
+        "проверки выводится из записей о проведении и так и подписывается). Создан `python -m oqumap.demo.example_project`.\n", encoding="utf-8")
     return paths
 
 
