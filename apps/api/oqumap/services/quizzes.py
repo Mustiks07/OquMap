@@ -62,7 +62,8 @@ def _opt(text: str, correct: bool, misconception: str | None, ru: str, kz: str) 
 def fam_frac_add(rng: random.Random, level: int) -> dict:
     dens = [(2, 3), (3, 4), (2, 5), (4, 6), (3, 5), (4, 5), (5, 6), (3, 8)][level * 2 + rng.randint(0, 1)]
     b, d = dens
-    a, c = rng.randint(1, b - 1), rng.randint(1, d - 1)
+    a = rng.choice([x for x in range(1, b) if gcd(x, b) == 1])  # stems use fractions in lowest terms
+    c = rng.choice([x for x in range(1, d) if gcd(x, d) == 1])
     return {"family": "frac_add", "params": {"a": a, "b": b, "c": c, "d": d}}
 
 
@@ -85,8 +86,9 @@ def render_frac_add(p: dict) -> dict:
 
 def fam_mixed_sub(rng: random.Random, level: int) -> dict:
     den = [4, 5, 6][level]
-    n1 = rng.randint(1, den - 2)
-    n2 = rng.randint(n1 + 1, den - 1)
+    reduced = [x for x in range(1, den) if gcd(x, den) == 1]
+    n1 = rng.choice(reduced[:-1])
+    n2 = rng.choice([x for x in reduced if x > n1])
     w1 = rng.randint(3, 5 + level)
     w2 = rng.randint(1, w1 - 1)
     return {"family": "mixed_sub", "params": {"w1": w1, "n1": n1, "w2": w2, "n2": n2, "d": den}}

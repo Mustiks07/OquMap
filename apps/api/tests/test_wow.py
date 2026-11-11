@@ -208,3 +208,19 @@ def test_tour_preflight_and_read_only_quiz_preview(client, H, datasets, curricul
     pv = client.post("/api/v1/quizzes/preview", json={"dataset_id": ds, "topic_id": r["topic_id"], "n_items": 4}, headers=H).json()
     assert pv["status"] == "preview" and len(pv["items"]) == 4 and pv["checks"]["approvable"]
     assert len(client.get("/api/v1/quizzes", params={"dataset_id": ds}, headers=H).json()) == n_before
+
+
+def test_quiz_stems_use_lowest_terms():
+    import random
+    import re
+    from math import gcd
+
+    from oqumap.services import quizzes as qz
+
+    rng = random.Random(3)
+    for fam in ("frac_add", "mixed_sub"):
+        for lvl in range(3):
+            for _ in range(20):
+                spec = qz.FAMILIES[fam][0](rng, lvl)
+                stem = qz.FAMILIES[fam][1](spec["params"])["stem_ru"]
+                assert all(gcd(int(n), int(d)) == 1 for n, d in re.findall(r"(\d+)/(\d+)", stem)), stem
