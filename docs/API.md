@@ -59,6 +59,41 @@
 | `POST /ai/explain-comparison`, `/ai/interpret-misconception`, `/ai/recommend` | Объяснения и рекомендации (режим виден) |
 | `POST /assistant/query` | Контекстный ассистент с разрешёнными функциями чтения/расчёта |
 
+## Измерение и организационное обучение (Claude №2)
+Подробно: [ASSESSMENT_QUALITY.md](ASSESSMENT_QUALITY.md), [INTERVENTION_AND_PILOT_PROTOCOL.md](INTERVENTION_AND_PILOT_PROTOCOL.md),
+[LEARNING_LOOP.md](LEARNING_LOOP.md). Чтение — любой участник организации; права на изменения — в протоколе (§3).
+
+| Метод и путь | Назначение |
+|---|---|
+| `GET /quality/assessments?dataset_id=&attempt_rule=&omitted_policy=` | Сводка качества по проверкам (знаменатели, пропуски, α, число заданий с сигналами) |
+| `GET /quality/assessments/{id}` | Форма: знаменатели, распределение, надёжность, разрезы со скрытием, задания, исключения, ограничения, происхождение |
+| `GET /quality/assessments/{id}/items?flag=` | Задания проверки (p, r, D, дистракторы, сигналы) |
+| `GET /quality/items/{id}?dataset_id=` | Задание во всех проверках, без объединения |
+| `GET /interventions?status=&evidence_level=&topic_id=&objective_id=&misconception=&grade=&language=&q=` | Библиотека |
+| `POST /interventions` | Новая интервенция (черновик v1) |
+| `GET /interventions/{id}`, `PATCH /interventions/{id}` | Карточка с версиями и доказательной базой; правка черновика (`expected_version`) |
+| `POST /interventions/{id}/versions` | Новая версия (если последняя рецензирована) |
+| `POST /interventions/{id}/versions/{v}/review` | Рецензирование (approver) |
+| `DELETE /interventions/{id}/versions/{v}` | Удаление неиспользуемого черновика |
+| `POST /interventions/{id}/archive {reason}` | Архив (approver) |
+| `POST /interventions/{id}/targets` | Связь черновика с темой/целью/ошибкой |
+| `GET /interventions/suggest?topic_id=&objective_id=&misconception=&grade=&language=&dataset_id=` | Подбор с объяснённым баллом |
+| `GET /interventions/{id}/evidence`, `POST /intervention-evidence/{entry}/review {accept, note}` | Доказательная база; принятие записи (approver) |
+| `GET /pilots?dataset_id=&status=&intervention_id=`, `POST /pilots` | Пилоты, создание черновика протокола |
+| `GET /pilots/{id}`, `PATCH /pilots/{id}` | Протокол с проверкой и допустимыми переходами; правка только в `draft` |
+| `POST /pilots/{id}/randomize {seed, cohort_ids}` | Серверная рандомизация кластеров/волн |
+| `POST /pilots/{id}/transition {to_status, note}` | Машина статусов |
+| `GET /pilots/{id}/fidelity?as_of=`, `POST /pilots/{id}/fidelity-logs` | Агрегаты реализации; запись/исправление журнала |
+| `POST /pilots/{id}/follow-up {outcome_assessment_id?, as_of?}`, `GET /pilots/{id}/outcomes` | Повторное измерение (неизменяемый результат) |
+| `POST /pilots/{id}/conclusions`, `GET /pilots/{id}/conclusions` | Вывод, следующая версия решения, предложение записи доказательной базы |
+| `GET /learning/summary?dataset_id=` | Чему научилась организация |
+| `GET /portfolio/interventions?dataset_id=&as_of=` | Портфель без рейтингов |
+
+Коды ошибок модуля: `version_immutable`, `draft_exists`, `intervention_archived`, `version_in_use`, `version_conflict`,
+`incomplete_for_review`, `protocol_locked`, `protocol_invalid` (`details.errors` — список проверок), `invalid_transition`,
+`snapshot_mismatch`, `randomization_not_applicable`, `pilot_not_running`, `cohort_not_in_pilot`, `date_outside_pilot`,
+`date_in_future`, `already_corrected`, `outcome_before_start`, `conclusion_misreads_fidelity`, `invalid_state`.
+
 ## Отличия от исходного списка маршрутов задания
 Добавлены вспомогательные маршруты (auth, quality, overview, analyses, fixtures, documents/*, search, plans/context,
 ai/*). Существующие маршруты задания реализованы без изменения путей. `GET /topics/{id}/evidence` принимает фильтры
