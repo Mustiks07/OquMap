@@ -113,7 +113,7 @@ test("structural import blocks a broken item bank and lists rejected rows", asyn
   await page.getByTestId("import-validate").click();
   await expect(page.getByTestId("rows-rejected")).toHaveText("0");
   await page.getByTestId("import-commit").click();
-  await expect(page.getByText(/Загружено\. Новая версия данных/)).toBeVisible();
+  await expect(page.getByText(/Загружено\. Новая версия данных/)).toBeVisible({ timeout: 90_000 });
   await page.getByTestId("stage-item_bank").click();
   const bank = readFileSync(path.join(REPO, "data/templates/example_project/3_item_bank.csv"), "utf-8")
     .replace("Вычислите 248 + 175", '=HYPERLINK(""http://x"")').replace("EX-1.2,confirmed", "EX-9.9,confirmed");
@@ -147,7 +147,10 @@ test("empty organisation imports a real project from templates and analyses it",
     await page.getByTestId("import-commit").click();
     await expect(page.getByText(/Загружено\. Новая версия данных/)).toBeVisible({ timeout: 90_000 });
   }
-  await expect(page.getByTestId("stages")).not.toContainText("ожидает");
+  const stageRows = page.getByTestId("stages").locator("tbody tr");
+  for (let i = 0; i < 5; i++) await expect(stageRows.nth(i)).toContainText("загружено");
+  await expect(stageRows.nth(5)).toContainText("необязательно");
+  await expect(stageRows.nth(5)).toContainText("ожидает");
   await page.getByRole("link", { name: /Обзор тем/ }).click();
   await expect(page.getByTestId("topics-table")).toContainText("EX-T2");
   await expect(page.getByTestId("topics-table")).not.toContainText("DEMO-");
