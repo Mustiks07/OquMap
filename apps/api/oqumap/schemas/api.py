@@ -57,7 +57,7 @@ class DatasetSummary(Model):
     data_level: str
     version: int
     version_updated_at: str
-    program_version_id: str
+    program_version_id: str | None
     manifest: dict[str, Any]
 
 

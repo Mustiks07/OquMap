@@ -491,6 +491,10 @@ def validate_upload(
 ) -> m.ImportBatch:
     if kind not in FIELDS:
         raise ApiError("invalid_kind", "Неизвестный тип импорта", 422, {"kind": kind})
+    from . import onboarding
+
+    if kind in onboarding.KINDS and not dataset_id:
+        raise ApiError("dataset_required", "Сначала создайте проект (набор данных), затем загружайте файлы этапа", 422)
     options = dict(options or {})
     table = read_table(data, filename, sheet)
     mapping = mapping or suggest_mapping(table.headers, kind)
@@ -519,8 +523,14 @@ def validate_upload(
             m.ImportBatch.status == "committed"))
         duplicate_of = prev.id if prev else None
 
+    if dataset is not None and kind in ("responses", "grades") and not program_version_id:
+        raise ApiError("missing_dependency", "Сначала загрузите учебную программу и банк заданий проекта.", 422,
+                       {"dependency": "program"})
     try:
-        _, summary = validate_rows(session, dataset, program_version_id, org.id, table, mapping, kind, options)
+        if kind in onboarding.KINDS:
+            summary = onboarding.validate(session, dataset, org.id, kind, table, mapping)
+        else:
+            _, summary = validate_rows(session, dataset, program_version_id, org.id, table, mapping, kind, options)
     except ApiError as exc:
         if exc.code != "mapping_incomplete":
             raise
@@ -567,6 +577,9 @@ def commit_batch(session: Session, org_id: str, batch_id: str, user_id: str | No
                 "rows_accepted": batch.rows_accepted, "rows_rejected": batch.rows_rejected}
     if batch.report.get("mapping_error"):
         raise ApiError("mapping_incomplete", "Сопоставление колонок не завершено", 422, batch.report["mapping_error"])
+    if batch.report.get("commit_allowed") is False:
+        raise ApiError("blocking_errors", "Загрузка невозможна: исправьте блокирующие ошибки и проверьте файл снова", 422,
+                       {"blocking": batch.report.get("blocking", []), "errors_by_code": batch.report.get("errors_by_code", {})})
     if batch.dataset_id:
         dup = session.scalar(select(m.ImportBatch).where(
             m.ImportBatch.dataset_id == batch.dataset_id, m.ImportBatch.file_sha256 == batch.file_sha256,
@@ -596,6 +609,10 @@ def commit_batch(session: Session, org_id: str, batch_id: str, user_id: str | No
 def _do_commit(session: Session, batch: m.ImportBatch, user_id: str | None) -> dict:
     data = Path(batch.storage_path).read_bytes()
     table = read_table(data, batch.filename, batch.sheet)
+    from . import onboarding
+
+    if batch.kind in onboarding.KINDS:
+        return _do_commit_onboarding(session, batch, table, user_id)
     dataset = None
     if batch.dataset_id:
         dataset = session.get(m.Dataset, batch.dataset_id)
@@ -674,15 +691,43 @@ def _do_commit(session: Session, batch: m.ImportBatch, user_id: str | None) -> d
             "rows_rejected": summary["rows_rejected"], "inserted": dict(inserted)}
 
 
+def _do_commit_onboarding(session: Session, batch: m.ImportBatch, table: Table, user_id: str | None) -> dict:
+    """Re-validate against the current state (another stage may have changed it) and commit atomically."""
+    from . import onboarding
+
+    dataset = session.get(m.Dataset, batch.dataset_id)
+    summary, accepted = onboarding.validate_full(session, dataset, batch.org_id, batch.kind, table, batch.column_mapping)
+    if not summary["commit_allowed"]:
+        raise ApiError("blocking_errors", "Данные изменились после проверки: исправьте ошибки и проверьте файл снова", 422,
+                       {"blocking": summary.get("blocking", []), "errors_by_code": summary.get("errors_by_code", {})})
+    inserted = onboarding.commit(session, dataset, batch, batch.kind, accepted)
+    _update_data_level(session, dataset, batch.kind)
+    version = bump_dataset_version(session, dataset, f"import:{batch.kind}:{batch.filename}", batch.id)
+    batch.status = "committed"
+    batch.committed_at = utcnow()
+    batch.resulting_dataset_version = version
+    batch.rows_total, batch.rows_accepted, batch.rows_rejected = summary["rows_total"], summary["rows_accepted"], summary["rows_rejected"]
+    batch.report = {**batch.report, "inserted": inserted, "errors_by_code": summary["errors_by_code"],
+                    "rejected_rows": summary["rejected_rows"]}
+    audit(session, dataset.org_id, user_id, "import.commit", "import_batch", batch.id, dataset_id=dataset.id,
+          dataset_version=version, kind=batch.kind, inserted=inserted)
+    return {"batch_id": batch.id, "status": "committed", "already_committed": False, "dataset_id": dataset.id,
+            "dataset_version": version, "rows_accepted": summary["rows_accepted"],
+            "rows_rejected": summary["rows_rejected"], "inserted": inserted}
+
+
 def _update_data_level(session: Session, dataset: m.Dataset, kind: str) -> None:
     if kind == "grades" and dataset.data_level == "grades_only":
         return
+    session.flush()
     stages = {a.stage for a in session.scalars(select(m.Assessment).where(m.Assessment.dataset_id == dataset.id))}
     has_exposure = session.scalar(select(m.MaterialExposure.id).where(m.MaterialExposure.dataset_id == dataset.id).limit(1))
     if "pre" in stages and "post" in stages and has_exposure:
         dataset.data_level = "pre_post_with_exposure"
     elif stages:
         dataset.data_level = "item_responses"
+    elif dataset.data_level not in ("grades_only",):
+        dataset.data_level = "setup"
 
 
 class _EntityCache:
@@ -765,3 +810,8 @@ class _EntityCache:
             self.s.add(m.MaterialExposure(org_id=self.ds.org_id, dataset_id=self.ds.id, cohort_id=cohort_id,
                                           edition_id=edition.id, topic_id=t.id, period_start=date(y0, 9, 1),
                                           period_end=date(y0 + 1, 5, 31), usage_level="primary"))
+
+
+from .onboarding import ONBOARDING_FIELDS  # noqa: E402  (onboarding kinds share the batch lifecycle)
+
+FIELDS.update(ONBOARDING_FIELDS)

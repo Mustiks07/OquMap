@@ -146,6 +146,165 @@ def list_datasets(p: P, session: DB):
     return [an.dataset_summary(d) for d in rows]
 
 
+class ProjectCreate(BaseModel):
+    name_ru: str
+    name_kz: str | None = None
+    description_ru: str = ""
+    is_synthetic: bool = False
+
+
+@router.post("/datasets", response_model=S.DatasetSummary, tags=["datasets"])
+def create_project(body: ProjectCreate, p: P, session: DB):
+    """Create an empty project (dataset) to be filled by the staged imports."""
+    p.require("methodist")
+    ratelimit.check(session, "import", p.org_id, "rate_import")
+    name = body.name_ru.strip()
+    if not name or len(name) > 300:
+        raise ApiError("validation_error", "Укажите название проекта (до 300 символов)", 422)
+    import uuid as _uuid
+
+    ds = m.Dataset(org_id=p.org_id, program_version_id=None, code=f"project-{_uuid.uuid4().hex[:8]}", name_ru=name,
+                   name_kz=(body.name_kz or name).strip()[:300], description_ru=body.description_ru[:2000],
+                   description_kz="", is_synthetic=body.is_synthetic or p.org.is_demo, data_level="setup", version=0,
+                   manifest={"source": "onboarding"})
+    session.add(ds)
+    from ..services.common import audit
+
+    audit(session, p.org_id, p.user_id, "dataset.create", "dataset", ds.id, name=name)
+    session.commit()
+    return an.dataset_summary(ds)
+
+
+@router.get("/datasets/{dataset_id}/project", tags=["datasets"])
+def project_status(dataset_id: str, p: P, session: DB) -> dict[str, Any]:
+    from ..services.onboarding import project_status as ps
+
+    return ps(session, an.get_dataset(session, p.org_id, dataset_id))
+
+
+@router.get("/imports/templates", tags=["imports"])
+def import_templates() -> dict[str, Any]:
+    from ..services import onboarding as ob
+
+    kinds = []
+    for k in ob.ORDER:
+        docs = ob.docs_for(k)
+        kinds.append({"kind": k, "order": ob.ORDER.index(k) + 1, "strict": k in ob.STRICT_KINDS,
+                      "fields": [{"name": f, "required": r, "description": d, "example": ex} for f, (r, d, ex) in docs.items()],
+                      "template_csv": f"/api/v1/imports/templates/{k}?format=csv",
+                      "template_xlsx": f"/api/v1/imports/templates/{k}?format=xlsx",
+                      "example_csv": f"/api/v1/imports/examples/{k}"})
+    return {"order": ob.ORDER, "kinds": kinds,
+            "rules": ["Коды (school_code, class_code, learner_code, item_code, objective_code …) — стабильные внешние ключи: "
+                      "не меняйте их между загрузками.",
+                      "Порядок: программа → издания → банк заданий → состав → ответы.",
+                      "Формулы в ячейках не допускаются и не вычисляются.",
+                      "Ученики — только псевдонимные коды, без ФИО и иных персональных данных."]}
+
+
+@router.get("/imports/templates/{kind}", tags=["imports"],
+            responses={200: {"content": {"text/csv": {}, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}}}})
+def import_template(kind: str, format: str = "xlsx"):
+    from ..services import onboarding as ob
+
+    if kind not in ob.ORDER:
+        raise not_found("template", kind)
+    docs = ob.docs_for(kind)
+    header = list(docs.keys())
+    example = [ex for _, _, ex in docs.values()]
+    if format == "csv":
+        import csv as _csv
+        import io as _io
+
+        buf = _io.StringIO()
+        w = _csv.writer(buf, lineterminator="\n")
+        w.writerow(header)
+        w.writerow(example)
+        return Response(("\ufeff" + buf.getvalue()).encode("utf-8"), media_type="text/csv; charset=utf-8",
+                        headers={"Content-Disposition": f'attachment; filename="oqumap-template-{kind}.csv"'})
+    if format != "xlsx":
+        raise ApiError("invalid_parameter", "format: csv | xlsx", 422)
+    import io as _io
+
+    from openpyxl import Workbook
+    from openpyxl.styles import Font
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "data"
+    ws.append(header)
+    ws.append(example)
+    for c in ws[1]:
+        c.font = Font(bold=True)
+    for row in ws.iter_rows():
+        for c in row:
+            c.data_type = "s"
+    info = wb.create_sheet("instructions")
+    info.append(["Поле", "Обязательно", "Описание", "Пример"])
+    for f, (r, d, ex) in docs.items():
+        info.append([f, "да" if r else "нет", d, ex])
+    info.append([])
+    info.append(["Лист data: первая строка — заголовки (не переименовывать), вторая — пример (удалите перед загрузкой)."])
+    info.append(["Коды — стабильные внешние ключи. Формулы не допускаются. Ученики — только псевдонимные коды."])
+    info.column_dimensions["A"].width = 22
+    info.column_dimensions["C"].width = 80
+    buf = _io.BytesIO()
+    wb.save(buf)
+    return Response(buf.getvalue(), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    headers={"Content-Disposition": f'attachment; filename="oqumap-template-{kind}.xlsx"'})
+
+
+@router.get("/imports/examples/{kind}", tags=["imports"], responses={200: {"content": {"text/csv": {}}}})
+def import_example(kind: str):
+    from ..config import REPO_ROOT
+    from ..services import onboarding as ob
+
+    if kind not in ob.ORDER:
+        raise not_found("example", kind)
+    path = REPO_ROOT / "data" / "templates" / "example_project" / f"{ob.ORDER.index(kind) + 1}_{kind}.csv"
+    return Response(path.read_bytes(), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="example-{path.name}"'})
+
+
+# ---------------------------------------------------------------------------
+# Users (non-demo organisations)
+# ---------------------------------------------------------------------------
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    display_name: str = ""
+    roles: list[str]
+
+
+class UserUpdate(BaseModel):
+    roles: list[str] | None = None
+    is_active: bool | None = None
+    password: str | None = None
+
+
+@router.get("/admin/users", tags=["admin"])
+def admin_users(p: P, session: DB) -> list[dict[str, Any]]:
+    from ..services import admin
+
+    return admin.list_users(session, p)
+
+
+@router.post("/admin/users", tags=["admin"])
+def admin_create_user(body: UserCreate, p: P, session: DB) -> dict[str, Any]:
+    from ..services import admin
+
+    return admin.create_user(session, p, body.username, body.password, body.display_name, body.roles)
+
+
+@router.post("/admin/users/{user_id}", tags=["admin"])
+def admin_update_user(user_id: str, body: UserUpdate, p: P, session: DB) -> dict[str, Any]:
+    from ..services import admin
+
+    return admin.update_user(session, p, user_id, body.roles, body.is_active, body.password)
+
+
 @router.get("/datasets/{dataset_id}", response_model=S.DatasetSummary, tags=["datasets"])
 def get_dataset(dataset_id: str, p: P, session: DB):
     return an.dataset_summary(an.get_dataset(session, p.org_id, dataset_id))

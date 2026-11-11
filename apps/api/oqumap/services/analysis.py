@@ -84,6 +84,9 @@ class DatasetFrame:
 def load_meta(session: Session, org_id: str, dataset_id: str) -> DatasetFrame:
     ds = get_dataset(session, org_id, dataset_id)
     pv = ds.program_version_id
+    if pv is None:
+        raise ApiError("project_incomplete", "Проект ещё не настроен: загрузите программу, банк заданий, состав и ответы.", 409,
+                       {"dataset_id": ds.id})
     topics = list(session.scalars(select(m.Topic).where(m.Topic.program_version_id == pv).order_by(m.Topic.order_index)))
     objectives = list(session.scalars(select(m.LearningObjective).where(m.LearningObjective.program_version_id == pv)
                                       .order_by(m.LearningObjective.code)))
@@ -424,7 +427,7 @@ def topic_evidence(session: Session, org_id: str, dataset_id: str, topic_id: str
         n_ans_learners = len(answered_learners)
         misconceptions = []
         for code, learners in sorted(misconception_learners.items(), key=lambda kv: -len(kv[1])):
-            ru, kz, check = MISCONCEPTIONS[code]
+            ru, kz, check = MISCONCEPTIONS.get(code, (code, code, "Проверить гипотезу дополнительным заданием."))
             misconceptions.append({
                 "code": code, "label_ru": ru, "label_kz": kz, "diagnostic_check_ru": check,
                 "n_learners": len(learners), "share_of_learners": (len(learners) / n_ans_learners) if n_ans_learners else None,
@@ -684,6 +687,16 @@ def _compare_topic(session: Session, meta: DatasetFrame, topic: m.Topic, req: Co
 
 
 def dataset_quality(session: Session, org_id: str, dataset_id: str) -> dict:
+    ds0 = get_dataset(session, org_id, dataset_id)
+    if ds0.program_version_id is None:
+        from .onboarding import project_status
+
+        return {"dataset": dataset_summary(ds0), "counts": {"schools": 0, "classes": 0, "learners": 0, "teachers": 0,
+                                                            "grade_records": 0},
+                "assessments": [], "imports": [batch_summary(b) for b in session.scalars(
+                    select(m.ImportBatch).where(m.ImportBatch.dataset_id == ds0.id).order_by(m.ImportBatch.created_at))],
+                "data_level": "setup", "capabilities": {"possible": [], "missing": ["program", "item_bank", "roster", "responses"]},
+                "editions_in_use": [], "versions": [], "attempt_rule_note": "first", "project": project_status(session, ds0)}
     meta = load_meta(session, org_id, dataset_id)
     ds = meta.dataset
     batches = list(session.scalars(select(m.ImportBatch).where(m.ImportBatch.dataset_id == ds.id).order_by(m.ImportBatch.created_at)))
@@ -703,6 +716,7 @@ def dataset_quality(session: Session, org_id: str, dataset_id: str) -> dict:
     grades = session.query(m.GradeRecord).filter(m.GradeRecord.dataset_id == ds.id).count()
     level = ds.data_level
     capabilities = {
+        "setup": {"possible": [], "missing": ["program", "item_bank", "roster", "responses"]},
         "grades_only": {"possible": ["grades_overview"], "missing": ["item_level_responses", "item_objective_links",
                                                                       "baseline_assessment", "material_exposure"]},
         "item_responses": {"possible": ["topic_diagnostics", "error_analysis"],
@@ -725,6 +739,7 @@ def dataset_quality(session: Session, org_id: str, dataset_id: str) -> dict:
                      for v in session.scalars(select(m.DatasetVersionEvent).where(m.DatasetVersionEvent.dataset_id == ds.id)
                                               .order_by(m.DatasetVersionEvent.version))],
         "attempt_rule_note": "first",
+        "project": __import__("oqumap.services.onboarding", fromlist=["project_status"]).project_status(session, ds),
     }
 
 

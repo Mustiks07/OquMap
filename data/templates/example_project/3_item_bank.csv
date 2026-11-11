@@ -1,0 +1,18 @@
+form_code,form_name,form_stage,scale_code,scale_linking,item_code,position,stem_ru,item_type,options,answer_key,max_points,objective_codes,mapping_status
+EX-PRE,Входная проверка,pre,EX-S-PRE,identical_form,EX-I01,1,Вычислите 248 + 175,single_choice,A=423|B=413|C=323|D=4213,A,1,EX-1.1,confirmed
+EX-PRE,Входная проверка,pre,EX-S-PRE,identical_form,EX-I02,2,Вычислите 502 − 137,single_choice,A=375|B=365|C=435|D=465,B,1,EX-1.1,confirmed
+EX-PRE,Входная проверка,pre,EX-S-PRE,identical_form,EX-I04,3,Вычислите 125 · 8,single_choice,A=1000|B=1008|C=900|D=133,A,1,EX-1.2,confirmed
+EX-PRE,Входная проверка,pre,EX-S-PRE,identical_form,EX-I05,4,Какая дробь больше: 3/7 или 4/7?,single_choice,A=3/7|B=4/7|C=равны|D=нельзя сравнить,B,1,EX-2.1,confirmed
+EX-PRE,Входная проверка,pre,EX-S-PRE,identical_form,EX-I09,5,Запишите 3/10 десятичной дробью,single_choice,"A=0,03|B=3,10|C=0,3|D=0,310",C,1,EX-3.1,confirmed
+EX-PRE,Входная проверка,pre,EX-S-PRE,identical_form,EX-I12,6,"Какое число больше: 0,5 или 0,45?",single_choice,"A=0,45|B=0,5|C=равны|D=нельзя сравнить",B,1,EX-3.1,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I01,1,Вычислите 248 + 175,single_choice,A=423|B=413|C=323|D=4213,A,1,EX-1.1,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I03,2,Вычислите 34 · 12,single_choice,A=68|B=408|C=348|D=46,B,1,EX-1.2,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I04,3,Вычислите 125 · 8,single_choice,A=1000|B=1008|C=900|D=133,A,1,EX-1.2,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I05,4,Какая дробь больше: 3/7 или 4/7?,single_choice,A=3/7|B=4/7|C=равны|D=нельзя сравнить,B,1,EX-2.1,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I06,5,Какая дробь меньше: 1/3 или 1/5?,single_choice,A=1/3|B=1/5|C=равны|D=нельзя сравнить,B,1,EX-2.1,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I07,6,Вычислите 2/9 + 5/9,single_choice,A=7/18|B=7/9|C=10/9|D=3/9,B,1,EX-2.2,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I08,7,Вычислите 7/10 − 3/10,single_choice,A=4/10|B=4/0|C=10/10|D=4/20,A,1,EX-2.2,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I09,8,Запишите 3/10 десятичной дробью,single_choice,"A=0,03|B=3,10|C=0,3|D=0,310",C,1,EX-3.1,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I10,9,"Вычислите 0,4 + 0,35",single_choice,"A=0,39|B=0,75|C=7,5|D=0,075",B,1,EX-3.2,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I11,10,"Купили 1,2 кг яблок и 0,8 кг груш. Сколько всего?",single_choice,"A=2|B=1,10|C=2,0|D=20",A,1,EX-3.2:0.5;EX-1.1:0.5,confirmed
+EX-POST,Итоговая проверка,post,EX-S-POST,identical_form,EX-I12,11,"Какое число больше: 0,5 или 0,45?",single_choice,"A=0,45|B=0,5|C=равны|D=нельзя сравнить",B,1,EX-3.1,confirmed
