@@ -22,6 +22,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -235,8 +236,14 @@ class PilotConclusion(IdMixin, TimestampMixin, Base):
     evidence_ids: Mapped[list] = mapped_column(JSON, default=list)
     next_decision_id: Mapped[str | None] = mapped_column(ForeignKey("decisions.id"), nullable=True)
     created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    decision_basis: Mapped[str] = mapped_column(String(30), default="insufficient_evidence", server_default="insufficient_evidence")
+    stop_reason_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    acknowledged_limitation_codes: Mapped[list] = mapped_column(JSON, default=list, server_default=text("'[]'"))
     __table_args__ = (CheckConstraint(_in("decision", ("continue", "modify", "stop", "extend_data_collection")),
-                                      name="ck_pilot_conclusions_decision"),)
+                                      name="ck_pilot_conclusions_decision"),
+                      CheckConstraint(_in("decision_basis", ("evidence_supports", "operational", "insufficient_evidence",
+                                                             "external_factors")), name="ck_pilot_conclusions_basis"),
+                      CheckConstraint("decision <> 'stop' OR stop_reason_code IS NOT NULL", name="ck_pilot_conclusions_stop_reason"))
 
 
 class InterventionEvidenceEntry(IdMixin, TimestampMixin, Base):

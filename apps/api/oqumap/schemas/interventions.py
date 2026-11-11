@@ -519,6 +519,8 @@ class AnalysisPlan(BaseModel):
     omitted_policy: Literal["as_incorrect", "exclude"] = "as_incorrect"
     min_matched_learners: int = Field(default=30, ge=10, le=10000)
     notes: str = Field(default="", max_length=2000)
+    # interrupted_time_series / stepped_wedge: OquMap stores the protocol only; results are analysed externally
+    external_analysis_acknowledged: bool = False
 
 
 class PilotCreate(BaseModel):
@@ -576,6 +578,7 @@ class PilotPatch(BaseModel):
 class TransitionRequest(BaseModel):
     to_status: PilotStatus
     note: str = Field(default="", max_length=1000)
+    override_future_end: bool = False  # completing before the planned end date requires an explicit override + note
 
 
 class RandomizeRequest(BaseModel):
@@ -614,6 +617,7 @@ class PilotOut(Model):
     design: Design
     assignment_unit: str
     causal_ceiling: Label
+    analysis_mode: Literal["built_in", "protocol_only_external_analysis"]
     intervention_id: str
     intervention_version_id: str
     intervention_version: int
@@ -790,6 +794,11 @@ class ConclusionCreate(BaseModel):
     create_next_decision_version: bool = True
     next_action_ru: str = Field(default="", max_length=4000)
     propose_evidence_update: bool = True
+    # structured basis of the decision (the free text is only a description, never a control)
+    decision_basis: Literal["evidence_supports", "operational", "insufficient_evidence", "external_factors"] = "insufficient_evidence"
+    stop_reason_code: Literal["implementation_not_feasible", "resource_constraints", "priority_change", "safety_or_harm_concern",
+                              "replaced_by_alternative", "other"] | None = None
+    acknowledged_limitation_codes: list[str] = Field(default_factory=list, max_length=30)
 
 
 class EvidenceReview(BaseModel):
@@ -803,6 +812,9 @@ class ConclusionOut(Model):
     outcome_id: str
     outcome_status: str
     decision: str
+    decision_basis: str
+    stop_reason_code: str | None
+    acknowledged_limitation_codes: list[str]
     summary_ru: str
     summary_kz: str
     lessons_ru: str

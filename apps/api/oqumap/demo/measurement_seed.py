@@ -367,7 +367,8 @@ def seed_measurement(session: Session, org_id: str) -> dict:
     o1 = loop.run_follow_up(session, p, p1["id"], S.FollowUpRun())
     loop.run_follow_up(session, p, p2["id"], S.FollowUpRun())
     c1 = loop.create_conclusion(session, p, p1["id"], S.ConclusionCreate(
-        outcome_id=o1["id"], decision="continue",
+        outcome_id=o1["id"], decision="continue", decision_basis="evidence_supports",
+        acknowledged_limitation_codes=["observational_design", "synthetic_data_only"],
         summary_ru="В 6А классах изменение по цели 3.1 больше, чем в 6Б, при высокой реализации. Дизайн — подобранное сравнение: "
                    "это связь с поправкой на входной уровень, а не доказанный эффект.",
         lessons_ru="Полоса дробей выполнима в формате 3×20 минут; чек-лист самопроверки удобен для журнала реализации.",

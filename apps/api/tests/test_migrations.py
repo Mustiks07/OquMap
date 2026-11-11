@@ -16,7 +16,7 @@ from oqumap.db import Base
 API = Path(__file__).resolve().parents[1]
 PREVIOUS = "d964e255551f"
 MEASUREMENT = "c2a7e5f1b3d9"
-HEAD = "e1a4b7c9d2f0"
+HEAD = "f3c5d8e2a7b1"
 NEW_TABLES = {"interventions", "intervention_versions", "intervention_targets", "pilots", "pilot_cohorts", "pilot_events",
               "fidelity_logs", "pilot_outcomes", "pilot_conclusions", "intervention_evidence", "assessment_cohorts"}
 

@@ -5,7 +5,18 @@ from datetime import date, timedelta
 
 import pytest
 from conftest import login
-from mhelpers import DEMO_ORG, OTHER_ORG, assessment, cohorts, curriculum, dataset, intervention_body, items, objective, topic
+from mhelpers import (
+    DEMO_ORG,
+    OTHER_ORG,
+    assessment,
+    cohorts,
+    curriculum,
+    dataset,
+    intervention_body,
+    items,
+    objective,
+    topic,
+)
 
 from oqumap import db
 from oqumap import measurement_models as mm

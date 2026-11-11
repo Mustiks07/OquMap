@@ -137,6 +137,11 @@
             "title": "Attempt Rule",
             "type": "string"
           },
+          "external_analysis_acknowledged": {
+            "default": false,
+            "title": "External Analysis Acknowledged",
+            "type": "boolean"
+          },
           "min_matched_learners": {
             "default": 30,
             "maximum": 10000.0,
@@ -1144,6 +1149,14 @@
       },
       "ConclusionCreate": {
         "properties": {
+          "acknowledged_limitation_codes": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Acknowledged Limitation Codes",
+            "type": "array"
+          },
           "create_next_decision_version": {
             "default": true,
             "title": "Create Next Decision Version",
@@ -1157,6 +1170,17 @@
               "extend_data_collection"
             ],
             "title": "Decision",
+            "type": "string"
+          },
+          "decision_basis": {
+            "default": "insufficient_evidence",
+            "enum": [
+              "evidence_supports",
+              "operational",
+              "insufficient_evidence",
+              "external_factors"
+            ],
+            "title": "Decision Basis",
             "type": "string"
           },
           "evidence_ids": {
@@ -1196,6 +1220,25 @@
             "title": "Propose Evidence Update",
             "type": "boolean"
           },
+          "stop_reason_code": {
+            "anyOf": [
+              {
+                "enum": [
+                  "implementation_not_feasible",
+                  "resource_constraints",
+                  "priority_change",
+                  "safety_or_harm_concern",
+                  "replaced_by_alternative",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stop Reason Code"
+          },
           "summary_kz": {
             "default": "",
             "maxLength": 4000,
@@ -1220,6 +1263,13 @@
       "ConclusionOut": {
         "additionalProperties": true,
         "properties": {
+          "acknowledged_limitation_codes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Acknowledged Limitation Codes",
+            "type": "array"
+          },
           "created_at": {
             "title": "Created At",
             "type": "string"
@@ -1237,6 +1287,10 @@
           },
           "decision": {
             "title": "Decision",
+            "type": "string"
+          },
+          "decision_basis": {
+            "title": "Decision Basis",
             "type": "string"
           },
           "evidence_entry": {
@@ -1296,6 +1350,17 @@
             "title": "Pilot Id",
             "type": "string"
           },
+          "stop_reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stop Reason Code"
+          },
           "summary_kz": {
             "title": "Summary Kz",
             "type": "string"
@@ -1311,6 +1376,9 @@
           "outcome_id",
           "outcome_status",
           "decision",
+          "decision_basis",
+          "stop_reason_code",
+          "acknowledged_limitation_codes",
           "summary_ru",
           "summary_kz",
           "lessons_ru",
@@ -5875,6 +5943,14 @@
             "title": "Allowed Transitions",
             "type": "array"
           },
+          "analysis_mode": {
+            "enum": [
+              "built_in",
+              "protocol_only_external_analysis"
+            ],
+            "title": "Analysis Mode",
+            "type": "string"
+          },
           "analysis_plan": {
             "additionalProperties": true,
             "title": "Analysis Plan",
@@ -6144,6 +6220,7 @@
           "design",
           "assignment_unit",
           "causal_ceiling",
+          "analysis_mode",
           "intervention_id",
           "intervention_version_id",
           "intervention_version",
@@ -8345,6 +8422,11 @@
             "maxLength": 1000,
             "title": "Note",
             "type": "string"
+          },
+          "override_future_end": {
+            "default": false,
+            "title": "Override Future End",
+            "type": "boolean"
           },
           "to_status": {
             "enum": [

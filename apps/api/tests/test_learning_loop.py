@@ -259,16 +259,34 @@ def test_comparability_and_small_samples_are_honest(flow):
     assert r.status_code == 422 and r.json()["error"]["code"] == "outcome_before_start"
 
 
-def test_stop_after_low_fidelity_requires_explaining_implementation(flow):
+def test_stop_after_low_fidelity_requires_structured_operational_basis(flow):
     c, H, ds, cur = flow
     p2 = pilot_by_code(c, H, "PIL-M02")
     o2 = c.get(f"/api/v1/pilots/{p2['id']}/outcomes", headers=H).json()[0]
-    r = c.post(f"/api/v1/pilots/{p2['id']}/conclusions", json={"outcome_id": o2["id"], "decision": "stop",
-                                                                "summary_ru": "Интервенция не работает, прекращаем."}, headers=H)
-    assert r.status_code == 422 and r.json()["error"]["code"] == "conclusion_misreads_fidelity"
-    ok = c.post(f"/api/v1/pilots/{p2['id']}/conclusions", json={
-        "outcome_id": o2["id"], "decision": "extend_data_collection", "create_next_decision_version": False,
-        "summary_ru": "Реализация низкая: проверить эффективность не удалось. Повторить с поддержкой учителей."}, headers=H).json()
+    url = f"/api/v1/pilots/{p2['id']}/conclusions"
+    base = {"outcome_id": o2["id"], "create_next_decision_version": False}
+
+    def post(**kw):
+        return c.post(url, json={**base, **kw}, headers=H)
+
+    # the text is irrelevant: mentioning "реализация" no longer passes, and the structure decides
+    r = post(decision="stop", summary_ru="Реализация низкая, останавливаем.", stop_reason_code="resource_constraints")
+    assert r.status_code == 422 and r.json()["error"]["code"] == "stop_requires_operational_basis"
+    assert post(decision="stop", summary_ru="Останавливаем пилот.", decision_basis="operational",
+                acknowledged_limitation_codes=["no_effectiveness_conclusion", "requires_new_pilot_or_implementation"]
+                ).json()["error"]["code"] == "stop_reason_required"
+    assert post(decision="continue", summary_ru="Интервенция работает, продолжаем.", decision_basis="evidence_supports"
+                ).json()["error"]["code"] == "basis_inconsistent_with_outcome"
+    assert post(decision="continue", summary_ru="Продолжаем наблюдение.", acknowledged_limitation_codes=["made_up"]
+                ).json()["error"]["code"] == "unknown_limitation_code"
+    ok_stop = post(decision="stop", summary_ru="Интервенция не работает, прекращаем.", decision_basis="operational",
+                   stop_reason_code="implementation_not_feasible",
+                   acknowledged_limitation_codes=["no_effectiveness_conclusion", "requires_new_pilot_or_implementation", "fidelity_low"])
+    assert ok_stop.status_code == 200, ok_stop.text  # allowed: structurally an operational stop, not a verdict
+    body = ok_stop.json()
+    assert body["decision_basis"] == "operational" and body["stop_reason_code"] == "implementation_not_feasible"
+    assert "no_effectiveness_conclusion" in body["acknowledged_limitation_codes"]
+    ok = post(decision="extend_data_collection", summary_ru="Реализация низкая: проверить эффективность не удалось.").json()
     assert ok["next_decision_id"] is None and ok["evidence_entry"]["outcome_status"] == "invalid_due_to_fidelity"
     # accepting an uninterpretable result requires a note
     rv = c.post(f"/api/v1/intervention-evidence/{ok['evidence_entry']['id']}/review", json={"accept": True}, headers=H)

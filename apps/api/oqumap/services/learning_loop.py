@@ -38,7 +38,7 @@ from .auth import Principal
 from .common import audit, fingerprint
 from .fidelity import DETAIL_ROLES, fidelity_for, logs_fingerprint, resolve_as_of
 from .measurement_messages import CAUSAL_LEVELS, FIDELITY_LABELS, STATUS_LABELS, label, render
-from .pilots import get_pilot, pilot_cohorts
+from .pilots import PROTOCOL_ONLY_DESIGNS, get_pilot, pilot_cohorts
 
 METHOD_VERSION_LOOP = "loop-v1"
 MIN_CLUSTERS_CI = 5
@@ -429,6 +429,9 @@ def outcome_payload(session: Session, o: mm.PilotOutcome, p: Principal | None = 
 def run_follow_up(session: Session, p: Principal, pilot_id: str, body: S.FollowUpRun) -> dict:
     p.require("methodist")
     pl = get_pilot(session, p.org_id, pilot_id)
+    if pl.design in PROTOCOL_ONLY_DESIGNS:
+        raise ApiError("protocol_only_external_analysis", "Для этого дизайна OquMap хранит протокол; результат рассчитывается вне системы",
+                       409, {"design": pl.design})
     if pl.status not in ("active", "completed"):
         raise ApiError("pilot_not_running", "Повторное измерение доступно для активного или завершённого пилота", 409,
                        {"status": pl.status})
@@ -540,6 +543,36 @@ def _next_decision(session: Session, p: Principal, pl: mm.Pilot, o: mm.PilotOutc
     return d
 
 
+UNINTERPRETABLE = {"invalid_due_to_fidelity", "invalid_due_to_comparability", "needs_more_data"}
+STANDARD_ACKS = {"no_effectiveness_conclusion", "requires_new_pilot_or_implementation", "synthetic_data_only",
+                 "observational_design", "interim_result"}
+
+
+def check_conclusion_basis(o: mm.PilotOutcome, body: S.ConclusionCreate) -> None:
+    """Structured guardrail (the summary text is never inspected):
+    * acknowledged codes must be standard acknowledgements or reason codes of this outcome;
+    * an uninterpretable outcome cannot be called 'evidence_supports';
+    * 'stop' needs a stop_reason_code; after an uninterpretable outcome it must be an operational decision that
+      explicitly acknowledges 'no_effectiveness_conclusion' and 'requires_new_pilot_or_implementation'."""
+    allowed = STANDARD_ACKS | {r.get("code") for r in (o.result or {}).get("reasons", [])}
+    unknown = sorted(set(body.acknowledged_limitation_codes) - allowed)
+    if unknown:
+        raise ApiError("unknown_limitation_code", "Неизвестный код ограничения", 422, {"codes": unknown, "allowed": sorted(allowed)})
+    if o.status in UNINTERPRETABLE and body.decision_basis == "evidence_supports":
+        raise ApiError("basis_inconsistent_with_outcome", "Результат не интерпретируется: решение не может опираться на него как на доказательство",
+                       422, {"outcome_status": o.status})
+    if body.decision == "stop":
+        if not body.stop_reason_code:
+            raise ApiError("stop_reason_required", "Для решения «остановить» укажите код причины", 422)
+        if o.status in UNINTERPRETABLE:
+            need = {"no_effectiveness_conclusion", "requires_new_pilot_or_implementation"}
+            if body.decision_basis != "operational" or not need <= set(body.acknowledged_limitation_codes):
+                raise ApiError("stop_requires_operational_basis",
+                               "Результат не интерпретируется: остановка допустима только как операционное решение без вывода "
+                               "о неэффективности, с указанием, что нужен другой пилот или способ реализации.", 422,
+                               {"required_basis": "operational", "required_acknowledgements": sorted(need)})
+
+
 def create_conclusion(session: Session, p: Principal, pilot_id: str, body: S.ConclusionCreate) -> dict:
     p.require("methodist")
     pl = get_pilot(session, p.org_id, pilot_id)
@@ -547,17 +580,15 @@ def create_conclusion(session: Session, p: Principal, pilot_id: str, body: S.Con
                                                      mm.PilotOutcome.org_id == p.org_id))
     if o is None:
         raise not_found("pilot_outcome", body.outcome_id)
-    if body.decision == "stop" and o.status == "invalid_due_to_fidelity" and "fidelity" not in body.summary_ru.lower() \
-            and "реализац" not in body.summary_ru.lower():
-        raise ApiError("conclusion_misreads_fidelity",
-                       "Результат не интерпретируется из-за недостаточной реализации: при решении «остановить» объясните, "
-                       "что причина не в доказанной неэффективности (упомяните реализацию).", 422)
+    check_conclusion_basis(o, body)
     evidence = _valid_evidence_ids(session, pl, body.evidence_ids, o.id)
     c = mm.PilotConclusion(org_id=p.org_id, pilot_id=pl.id, outcome_id=o.id, decision=body.decision,
                            summary_ru=ivs.clean_text(body.summary_ru, 4000), summary_kz=ivs.clean_text(body.summary_kz, 4000),
                            lessons_ru=ivs.clean_text(body.lessons_ru, 4000),
                            open_questions=[ivs.clean_text(q, 500) for q in body.open_questions if ivs.clean_text(q, 500)],
-                           evidence_ids=evidence, created_by=p.user_id)
+                           evidence_ids=evidence, created_by=p.user_id, decision_basis=body.decision_basis,
+                           stop_reason_code=body.stop_reason_code if body.decision == "stop" else None,
+                           acknowledged_limitation_codes=sorted(set(body.acknowledged_limitation_codes)))
     session.add(c)
     session.flush()
     if body.create_next_decision_version:
@@ -582,6 +613,8 @@ def conclusion_payload(session: Session, c: mm.PilotConclusion) -> dict:
     e = session.scalar(select(mm.InterventionEvidenceEntry).where(mm.InterventionEvidenceEntry.conclusion_id == c.id))
     users = ivs._users(session, [c.created_by])
     return {"id": c.id, "pilot_id": c.pilot_id, "outcome_id": c.outcome_id, "outcome_status": o.status, "decision": c.decision,
+            "decision_basis": c.decision_basis, "stop_reason_code": c.stop_reason_code,
+            "acknowledged_limitation_codes": c.acknowledged_limitation_codes or [],
             "summary_ru": c.summary_ru, "summary_kz": c.summary_kz, "lessons_ru": c.lessons_ru, "open_questions": c.open_questions,
             "evidence_ids": c.evidence_ids, "next_decision_id": c.next_decision_id,
             "evidence_entry": ({"id": e.id, "review_status": e.review_status, "outcome_status": e.outcome_status,

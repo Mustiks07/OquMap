@@ -1193,6 +1193,11 @@ export interface components {
              */
             attempt_rule: "first" | "last";
             /**
+             * External Analysis Acknowledged
+             * @default false
+             */
+            external_analysis_acknowledged: boolean;
+            /**
              * Min Matched Learners
              * @default 30
              */
@@ -1590,6 +1595,8 @@ export interface components {
         };
         /** ConclusionCreate */
         ConclusionCreate: {
+            /** Acknowledged Limitation Codes */
+            acknowledged_limitation_codes?: string[];
             /**
              * Create Next Decision Version
              * @default true
@@ -1600,6 +1607,12 @@ export interface components {
              * @enum {string}
              */
             decision: "continue" | "modify" | "stop" | "extend_data_collection";
+            /**
+             * Decision Basis
+             * @default insufficient_evidence
+             * @enum {string}
+             */
+            decision_basis: "evidence_supports" | "operational" | "insufficient_evidence" | "external_factors";
             /** Evidence Ids */
             evidence_ids?: string[];
             /**
@@ -1621,6 +1634,8 @@ export interface components {
              * @default true
              */
             propose_evidence_update: boolean;
+            /** Stop Reason Code */
+            stop_reason_code?: ("implementation_not_feasible" | "resource_constraints" | "priority_change" | "safety_or_harm_concern" | "replaced_by_alternative" | "other") | null;
             /**
              * Summary Kz
              * @default
@@ -1631,12 +1646,16 @@ export interface components {
         };
         /** ConclusionOut */
         ConclusionOut: {
+            /** Acknowledged Limitation Codes */
+            acknowledged_limitation_codes: string[];
             /** Created At */
             created_at: string;
             /** Created By */
             created_by: string | null;
             /** Decision */
             decision: string;
+            /** Decision Basis */
+            decision_basis: string;
             /** Evidence Entry */
             evidence_entry: {
                 [key: string]: unknown;
@@ -1657,6 +1676,8 @@ export interface components {
             outcome_status: string;
             /** Pilot Id */
             pilot_id: string;
+            /** Stop Reason Code */
+            stop_reason_code: string | null;
             /** Summary Kz */
             summary_kz: string;
             /** Summary Ru */
@@ -3184,6 +3205,11 @@ export interface components {
         PilotOut: {
             /** Allowed Transitions */
             allowed_transitions: string[];
+            /**
+             * Analysis Mode
+             * @enum {string}
+             */
+            analysis_mode: "built_in" | "protocol_only_external_analysis";
             /** Analysis Plan */
             analysis_plan: {
                 [key: string]: unknown;
@@ -3989,6 +4015,11 @@ export interface components {
              * @default
              */
             note: string;
+            /**
+             * Override Future End
+             * @default false
+             */
+            override_future_end: boolean;
             /**
              * To Status
              * @enum {string}

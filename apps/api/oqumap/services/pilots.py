@@ -48,10 +48,16 @@ TRANSITIONS: dict[tuple[str, str], tuple[str, ...]] = {
 DESIGN_CEILING = {
     "single_group": "descriptive_change",
     "matched_comparison": "descriptive_comparison",  # → adjusted_association when baseline adjustment is pre-registered
-    "interrupted_time_series": "quasi_experimental_trend",
+    "interrupted_time_series": "external_analysis_required",  # protocol only: no built-in estimate
     "cluster_randomized": "causal_estimate",
-    "stepped_wedge": "causal_estimate",
+    "stepped_wedge": "external_analysis_required",
 }
+PROTOCOL_ONLY_DESIGNS = {"interrupted_time_series", "stepped_wedge"}
+COMPARISON_DESIGNS = {"matched_comparison", "cluster_randomized"}
+
+
+def analysis_mode(design: str) -> str:
+    return "protocol_only_external_analysis" if design in PROTOCOL_ONLY_DESIGNS else "built_in"
 
 
 def causal_ceiling(design: str, analysis_plan: dict) -> str:
@@ -297,6 +303,26 @@ def validate_protocol(session: Session, pl: mm.Pilot, for_status: str = "ready")
         a = session.get(m.Assessment, pl.baseline_assessment_id)
         if a.administered_on and a.administered_on > pl.start_date:
             errors.append(render("baseline_after_start", {}, "fail"))
+    if pl.end_date and pl.follow_up_due and pl.follow_up_due < pl.end_date:
+        errors.append(render("follow_up_before_end", {}, "fail"))
+    if pl.outcome_assessment_id and pl.start_date:
+        oa = session.get(m.Assessment, pl.outcome_assessment_id)
+        if oa.administered_on and oa.administered_on < pl.start_date:
+            errors.append(render("outcome_before_start", {}, "fail"))
+    if pl.start_date and pl.end_date and pl.end_date >= pl.start_date:
+        cal_weeks = round(((pl.end_date - pl.start_date).days + 1) / 7)
+        if abs(cal_weeks - pl.duration_weeks) > 1:
+            warnings.append(render("duration_calendar_mismatch", {"weeks": pl.duration_weeks, "calendar_weeks": cal_weeks}, "warn"))
+    plan = pl.analysis_plan or {}
+    est = plan.get("primary_estimand")
+    if est and ((pl.design in COMPARISON_DESIGNS and est != "difference_in_mean_changes")
+                or (pl.design == "single_group" and est != "mean_paired_change")
+                or pl.design in PROTOCOL_ONLY_DESIGNS):
+        errors.append(render("estimand_design_mismatch", {"estimand": est, "design": pl.design}, "fail"))
+    if pl.design in PROTOCOL_ONLY_DESIGNS:
+        if not plan.get("external_analysis_acknowledged"):
+            errors.append(render("external_analysis_not_acknowledged", {"design": pl.design}, "fail"))
+        warnings.append(render("protocol_only_external_analysis", {"design": pl.design}, "warn"))
     inter = [c for c in cohorts if c.arm == "intervention"]
     comp = [c for c in cohorts if c.arm == "comparison"]
     if not inter:
@@ -388,6 +414,10 @@ def transition(session: Session, p: Principal, pilot_id: str, body: S.Transition
             raise ApiError("snapshot_mismatch", "Снимок интервенции не совпадает с рецензированной версией", 409,
                            {"failed_checks": failed})
         pl.activated_by, pl.activated_at = p.user_id, utcnow()
+    if body.to_status == "completed" and pl.end_date and pl.end_date > clock.today():
+        if not body.override_future_end or len(note) < 3:
+            raise ApiError("end_date_in_future", "Плановая дата окончания ещё не наступила: нужен явный override с причиной", 409,
+                           {"end_date": pl.end_date.isoformat(), "today": clock.today().isoformat()})
     if body.to_status == "stopped":
         if len(note) < 3:
             raise ApiError("validation_error", "Укажите причину остановки", 422, {"field": "note"})
@@ -447,6 +477,7 @@ def payload(session: Session, pl: mm.Pilot, p: Principal | None = None) -> dict:
     return {
         "id": pl.id, "code": pl.code, "title": pl.title, "dataset_id": pl.dataset_id, "status": pl.status, "design": pl.design,
         "assignment_unit": pl.assignment_unit, "causal_ceiling": label(CAUSAL_LEVELS, pl.causal_ceiling),
+        "analysis_mode": analysis_mode(pl.design),
         "intervention_id": pl.intervention_id, "intervention_code": iv.code, "intervention_version_id": pl.intervention_version_id,
         "intervention_version": v.version, "intervention_snapshot": pl.intervention_snapshot, "snapshot_sha256": pl.snapshot_sha256,
         "snapshot_locked": pl.status != "draft", "decision_id": pl.decision_id,

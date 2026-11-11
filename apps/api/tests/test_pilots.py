@@ -22,7 +22,8 @@ def test_causal_ceiling_is_derived_from_design():
     assert causal_ceiling("matched_comparison", {"adjustment": "none"}) == "descriptive_comparison"
     assert causal_ceiling("matched_comparison", {"adjustment": "baseline_strata"}) == "adjusted_association"
     assert causal_ceiling("cluster_randomized", {}) == "causal_estimate"
-    assert causal_ceiling("interrupted_time_series", {}) == "quasi_experimental_trend"
+    assert causal_ceiling("interrupted_time_series", {}) == "external_analysis_required"  # protocol only
+    assert causal_ceiling("stepped_wedge", {}) == "external_analysis_required"
 
 
 def test_transition_table_has_no_exit_from_terminal_states():
