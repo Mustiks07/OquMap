@@ -641,6 +641,21 @@ def quiz_generate(body: QuizGenerateReq, p: P, session: DB) -> dict[str, Any]:
     return quizzes.generate(session, p, body)
 
 
+@router.post("/quizzes/preview", tags=["quizzes"])
+def quiz_preview(body: QuizGenerateReq, p: P, session: DB) -> dict[str, Any]:
+    """Same generator and checks without saving anything (used by the read-only presentation mode)."""
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    return quizzes.generate(session, p, body, persist=False)
+
+
+@router.get("/demo/tour/preflight", tags=["demo"])
+def tour_preflight(dataset_id: str, p: P, session: DB) -> dict[str, Any]:
+    """Checks before the 3-minute presentation: data, graph, comparison, planner and AI mode are ready."""
+    from ..services import tour
+
+    return tour.preflight(session, p, dataset_id)
+
+
 @router.get("/quizzes", tags=["quizzes"])
 def quiz_list(dataset_id: str, p: P, session: DB) -> list[dict[str, Any]]:
     an.get_dataset(session, p.org_id, dataset_id)

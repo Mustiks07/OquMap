@@ -198,3 +198,13 @@ def test_quiz_for_topic_without_family_is_honest(client, H, datasets, curriculum
     t8 = _topic(curriculum, "T8")  # not measured: no hypotheses → no template family
     r = client.post("/api/v1/quizzes/generate", json={"dataset_id": datasets["base"]["id"], "topic_id": t8["id"]}, headers=H)
     assert r.status_code == 422 and r.json()["error"]["code"] == "no_template_family"
+
+
+def test_tour_preflight_and_read_only_quiz_preview(client, H, datasets, curriculum):
+    ds = datasets["base"]["id"]
+    r = client.get("/api/v1/demo/tour/preflight", params={"dataset_id": ds}, headers=H).json()
+    assert r["ready"] and {c["code"] for c in r["checks"]} >= {"dataset", "overview", "graph", "comparison", "plan", "ai_mode"}
+    n_before = len(client.get("/api/v1/quizzes", params={"dataset_id": ds}, headers=H).json())
+    pv = client.post("/api/v1/quizzes/preview", json={"dataset_id": ds, "topic_id": r["topic_id"], "n_items": 4}, headers=H).json()
+    assert pv["status"] == "preview" and len(pv["items"]) == 4 and pv["checks"]["approvable"]
+    assert len(client.get("/api/v1/quizzes", params={"dataset_id": ds}, headers=H).json()) == n_before

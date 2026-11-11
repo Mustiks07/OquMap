@@ -278,8 +278,9 @@ def _known(session: Session, org_id: str, quiz: m.Quiz) -> tuple[set[str], set[s
     return {o.id for o in meta.objectives}, {n["id"] for n in g["result"]["nodes"]}
 
 
-def generate(session: Session, p, req: GenerateReq) -> dict:
-    p.require("methodist")
+def generate(session: Session, p, req: GenerateReq, persist: bool = True) -> dict:
+    if persist:
+        p.require("methodist")
     if not 3 <= req.n_items <= 7:
         raise ApiError("invalid_parameter", "От 3 до 7 заданий", 422)
     ds = an.get_dataset(session, p.org_id, req.dataset_id)
@@ -330,6 +331,10 @@ def generate(session: Session, p, req: GenerateReq) -> dict:
     meta = an.load_meta(session, p.org_id, req.dataset_id)
     checks = check_quiz(items, {o.id for o in meta.objectives}, {n["id"] for n in g["result"]["nodes"]})
     t = next(x for x in meta.topics if x.id == req.topic_id)
+    if not persist:  # read-only preview (presentation mode): nothing is stored
+        return {"id": None, "title": f"Диагностика: {t.code} {t.title_ru}", "status": "preview", "use": "diagnostic_only",
+                "counts_toward_grade": False, "items": items, "checks": checks, "generation_mode": "template",
+                "source_analysis_id": g["context"]["analysis_id"]}
     q = m.Quiz(org_id=p.org_id, dataset_id=ds.id, topic_id=req.topic_id, title=f"Диагностика: {t.code} {t.title_ru}",
                status="draft", current_version=1, source_analysis_id=g["context"]["analysis_id"], generation_mode="template",
                created_by=p.user_id)
