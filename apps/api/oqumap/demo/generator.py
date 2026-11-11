@@ -38,6 +38,7 @@ class ClassSpec:
     teacher: str | None = None
     size: int | None = None
     post_form: str | None = None  # overrides scenario post form
+    language: str | None = None  # language of instruction; defaults to the scenario language
 
 
 @dataclass
@@ -92,7 +93,7 @@ def generate_rows(sc: Scenario) -> list[dict]:
                 lcode = f"{sc.learner_prefix}{learner_no:04d}"
                 theta = school.effect + class_eff + float(rng.normal(0, 1))
                 base = dict(
-                    school_code=school.code, class_code=class_code, teacher_code=teacher, language=sc.language,
+                    school_code=school.code, class_code=class_code, teacher_code=teacher, language=cls.language or sc.language,
                     grade=sc.grade, academic_year=sc.academic_year, edition_code=cls.edition, learner_code=lcode,
                 )
                 for a in sc.assessments:
@@ -170,6 +171,12 @@ def base_scenario() -> Scenario:
             classes = [ClassSpec("EDA"), ClassSpec("EDB"), ClassSpec("EDB"), ClassSpec("EDB")]
             eff = WEAK[i - 4]
         schools.append(SchoolSpec(code, eff, classes))
+    # Kazakh-medium classes (synthetic): one strong-school EDB class and two weak-school classes (EDA and EDB),
+    # so both editions are used in both languages. Language does not enter the random draws, so all other
+    # demo numbers are unchanged. Item texts for these classes are the developer's draft KZ (not verified).
+    schools[2].classes[3].language = "kz"
+    schools[6].classes[0].language = "kz"
+    schools[6].classes[1].language = "kz"
     return Scenario(
         code="base",
         seed=20260901,

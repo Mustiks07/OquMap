@@ -285,3 +285,19 @@ def test_observed_decimal_and_proportion_hypotheses_get_families(client, H, data
         assert r.json()["checks"]["approvable"], r.json()["checks"]["blocking_failed"]
     fams = client.get("/api/v1/quizzes/families", headers=H).json()
     assert {"dec_add", "proportion", "neg_add", "linear_eq", "order_ops", "area_perimeter"} <= {f["code"] for f in fams}
+
+
+def test_kazakh_medium_classes_are_filterable_and_do_not_bias_comparison(client, H, datasets, curriculum):
+    ds = datasets["base"]["id"]
+    cohorts = curriculum["cohorts"]
+    kz = [c for c in cohorts if c["language"] == "kz"]
+    assert len(kz) == 3
+    ov = client.post(f"/api/v1/datasets/{ds}/overview", json={"language": "kz"}, headers=H).json()
+    t3 = next(t for t in ov["result"]["topics"] if t["code"] == "T3")
+    assert t3["score"]["n_classes"] == 3
+    full = client.post(f"/api/v1/datasets/{ds}/overview", json={}, headers=H).json()
+    assert next(t for t in full["result"]["topics"] if t["code"] == "T3")["score"]["n_classes"] == 32
+    ed = {e["code"]: e["id"] for e in curriculum["editions"]}
+    r = client.post("/api/v1/comparisons", json={"dataset_id": ds, "topic_id": _topic(curriculum, "T3")["id"],
+                                                 "edition_a_id": ed["EDA"], "edition_b_id": ed["EDB"]}, headers=H).json()["result"]
+    assert r["status"] == "comparable" and "language_mismatch" not in {x["code"] for x in r["reasons"]}

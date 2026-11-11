@@ -80,3 +80,14 @@ test("graph → council, sandbox scenarios, quiz review", async ({ page }) => {
   await page.getByTestId("quiz-approve").click();
   await expect(page.getByTestId("quiz-responses")).toBeVisible();
 });
+
+test("language filter shows the Kazakh-medium classes", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByTestId("enter-demo").click();
+  await expect(page.getByTestId("topics-table")).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByTestId("overview-counts")).toContainText("32");
+  await page.getByLabel("Язык обучения").selectOption("kz");
+  await expect(page.getByTestId("overview-counts")).toContainText("3 класс");
+  await page.getByRole("button", { name: "KZ" }).click();
+  await expect(page.getByLabel("Оқыту тілі")).toHaveValue("kz");
+});
