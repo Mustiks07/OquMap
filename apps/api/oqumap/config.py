@@ -47,8 +47,8 @@ class Settings(BaseSettings):
     # Model provider (provider-agnostic). "none" keeps the app fully functional via template / recorded_demo modes.
     # none | recorded | gemini | openrouter | openai | anthropic
     llm_provider: str = "none"
-    # Model ID of the selected provider (no default: choose it with scripts/eval_llm_provider.py), e.g.
-    # gemini: gemini-2.5-flash · openrouter: google/gemini-2.5-flash · openai: gpt-5-mini · anthropic: claude-sonnet-5-5
+    # Model ID of the selected provider (no runtime default: choose it with scripts/eval_llm_provider.py), e.g.
+    # gemini: gemini-3.8-flash (fallback gemini:gemini-3.5-flash-lite) · openrouter/openai/anthropic: exact provider ID
     llm_model: str = ""
     # Provider-specific keys / endpoints (never one shared key)
     gemini_api_key: SecretStr | None = None

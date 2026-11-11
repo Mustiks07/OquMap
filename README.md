@@ -112,9 +112,13 @@ cd apps/api && uv run python ../../scripts/export_openapi.py && cd ../web && npm
 типизированы и исполняются сервером). Пример для бесплатного Gemini и **только синтетических** данных:
 ```
 OQUMAP_LLM_PROVIDER=gemini
-OQUMAP_LLM_MODEL=gemini-2.5-flash
+OQUMAP_LLM_MODEL=gemini-3.8-flash
+OQUMAP_LLM_FALLBACKS=["gemini:gemini-3.5-flash-lite"]
 OQUMAP_GEMINI_API_KEY=<ключ>      # только на сервере; не попадает во frontend, ответы API, логи, экспорт
 ```
+Это рекомендуемая цепочка primary/fallback для синтетической демонстрации, а не runtime default:
+без явной конфигурации приложение остаётся в безопасном deterministic/template-режиме. Live-модель всё равно
+отключена для анонимного `public_demo`.
 Бесплатный тариф Gemini может использовать запросы для улучшения продуктов Google, поэтому UI показывает
 предупреждение, а реальные данные учеников туда не отправляются (`OQUMAP_LLM_REAL_DATA_ALLOWED=false`;
 даже при `true` политика `may_train` блокирует отправку). Для реальных данных нужен платный/договорный профиль
