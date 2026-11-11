@@ -1091,6 +1091,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/quality/assessments/{assessment_id}/dif": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dif Screening
+         * @description Language DIF screening (Mantel–Haenszel) on one form; screening signals, not evidence of bias.
+         */
+        get: operations["dif_screening_api_v1_quality_assessments__assessment_id__dif_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quality/assessments/{assessment_id}/items": {
         parameters: {
             query?: never;
@@ -2077,6 +2097,79 @@ export interface components {
              * @default 0.8
              */
             target_power: number;
+        };
+        /** DifItem */
+        DifItem: {
+            /** Alpha Mh */
+            alpha_mh: number | null;
+            /** Category */
+            category: ("A" | "B" | "C") | null;
+            /** Chi2 */
+            chi2: number | null;
+            /** Ci High */
+            ci_high: number | null;
+            /** Ci Low */
+            ci_low: number | null;
+            /** Code */
+            code: string;
+            /** Item Id */
+            item_id: string;
+            /** Mh D Dif */
+            mh_d_dif: number | null;
+            /** N Focal */
+            n_focal: number;
+            /** N Reference */
+            n_reference: number;
+            /** N Strata */
+            n_strata: number;
+            /** P Value */
+            p_value: number | null;
+            /** Se */
+            se: number | null;
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** DifOut */
+        DifOut: {
+            /** Assessment */
+            assessment: {
+                [key: string]: unknown;
+            };
+            /** Available */
+            available: boolean;
+            /** Excluded Items */
+            excluded_items: {
+                [key: string]: unknown;
+            }[];
+            /** Focal */
+            focal: string;
+            /** Group Sizes */
+            group_sizes: {
+                [key: string]: number | null;
+            };
+            /** Is Synthetic */
+            is_synthetic: boolean;
+            /** Items */
+            items: components["schemas"]["DifItem"][];
+            /**
+             * Label
+             * @constant
+             */
+            label: "dif_screening_signal";
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Method Version */
+            method_version: string;
+            /** Min Group N */
+            min_group_n: number;
+            /** Reference */
+            reference: string;
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** Envelope[ComparisonResult] */
         Envelope_ComparisonResult_: {
@@ -10248,6 +10341,87 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AssignmentsOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    dif_screening_api_v1_quality_assessments__assessment_id__dif_get: {
+        parameters: {
+            query?: {
+                reference?: string;
+                focal?: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DifOut"];
                 };
             };
             /** @description Bad Request */

@@ -8,6 +8,8 @@ Adds to the demo organisation (all data SYNTHETIC, fictional schools/classes/lea
 * dataset ``measurement_loop`` (2026–2027, 6 schools × 4 classes) imported through the regular pipeline:
   PRE-2026M (F-PRE), DIAG-BASE and DIAG-END (both F-T3-DIAG → identical form, paired change measurable);
 * 6 interventions (practice_based / observational / experimental; reviewed, draft, archived, a v2 revision);
+* language DIF demo: M05/M06 classes are Kazakh-medium; Q10 is deliberately harder for them (screening signal),
+  Q08 behaves the same in both groups;
 * pilots: PIL-M01 completed matched comparison with full fidelity (known synthetic effect +0.8 logit on the
   6А classes → expected ``positive_signal``), PIL-M02 completed single group with low fidelity (expected
   ``invalid_due_to_fidelity`` — never "ineffective"), PIL-M03 active with partial logs and no outcome yet
@@ -72,7 +74,7 @@ DIAG_ITEMS = [
      [("1", None), ("2/4", "add_across"), ("1/4", "multiplied_instead"), ("1/2", "calc_error")], "A", -3.0, None),
     ("Q10", "3.3", "В бутылке было 3/4 л сока, выпили 1/2 л. Сколько сока осталось?",
      "Бөтелкеде 3/4 л шырын болды, 1/2 л ішті. Қанша шырын қалды?",
-     [("2/2", "subtract_across"), ("2/4", "numerators_not_scaled"), ("1/4", None), ("5/4", "wrong_operation")], "C", 0.2, None),
+     [("2/2", "subtract_across"), ("2/4", "numerators_not_scaled"), ("1/4", None), ("5/4", "wrong_operation")], "C", 0.2, "dif_kz"),
     ("Q11", "3.3", "От ленты длиной 5/6 м отрезали сначала 1/4 м, затем ещё 1/3 м. Сколько метров ленты осталось?",
      "Ұзындығы 5/6 м таспадан алдымен 1/4 м, сосын тағы 1/3 м кесіп алды. Таспаның неше метрі қалды?",
      [("1/4", None), ("7/12", "answered_complement"), ("3/7", "subtract_across"), ("1/12", "calc_error")], "A", 0.6, "long_item"),
@@ -84,6 +86,10 @@ LETTERS = ["A", "B", "C", "D"]
 SCHOOLS = [("M01", 0.4), ("M02", -0.3), ("M03", 0.2), ("M04", -0.1), ("M05", 0.0), ("M06", 0.3)]
 CLASS_EFFECT_ON_END = {0: 0.8, 1: 0.0, 2: 0.15, 3: 0.0, 4: 0.0}  # 6А pilot 1, 6Б comparison, 6В pilot 2, 6Г pilot 3, 6Д none
 GROWTH = 0.35
+# Language DIF demo: classes of M05/M06 are taught in Kazakh; Q10 (a word problem) is made harder for them only
+# (+1.5 logit, e.g. an unclear translation). Q08 (also a word problem) has no shift → the "normal" example.
+KZ_SCHOOLS = {"M05", "M06"}
+KZ_DIF_SHIFT = 1.5
 ASSESSMENTS = [("PRE-2026M", "F-PRE", "2026-09-07"), ("DIAG-BASE", FORM_CODE, "2026-09-14"), ("DIAG-END", FORM_CODE, "2026-10-30")]
 
 
@@ -107,7 +113,8 @@ def generate_rows(seed: int = SEED) -> list[dict]:
             for _ in range(size):
                 n += 1
                 theta = s_eff + c_eff + float(rng.normal(0, 1))
-                base = dict(school_code=school, class_code=cls, teacher_code=f"T-{school}-{ci + 1}", language="ru", grade=6,
+                language = "kz" if school in KZ_SCHOOLS else "ru"
+                base = dict(school_code=school, class_code=cls, teacher_code=f"T-{school}-{ci + 1}", language=language, grade=6,
                             academic_year="2026-2027", edition_code="EDA" if ci % 2 == 0 else "EDB", learner_code=f"ML{n:04d}")
                 for acode, form, day in ASSESSMENTS:
                     if ci == 4 and acode == "DIAG-END":
@@ -124,7 +131,8 @@ def generate_rows(seed: int = SEED) -> list[dict]:
                     end = acode == "DIAG-END"
                     shift = (GROWTH + CLASS_EFFECT_ON_END[ci]) if end else 0.0
                     for code, _obj, _ru, _kz, opts, key, b, beh in DIAG_ITEMS:
-                        rows.append(dict(common, item_code=code, attempt=1, **_diag_answer(rng, theta + shift, opts, key, b, beh)))
+                        b_eff = b + (KZ_DIF_SHIFT if (beh == "dif_kz" and language == "kz") else 0.0)
+                        rows.append(dict(common, item_code=code, attempt=1, **_diag_answer(rng, theta + shift, opts, key, b_eff, beh)))
     return rows
 
 
@@ -192,6 +200,8 @@ def _seed_dataset(session: Session, org: m.Organization) -> m.Dataset:
                    is_synthetic=True, scenario=DATASET_CODE, version=0,
                    manifest={"generator": "oqumap.demo.measurement_seed", "seed": SEED, "growth_logit": GROWTH,
                              "class_effect_on_end_logit": {"6А (PIL-M01)": 0.8, "6Б (comparison)": 0.0, "6В (PIL-M02)": 0.15, "6Г": 0.0},
+                             "language_dif": {"kz_schools": sorted(KZ_SCHOOLS), "item": "Q10", "shift_logit": KZ_DIF_SHIFT,
+                                              "control_item": "Q08"},
                              "problem_items": {"Q03": "two_defensible_answers", "Q05": "wrong_answer_key", "Q07": "non_functional_distractor",
                                                "Q09": "very_easy", "Q11": "high_omission", "Q12": "very_hard"},
                              "expected_behaviour": ["PIL-M01 positive_signal", "PIL-M02 invalid_due_to_fidelity",

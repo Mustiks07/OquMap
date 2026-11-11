@@ -56,6 +56,12 @@ export function useAssignments(id: string | undefined) {
   return useQuery({ queryKey: ["m-assignments", id], enabled: !!id, queryFn: () => api.get<AssignmentsOut>(`/api/v1/quality/assessments/${id}/assignments`) });
 }
 
+export type DifOut = S["DifOut"];
+
+export function useDif(id: string | undefined) {
+  return useQuery({ queryKey: ["m-dif", id], enabled: !!id, queryFn: () => api.get<DifOut>(`/api/v1/quality/assessments/${id}/dif`) });
+}
+
 export function useItemQuality(id: string | null) {
   return useQuery({ queryKey: ["m-item", id], enabled: !!id, queryFn: () => api.get<ItemQualityDetail>(`/api/v1/quality/items/${id}`) });
 }

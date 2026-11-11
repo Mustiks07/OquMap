@@ -536,6 +536,19 @@ const ru = {
   "cal.action.rescheduled": "перенос",
   "cal.action.deleted": "удалено",
   "fid.expected_from": "Ожидаемые занятия",
+  "dif.title": "Языковой DIF screening (RU/KZ)",
+  "dif.lead": "Mantel–Haenszel на одной форме: при равном балле по остальным заданиям сравнивается успешность групп с разным языком обучения. Это сигнал для экспертной проверки задания (перевод, контекст), а не доказательство предвзятости и не психометрическая экспертиза.",
+  "dif.run": "Выполнить скрининг",
+  "dif.groups": "Группы: опорная {ref}, фокальная {focal}",
+  "dif.category": "Сигнал",
+  "dif.cat.A": "A — нет сигнала",
+  "dif.cat.B": "B — умеренный сигнал",
+  "dif.cat.C": "C — сильный сигнал: проверить задание",
+  "dif.unavailable.insufficient_sample": "мало учеников в группе",
+  "dif.unavailable.single_language_group": "в проверке только одна языковая группа",
+  "dif.unavailable.near_constant_item": "почти все отвечают одинаково",
+  "dif.unavailable.no_informative_strata": "нет сопоставимых групп",
+  "dif.unavailable.degenerate_odds_ratio": "отношение шансов не определено",
 } as const;
 
 export type MKey = keyof typeof ru;
@@ -1073,6 +1086,19 @@ const kz: Record<MKey, string> = {
   "cal.action.rescheduled": "ауыстыру",
   "cal.action.deleted": "жойылды",
   "fid.expected_from": "Күтілетін сабақтар",
+  "dif.title": "Тілдік DIF screening (RU/KZ)",
+  "dif.lead": "Бір формадағы Mantel–Haenszel: қалған тапсырмалар бойынша тең балда әртүрлі оқыту тіліндегі топтар салыстырылады. Бұл сараптамаға арналған сигнал, біржақтылықтың дәлелі емес.",
+  "dif.run": "Скрининг жасау",
+  "dif.groups": "Топтар: тірек {ref}, фокалды {focal}",
+  "dif.category": "Сигнал",
+  "dif.cat.A": "A — сигнал жоқ",
+  "dif.cat.B": "B — орташа сигнал",
+  "dif.cat.C": "C — күшті сигнал: тапсырманы тексеру",
+  "dif.unavailable.insufficient_sample": "топта оқушы аз",
+  "dif.unavailable.single_language_group": "тексеруде бір ғана тіл тобы",
+  "dif.unavailable.near_constant_item": "барлығы дерлік бірдей жауап береді",
+  "dif.unavailable.no_informative_strata": "салыстырмалы топтар жоқ",
+  "dif.unavailable.degenerate_odds_ratio": "мүмкіндіктер қатынасы анықталмаған",
 };
 
 export const mdict = { ru, kz } as const;

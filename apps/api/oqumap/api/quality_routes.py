@@ -50,3 +50,9 @@ def get_assignments(assessment_id: str, p: P, session: DB):
 @router.put("/assessments/{assessment_id}/assignments", response_model=S.AssignmentsOut)
 def put_assignments(assessment_id: str, body: S.AssignmentsIn, p: P, session: DB):
     return svc.set_assignments(session, p, assessment_id, body.cohort_ids, body.note)
+
+
+@router.get("/assessments/{assessment_id}/dif", response_model=S.DifOut)
+def dif_screening(assessment_id: str, p: P, session: DB, reference: str = "ru", focal: str = "kz"):
+    """Language DIF screening (Mantel–Haenszel) on one form; screening signals, not evidence of bias."""
+    return svc.dif_screening(session, p.org_id, assessment_id, reference, focal)

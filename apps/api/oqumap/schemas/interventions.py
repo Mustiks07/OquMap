@@ -979,3 +979,41 @@ class SessionCalendarOut(Model):
     counts: dict[str, int]
     sessions: list[PilotSessionOut]
     events: list[dict[str, Any]]
+
+
+# ---------------------------------------------------------------------------
+# Language DIF screening
+# ---------------------------------------------------------------------------
+
+
+class DifItem(Model):
+    item_id: str
+    code: str
+    n_reference: int
+    n_focal: int
+    alpha_mh: float | None
+    mh_d_dif: float | None
+    se: float | None
+    ci_low: float | None
+    ci_high: float | None
+    chi2: float | None
+    p_value: float | None
+    category: Literal["A", "B", "C"] | None
+    n_strata: int
+    unavailable_reason: str | None
+
+
+class DifOut(Model):
+    method_version: str
+    assessment: dict[str, Any]
+    reference: str
+    focal: str
+    group_sizes: dict[str, int | None]
+    available: bool
+    unavailable_reason: str | None
+    items: list[DifItem]
+    excluded_items: list[dict[str, Any]]
+    min_group_n: int
+    limitations: list[Message]
+    label: Literal["dif_screening_signal"]
+    is_synthetic: bool

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAppState } from "../../state/AppState";
-import { Badge, Button, Card, Field, Metric, Select, StaleBanner } from "../../ui";
+import { Alert, Badge, Button, Card, Field, Metric, Select, StaleBanner } from "../../ui";
 import { dateTime } from "../../ui/format";
-import { useAssessmentQuality, useAssignments, useItemQuality, useMAction, useQualityList, type ItemQuality, type QualityRules } from "../measurement/api";
+import { useAssessmentQuality, useAssignments, useDif, useItemQuality, useMAction, useQualityList, type ItemQuality, type QualityRules } from "../measurement/api";
 import { ActionError, CodeLabel, KV, MQuery, Messages, Num, Pager, Share, Stat, useRoles, useUrlState } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
 
@@ -310,6 +310,7 @@ export function QualityDetailPage() {
                 </Card>
               </div>
               <AssignmentsCard assessmentId={d.assessment.assessment_id} />
+              <DifCard assessmentId={d.assessment.assessment_id} />
             </>
           );
         }}
@@ -360,6 +361,51 @@ function AssignmentsCard({ assessmentId }: { assessmentId: string }) {
           </div>
         )}
       </MQuery>
+    </Card>
+  );
+}
+
+function DifCard({ assessmentId }: { assessmentId: string }) {
+  const { t2, lang } = useMT();
+  const [open, setOpen] = useState(false);
+  const q = useDif(open ? assessmentId : undefined);
+  const fmt = (x: number | null | undefined) => (x === null || x === undefined ? "—" : x.toLocaleString(lang === "kz" ? "kk-KZ" : "ru-RU", { maximumFractionDigits: 2 }));
+  return (
+    <Card title={t2("dif.title")} id="dif">
+      <p className="small muted">{t2("dif.lead")}</p>
+      {!open ? <Button size="sm" onClick={() => setOpen(true)}>{t2("dif.run")}</Button> : (
+        <MQuery q={q}>
+          {(d) => (
+            <div className="stack" data-testid="dif">
+              <p className="small" style={{ margin: 0 }}>
+                {t2("dif.groups", { ref: d.reference, focal: d.focal })}: {Object.entries(d.group_sizes).map(([g, n]) => `${g} — ${n ?? t2("fu.suppressed")}`).join(", ")}
+              </p>
+              {!d.available ? <Alert tone="info" role="note"><CodeLabel prefix="dif.unavailable." code={d.unavailable_reason} /></Alert> : (
+                <div className="table-wrap">
+                  <table className="table">
+                    <caption className="sr-only">{t2("dif.title")}</caption>
+                    <thead><tr><th scope="col">{t2("quality.item")}</th><th scope="col" className="num">MH D-DIF</th><th scope="col">95%</th>
+                      <th scope="col" className="num">p</th><th scope="col">{t2("dif.category")}</th></tr></thead>
+                    <tbody>
+                      {d.items.map((r) => (
+                        <tr key={r.item_id}>
+                          <th scope="row" className="mono">{r.code}</th>
+                          <td className="num">{fmt(r.mh_d_dif)}</td>
+                          <td className="small">{r.ci_low === null ? <CodeLabel prefix="dif.unavailable." code={r.unavailable_reason} /> : `${fmt(r.ci_low)} … ${fmt(r.ci_high)}`}</td>
+                          <td className="num">{fmt(r.p_value)}</td>
+                          <td>{r.category ? <Badge tone={r.category === "C" ? "warn" : r.category === "B" ? "info" : "ok"}>{t2(`dif.cat.${r.category}`)}</Badge> : "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <Messages items={d.limitations} />
+              <p className="xs muted">{d.method_version}</p>
+            </div>
+          )}
+        </MQuery>
+      )}
     </Card>
   );
 }

@@ -2196,6 +2196,256 @@
         "title": "DesignStudioRequest",
         "type": "object"
       },
+      "DifItem": {
+        "additionalProperties": true,
+        "properties": {
+          "alpha_mh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alpha Mh"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "A",
+                  "B",
+                  "C"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "chi2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chi2"
+          },
+          "ci_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ci High"
+          },
+          "ci_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ci Low"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "mh_d_dif": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mh D Dif"
+          },
+          "n_focal": {
+            "title": "N Focal",
+            "type": "integer"
+          },
+          "n_reference": {
+            "title": "N Reference",
+            "type": "integer"
+          },
+          "n_strata": {
+            "title": "N Strata",
+            "type": "integer"
+          },
+          "p_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Value"
+          },
+          "se": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Se"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          }
+        },
+        "required": [
+          "item_id",
+          "code",
+          "n_reference",
+          "n_focal",
+          "alpha_mh",
+          "mh_d_dif",
+          "se",
+          "ci_low",
+          "ci_high",
+          "chi2",
+          "p_value",
+          "category",
+          "n_strata",
+          "unavailable_reason"
+        ],
+        "title": "DifItem",
+        "type": "object"
+      },
+      "DifOut": {
+        "additionalProperties": true,
+        "properties": {
+          "assessment": {
+            "additionalProperties": true,
+            "title": "Assessment",
+            "type": "object"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "excluded_items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Excluded Items",
+            "type": "array"
+          },
+          "focal": {
+            "title": "Focal",
+            "type": "string"
+          },
+          "group_sizes": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Group Sizes",
+            "type": "object"
+          },
+          "is_synthetic": {
+            "title": "Is Synthetic",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DifItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "label": {
+            "const": "dif_screening_signal",
+            "title": "Label",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "method_version": {
+            "title": "Method Version",
+            "type": "string"
+          },
+          "min_group_n": {
+            "title": "Min Group N",
+            "type": "integer"
+          },
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          }
+        },
+        "required": [
+          "method_version",
+          "assessment",
+          "reference",
+          "focal",
+          "group_sizes",
+          "available",
+          "unavailable_reason",
+          "items",
+          "excluded_items",
+          "min_group_n",
+          "limitations",
+          "label",
+          "is_synthetic"
+        ],
+        "title": "DifOut",
+        "type": "object"
+      },
       "Envelope_ComparisonResult_": {
         "additionalProperties": true,
         "properties": {
@@ -17891,6 +18141,135 @@
           }
         },
         "summary": "Put Assignments",
+        "tags": [
+          "quality"
+        ]
+      }
+    },
+    "/api/v1/quality/assessments/{assessment_id}/dif": {
+      "get": {
+        "description": "Language DIF screening (Mantel–Haenszel) on one form; screening signals, not evidence of bias.",
+        "operationId": "dif_screening_api_v1_quality_assessments__assessment_id__dif_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": false,
+            "schema": {
+              "default": "ru",
+              "title": "Reference",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "focal",
+            "required": false,
+            "schema": {
+              "default": "kz",
+              "title": "Focal",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DifOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Dif Screening",
         "tags": [
           "quality"
         ]

@@ -7,6 +7,8 @@ computation. Results contain aggregates only — never learner identifiers.
 
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 from pydantic import BaseModel
 from sqlalchemy import func, select
@@ -328,3 +330,62 @@ def set_assignments(session: Session, p, assessment_id: str, cohort_ids: list[st
           added=len(wanted - set(existing)), removed=len(set(existing) - wanted))
     session.commit()
     return assignments(session, p.org_id, a.id)
+
+
+# ---------------------------------------------------------------------------
+# Language DIF screening
+# ---------------------------------------------------------------------------
+
+
+def dif_screening(session: Session, org_id: str, assessment_id: str, reference: str = "ru", focal: str = "kz",
+                  params: QualityParams | None = None) -> dict:
+    """Mantel–Haenszel screening of dichotomous items of one form between two language groups (complete cases,
+    omitted as 0, rest score as matching variable). Small groups are suppressed; results are screening signals."""
+    from ..analytics import dif
+
+    params = params or QualityParams()
+    params.validate_values()
+    if reference == focal:
+        raise ApiError("invalid_parameter", "Группы сравнения должны различаться", 422)
+    a = _assessment(session, org_id, assessment_id)
+    meta = an.load_meta(session, org_id, a.dataset_id)
+    form = meta.forms[a.form_id]
+    item_ids = list(meta.form_items[form.id])
+    items = _items_meta(meta, item_ids)
+    selected = scoring.select_attempts(an.load_responses(session, meta, [a.id]), params.attempt_rule)
+    present, _ = _sittings(session, meta, a)
+    share, _status = aq.item_matrix(selected, present, item_ids, items, "as_incorrect")
+    dich = [i for i in item_ids if items[i].max_points == 1 and set(share[i].dropna().unique()) <= {0.0, 1.0}]
+    excluded = [{"item_id": i, "code": items[i].code, "reason": "not_dichotomous"} for i in item_ids if i not in dich]
+    mat = share[dich].dropna()
+    groups = _learner_groups(session, meta, list(mat.index)).set_index("learner_id")["cohort_id"].map(lambda c: meta.cohorts[c].language)
+    lang = groups.reindex(mat.index)
+    keep = lang.isin([reference, focal])
+    mat, lang = mat[keep], lang[keep]
+    n_ref, n_foc = int((lang == reference).sum()), int((lang == focal).sum())
+    from .privacy import MIN_CELL
+
+    sizes = {g: (n if n >= MIN_CELL else None) for g, n in ((reference, n_ref), (focal, n_foc))}
+    limitations = [render("dif_screening_only"), render("dif_matching_rest_score")]
+    rows = []
+    if min(n_ref, n_foc) < dif.MIN_GROUP_N:
+        reason = "insufficient_sample" if max(n_ref, n_foc) > 0 and min(n_ref, n_foc) > 0 else "single_language_group"
+        limitations.append(render("dif_insufficient_sample", {"min": dif.MIN_GROUP_N}, "warn"))
+        return {"method_version": dif.METHOD_VERSION_DIF, "assessment": {"assessment_id": a.id, "code": a.code, "form_code": form.code},
+                "reference": reference, "focal": focal, "group_sizes": sizes, "available": False, "unavailable_reason": reason,
+                "items": [], "excluded_items": excluded, "min_group_n": dif.MIN_GROUP_N, "limitations": limitations,
+                "label": "dif_screening_signal", "is_synthetic": meta.dataset.is_synthetic}
+    arr = mat.to_numpy(dtype=int)
+    is_focal = (lang == focal).to_numpy()
+    total = arr.sum(axis=1)
+    for j, iid in enumerate(dich):
+        res = dif.mantel_haenszel(arr[:, j], is_focal, total - arr[:, j])
+        rows.append({"item_id": iid, "code": items[iid].code, **{k: (None if isinstance(v, float) and not math.isfinite(v) else v)
+                                                                  for k, v in res.items()}})
+    if meta.dataset.is_synthetic:
+        limitations.append(render("quality_synthetic"))
+    return {"method_version": dif.METHOD_VERSION_DIF, "assessment": {"assessment_id": a.id, "code": a.code, "form_code": form.code},
+            "reference": reference, "focal": focal, "group_sizes": sizes, "available": True, "unavailable_reason": None,
+            "items": rows, "excluded_items": excluded, "min_group_n": dif.MIN_GROUP_N, "limitations": limitations,
+            "label": "dif_screening_signal", "is_synthetic": meta.dataset.is_synthetic,
+            "n_flagged": sum(1 for r in rows if r["category"] in ("B", "C"))}

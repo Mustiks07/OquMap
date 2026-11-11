@@ -282,3 +282,19 @@ test("session calendar after activation: reschedule sends a new date, no delete 
   fireEvent.click(screen.getByRole("button", { name: "Перенести" }));
   await waitFor(() => expect(calls.find((c) => c.method === "PATCH")?.body).toEqual({ planned_date: "2026-11-19" }));
 });
+
+
+test("DIF screening is labelled as a signal and shows unavailable reasons", async () => {
+  const dif = { method_version: "dif-mh-v1", assessment: {}, reference: "ru", focal: "kz", group_sizes: { ru: 400, kz: 210 }, available: true,
+    unavailable_reason: null, excluded_items: [], min_group_n: 100, label: "dif_screening_signal", is_synthetic: true,
+    limitations: [msg("dif_screening_only", "info")],
+    items: [{ item_id: "i10", code: "Q10", n_reference: 400, n_focal: 210, alpha_mh: 4.1, mh_d_dif: -3.3, se: 0.4, ci_low: -4.1, ci_high: -2.5, chi2: 60, p_value: 0, category: "C", n_strata: 11, unavailable_reason: null },
+      { item_id: "i8", code: "Q08", n_reference: 400, n_focal: 210, alpha_mh: 1.0, mh_d_dif: 0.1, se: 0.3, ci_low: -0.5, ci_high: 0.7, chi2: 0.1, p_value: 0.7, category: "A", n_strata: 11, unavailable_reason: null }] };
+  routes = [[/GET .*\/quality\/assessments\/a1\/assignments/, () => ({ body: { assessment_id: "a1", assessment_code: "DIAG-BASE", assignment_scope: "explicit", cohorts: [] } })],
+    [/GET .*\/quality\/assessments\/a1\/dif/, () => ({ body: dif })], [/GET .*\/quality\/assessments\/a1/, () => ({ body: QUALITY })]];
+  renderAt("/quality/a1", "/quality/:assessmentId", <QualityDetailPage />);
+  fireEvent.click(await screen.findByRole("button", { name: "Выполнить скрининг" }));
+  expect(await screen.findByText("C — сильный сигнал: проверить задание")).toBeInTheDocument();
+  expect(screen.getByText("A — нет сигнала")).toBeInTheDocument();
+  expect(screen.getByText("RU dif_screening_only")).toBeInTheDocument();
+});
