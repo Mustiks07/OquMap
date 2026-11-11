@@ -6022,9 +6022,16 @@
             "title": "Created At",
             "type": "string"
           },
+          "current_dataset_version": {
+            "title": "Current Dataset Version",
+            "type": "integer"
+          },
           "dataset_version": {
             "title": "Dataset Version",
             "type": "integer"
+          },
+          "fidelity": {
+            "$ref": "#/components/schemas/Label"
           },
           "id": {
             "title": "Id",
@@ -6066,8 +6073,10 @@
           "status_label",
           "causal_level",
           "causal_ceiling",
+          "fidelity",
           "method_version",
           "dataset_version",
+          "current_dataset_version",
           "is_stale",
           "interim",
           "created_at",

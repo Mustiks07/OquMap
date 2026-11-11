@@ -318,7 +318,9 @@ def item_flags(p: float | None, r_it: float | None, d: float | None, omit: float
             pb = o["point_biserial_rest"]["value"]
             beats_key = (key_opt is not None and o["mean_rest_score"] is not None and key_opt["mean_rest_score"] is not None
                          and o["count"] >= 5 and o["mean_rest_score"] > key_opt["mean_rest_score"])
-            if (pb is not None and pb > 0.05) or beats_key:
+            # positive association with the rest score, or a distractor chosen by stronger learners than the key
+            # *and* positively associated with the rest score (avoids flagging every option of a miskeyed item)
+            if (pb is not None and pb > 0.05) or (beats_key and pb is not None and pb > 0):
                 suspicious.append(o["key"])
         if suspicious:
             add("suspicious_distractor", "warn", options=suspicious)

@@ -99,6 +99,8 @@ def test_log_validation_and_append_only_corrections(active):
         rr = c.post(url, json={**body, **bad}, headers=H)
         assert rr.status_code == 422 and rr.json()["error"]["code"] == code, rr.text
     assert c.post(url, json={**body, "adaptation_note": "x" * 2001}, headers=H).status_code == 422
+    future = c.post(url, json={**body, "session_date": "2026-12-20"}, headers=H)  # inside the period, but not yet happened
+    assert future.status_code == 422 and future.json()["error"]["code"] == "date_in_future"
     before = c.get(f"/api/v1/pilots/{p3['id']}/fidelity", params={"as_of": "2026-11-11"}, headers=H).json()
     fixed = c.post(url, json={**body, "delivered_minutes": 25, "corrects_log_id": log["id"]}, headers=H).json()
     assert c.post(url, json={**body, "corrects_log_id": log["id"]}, headers=H).status_code == 409  # correct the latest only

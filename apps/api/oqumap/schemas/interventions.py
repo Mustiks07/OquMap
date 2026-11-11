@@ -735,8 +735,10 @@ class PilotOutcomeOut(Model):
     status_label: Label
     causal_level: Label
     causal_ceiling: Label
+    fidelity: Label
     method_version: str
     dataset_version: int
+    current_dataset_version: int
     is_stale: bool
     interim: bool
     created_at: str

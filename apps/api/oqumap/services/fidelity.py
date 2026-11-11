@@ -162,8 +162,10 @@ def add_log(session: Session, p: Principal, pilot_id: str, body: S.FidelityLogCr
     inter = {c.cohort_id for c in pilot_cohorts(session, pl) if c.arm == "intervention"}
     if body.cohort_id not in inter:
         raise ApiError("cohort_not_in_pilot", "Класс не получает интервенцию в этом пилоте", 422, {"cohort_id": body.cohort_id})
-    if pl.start_date and body.session_date < pl.start_date or pl.end_date and body.session_date > pl.end_date:
+    if (pl.start_date and body.session_date < pl.start_date) or (pl.end_date and body.session_date > pl.end_date):
         raise ApiError("date_outside_pilot", "Дата вне периода пилота", 422)
+    if body.session_date > today():
+        raise ApiError("date_in_future", "Нельзя записать занятие, которое ещё не прошло", 422)
     if body.learners_present is not None and body.learners_assigned is not None and body.learners_present > body.learners_assigned:
         raise ApiError("validation_error", "Присутствовало больше, чем назначено", 422, {"field": "learners_present"})
     if body.activities_completed > body.activities_planned and body.activities_planned:
