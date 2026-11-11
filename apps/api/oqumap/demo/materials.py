@@ -192,6 +192,13 @@ def build_docx() -> bytes:
             d.add_paragraph(text)
     d.core_properties.title = "Демонстрационное пособие Б"
     d.core_properties.author = "OquMap demo"
+    from datetime import datetime
+
+    fixed = datetime(2026, 1, 1)  # deterministic file (same bytes on every seed)
+    d.core_properties.created = fixed
+    d.core_properties.modified = fixed
+    d.core_properties.last_modified_by = "OquMap demo"
+    d.core_properties.revision = 1
     buf = io.BytesIO()
     d.save(buf)
     return buf.getvalue()

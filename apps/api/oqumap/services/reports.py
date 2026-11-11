@@ -210,14 +210,14 @@ def to_pdf(dec: dict) -> bytes:
         story.append(table([
             ["Тема", "Средняя доля баллов", "95% интервал", "Учеников", "Классов", "Школ"],
             [f"{t['code']} {t['title_ru']}", pct(sm.get("mean")), ci, sm.get("n_learners"), sm.get("n_classes"), sm.get("n_schools")],
-        ], [60 * mm, 26 * mm, 30 * mm, 18 * mm, 18 * mm, 18 * mm]))
+        ], [52 * mm, 26 * mm, 30 * mm, 22 * mm, 20 * mm, 20 * mm]))
         story.append(Spacer(1, 4))
         story.append(table([["Цель", "Формулировка", "Доля баллов", "Статус"]] +
                            [[o["code"], o["text_ru"], pct(o["mean"]), _objective_status(o["status"])] for o in t["objectives"]],
                            [28 * mm, 92 * mm, 24 * mm, 26 * mm]))
         if t["misconceptions"]:
             story.append(Spacer(1, 4))
-            story.append(table([["Возможная ошибка (гипотеза)", "Учеников", "Доля", "Задания"]] +
+            story.append(table([["Возможная ошибка (гипотеза)", "Учеников (≥1 выбор)", "Доля учеников", "Задания"]] +
                                [[mc["label_ru"], mc["n_learners"], pct(mc["share_of_learners"]), ", ".join(mc["items"])]
                                 for mc in t["misconceptions"]], [96 * mm, 20 * mm, 20 * mm, 34 * mm]))
         ex = t["exclusions"]

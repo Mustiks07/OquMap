@@ -25,3 +25,4 @@ data/demo/generated/
 .idea/
 .vscode/
 tests/e2e/node_modules/
+.ca-tmp.pem

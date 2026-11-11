@@ -1,0 +1,11 @@
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+apps/web/dist
+storage
+data/demo/generated
+tests/e2e/test-results
+.git
+.ca-tmp.pem

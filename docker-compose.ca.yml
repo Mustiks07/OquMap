@@ -1,0 +1,13 @@
+# Optional override for networks with a TLS-intercepting proxy:
+#   EXTRA_CA_FILE=/path/to/ca-bundle.pem docker compose -f docker-compose.yml -f docker-compose.ca.yml up --build
+# The bundle is used only at build time (pip / npm) as a BuildKit secret and is not stored in the images.
+services:
+  api:
+    build: { secrets: [extra_ca] }
+  worker:
+    build: { secrets: [extra_ca] }
+  web:
+    build: { secrets: [extra_ca] }
+secrets:
+  extra_ca:
+    file: ${EXTRA_CA_FILE}

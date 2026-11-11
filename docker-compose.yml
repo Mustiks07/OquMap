@@ -1,0 +1,61 @@
+# OquMap local stack: PostgreSQL + API (migrations + synthetic demo seed on start) + worker + web.
+# Usage: docker compose up --build   → http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: oqumap
+      POSTGRES_USER: oqumap
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-oqumap-local-only}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oqumap -d oqumap"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      OQUMAP_DATABASE_URL: postgresql+psycopg://oqumap:${POSTGRES_PASSWORD:-oqumap-local-only}@db:5432/oqumap
+      OQUMAP_JOB_MODE: worker
+      OQUMAP_STORAGE_DIR: /app/storage
+      OQUMAP_CORS_ORIGINS: '["http://localhost:8080"]'
+    volumes:
+      - storage:/app/storage
+    depends_on:
+      db: { condition: service_healthy }
+    ports:
+      - "8000:8000"
+    command: ["api"]
+
+  worker:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      OQUMAP_DATABASE_URL: postgresql+psycopg://oqumap:${POSTGRES_PASSWORD:-oqumap-local-only}@db:5432/oqumap
+      OQUMAP_JOB_MODE: worker
+      OQUMAP_STORAGE_DIR: /app/storage
+      OQUMAP_SEED_DEMO: "false"
+    volumes:
+      - storage:/app/storage
+    depends_on:
+      api: { condition: service_started }
+    command: ["worker"]
+
+  web:
+    build: { context: apps/web }
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+volumes:
+  db-data:
+  storage:
