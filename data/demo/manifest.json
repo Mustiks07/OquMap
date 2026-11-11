@@ -101,6 +101,36 @@
           "no_intervals"
         ]
       }
+    },
+    "measurement_loop": {
+      "id": "6548bc84-3b63-5976-bc90-f71c807ebb92",
+      "name": "Контур измерения и обучения: диагностика T3 и пилоты, 2026–2027",
+      "version": 1,
+      "manifest": {
+        "generator": "oqumap.demo.measurement_seed",
+        "seed": 20261020,
+        "growth_logit": 0.35,
+        "class_effect_on_end_logit": {
+          "6А (PIL-M01)": 0.8,
+          "6Б (comparison)": 0.0,
+          "6В (PIL-M02)": 0.15,
+          "6Г": 0.0
+        },
+        "problem_items": {
+          "Q03": "two_defensible_answers",
+          "Q05": "wrong_answer_key",
+          "Q07": "non_functional_distractor",
+          "Q09": "very_easy",
+          "Q11": "high_omission",
+          "Q12": "very_hard"
+        },
+        "expected_behaviour": [
+          "PIL-M01 positive_signal",
+          "PIL-M02 invalid_due_to_fidelity",
+          "PIL-M03 needs_more_data",
+          "PIL-M04 cannot_be_ready"
+        ]
+      }
     }
   },
   "upload_files": [
