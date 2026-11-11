@@ -61,7 +61,7 @@ export function PortfolioPage() {
                         <li key={i}>
                           <Link to={String(a.action).startsWith("run_follow") || a.action === "record_conclusion" || a.action === "review_evidence_entry" ? `/pilots/${String(a.pilot_id)}/follow-up` : `/pilots/${String(a.pilot_id)}`}>
                             {t2(`pf.action.${String(a.action)}`)}
-                          </Link> — <span className="mono">{String(a.code)}</span> <span className="small">{String(a.title)}</span>
+                          </Link> — <span className="small">{String(a.title)}</span> <span className="mono xs muted">{String(a.code)}</span>
                         </li>
                       ))}
                     </ol>
@@ -71,7 +71,7 @@ export function PortfolioPage() {
                   {([["overdue", fu.overdue], ["due", fu.due_within_14_days], ["upcoming", fu.upcoming]] as const).map(([k, rows]) => (
                     <div key={k}>
                       <h3 style={{ fontSize: "var(--text-sm)", marginBottom: 4 }}>{t2(`pf.${k}`)} ({rows.length})</h3>
-                      <ul className="small" style={{ margin: 0 }}>{rows.map((r) => <li key={r.pilot_id}><Link to={`/pilots/${r.pilot_id}`}>{r.code}</Link> · {r.follow_up_due}</li>)}</ul>
+                      <ul className="small" style={{ margin: 0 }}>{rows.map((r) => <li key={r.pilot_id}><Link to={`/pilots/${r.pilot_id}`} aria-label={`${r.title}: ${r.code}`}>{r.title}</Link> <span className="mono xs muted">{r.code}</span> · {r.follow_up_due}</li>)}</ul>
                     </div>
                   ))}
                 </Card>
@@ -79,7 +79,7 @@ export function PortfolioPage() {
               <div className="grid grid-2">
                 <Card title={t2("pf.missing")}>
                   <ul className="small" style={{ margin: 0 }}>
-                    {d.missing_for_conclusions.map((m) => <li key={String(m.pilot_id)}><Link to={`/pilots/${String(m.pilot_id)}`}>{String(m.code)}</Link>: {(m.missing as string[]).map((c, i) => <span key={c}>{i > 0 && ", "}<CodeLabel prefix="pf.missing." code={c} /></span>)}</li>)}
+                    {d.missing_for_conclusions.map((m) => <li key={String(m.pilot_id)}><Link to={`/pilots/${String(m.pilot_id)}`} aria-label={`${String(m.title)}: ${String(m.code)}`}>{String(m.title)}</Link> <span className="mono xs muted">{String(m.code)}</span>: {(m.missing as string[]).map((c, i) => <span key={c}>{i > 0 && ", "}<CodeLabel prefix="pf.missing." code={c} /></span>)}</li>)}
                   </ul>
                 </Card>
                 <Card title={t2("pf.repeated")}>
@@ -131,11 +131,11 @@ export function PortfolioPage() {
             <p className="xs muted">{l.note_ru}</p>
             <div className="grid grid-3">
               <div><h3 style={{ fontSize: "var(--text-sm)" }}>{t2("pf.lessons")}</h3>
-                <ul className="small">{l.lessons.map((x) => <li key={String(x.conclusion_id)}><span className="mono">{String(x.pilot_code)}</span>: {String(x.lessons_ru || x.summary_ru)}</li>)}</ul></div>
+                <ul className="small">{l.lessons.map((x) => <li key={String(x.conclusion_id)}>{String(x.lessons_ru || x.summary_ru)} <span className="mono xs muted">{String(x.pilot_code)}</span></li>)}</ul></div>
               <div><h3 style={{ fontSize: "var(--text-sm)" }}>{t2("pf.questions")}</h3>
-                <ul className="small">{l.open_questions.map((x, i) => <li key={i}><span className="mono">{String(x.pilot_code)}</span>: {String(x.question)}</li>)}</ul></div>
+                <ul className="small">{l.open_questions.map((x, i) => <li key={i}>{String(x.question)} <span className="mono xs muted">{String(x.pilot_code)}</span></li>)}</ul></div>
               <div><h3 style={{ fontSize: "var(--text-sm)" }}>{t2("pf.pending")}</h3>
-                <ul className="small">{l.pending_evidence_reviews.map((x) => <li key={String(x.entry_id)}>{String(x.intervention_code)} · {String(x.pilot_code)} · <OutcomeBadge status={String(x.outcome_status)} /></li>)}</ul></div>
+                <ul className="small">{l.pending_evidence_reviews.map((x) => <li key={String(x.entry_id)}><OutcomeBadge status={String(x.outcome_status)} /> <span className="mono xs muted">{String(x.intervention_code)} · {String(x.pilot_code)}</span></li>)}</ul></div>
             </div>
           </Card>
         )}
@@ -163,7 +163,7 @@ function PilotTable({ datasetId }: { datasetId: string | null }) {
               <tbody>
                 {d.items.map((p) => (
                   <tr key={p.id}>
-                    <th scope="row"><Link to={`/pilots/${p.id}`} className="mono" aria-label={`${p.code}: ${p.title}`}>{p.code}</Link> <span className="small">{p.title}</span></th>
+                    <th scope="row"><Link to={`/pilots/${p.id}`} aria-label={`${p.code}: ${p.title}`}>{p.title}</Link> <span className="mono xs muted">{p.code}</span></th>
                     <td><PilotStatusBadge status={p.status} /></td><td className="small">{t2(`pilot.design.${p.design}`)}</td>
                     <td className="mono small">{String((p as Record<string, unknown>).intervention_code ?? "")} v{p.intervention_version}</td>
                     <td><FidelityBadge code={p.fidelity} /></td><td><OutcomeBadge status={p.outcome_status} /></td>

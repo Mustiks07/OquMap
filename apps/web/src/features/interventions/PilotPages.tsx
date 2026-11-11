@@ -67,7 +67,7 @@ export function PilotNewPage() {
           <div className="grid grid-2">
             <Field label={t2("pilot.intervention")}>
               {(id) => <Select id={id} value={ivId} onChange={(v) => { setIvId(v); setVersion(""); }}
-                options={[{ value: "", label: "—" }, ...(ivs.data?.items ?? []).filter((x) => x.reviewed_version).map((x) => ({ value: x.id, label: `${x.code} · ${pick(x, "title")}` }))]} />}
+                options={[{ value: "", label: "—" }, ...(ivs.data?.items ?? []).filter((x) => x.reviewed_version).map((x) => ({ value: x.id, label: `${pick(x, "title")} · ${x.code}` }))]} />}
             </Field>
             <Field label={t2("common.version")}>
               {(id) => <Select id={id} value={version} onChange={setVersion}

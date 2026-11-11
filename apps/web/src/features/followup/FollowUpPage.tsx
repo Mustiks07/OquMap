@@ -156,8 +156,8 @@ export function FollowUpPage() {
     <div className="page stack">
       <div className="page-header">
         <div>
-          <h1>{t2("fu.title", { code: p?.code ?? "" })}</h1>
-          <p className="muted">{t2("fu.lead")}</p>
+          <h1>{p?.title ?? t2("fu.title", { code: "" })}</h1>
+          <p className="muted"><span className="mono xs">{p?.code ?? ""}</span>{p?.code ? " · " : ""}{t2("fu.lead")}</p>
         </div>
         <Button onClick={() => nav(`/pilots/${id}`)}>{t2("common.back")}</Button>
       </div>

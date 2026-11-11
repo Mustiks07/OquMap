@@ -98,8 +98,8 @@ export function FidelityPage() {
     <div className="page stack">
       <div className="page-header">
         <div>
-          <h1>{t2("fid.title", { code: pilot.data?.code ?? "" })}</h1>
-          <p className="muted">{t2("fid.lead")}</p>
+          <h1>{pilot.data?.title ?? t2("fid.title", { code: "" })}</h1>
+          <p className="muted"><span className="mono xs">{pilot.data?.code ?? ""}</span>{pilot.data?.code ? " · " : ""}{t2("fid.lead")}</p>
         </div>
         <div className="row">
           <Button onClick={() => nav(`/pilots/${id}`)}>{t2("common.back")}</Button>

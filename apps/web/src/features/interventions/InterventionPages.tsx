@@ -205,7 +205,7 @@ export function InterventionsPage() {
               <caption className="sr-only">{t2("iv.title")}</caption>
               <thead>
                 <tr>
-                  <th scope="col">{t2("iv.code")}</th><th scope="col">{t2("iv.name")}</th><th scope="col">{t2("common.version")}</th>
+                  <th scope="col">{t2("iv.name")}</th><th scope="col">{t2("iv.code")}</th><th scope="col">{t2("common.version")}</th>
                   <th scope="col">{t2("iv.evidence")}</th><th scope="col">{t2("iv.targets")}</th><th scope="col" className="num">{t2("iv.dosage")}</th>
                   <th scope="col" className="num">{t2("iv.pilots")}</th><th scope="col" className="num">{t2("iv.accepted")}</th>
                 </tr>
@@ -213,8 +213,8 @@ export function InterventionsPage() {
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.id}>
-                    <th scope="row" className="mono"><Link to={`/interventions/${r.id}`} aria-label={`${r.code}: ${pick(r, "title")}`}>{r.code}</Link></th>
-                    <td>{pick(r, "title")} {r.status === "archived" && <Badge tone="warn">{t2("iv.archived")}</Badge>}</td>
+                    <th scope="row"><Link to={`/interventions/${r.id}`} aria-label={`${r.code}: ${pick(r, "title")}`}>{pick(r, "title")}</Link> {r.status === "archived" && <Badge tone="warn">{t2("iv.archived")}</Badge>}</th>
+                    <td className="mono xs muted">{r.code}</td>
                     <td>v{r.latest_version} <VersionStatusBadge status={r.current_status} />{r.reviewed_version && r.reviewed_version !== r.latest_version ? <span className="xs muted"> (v{r.reviewed_version} ✓)</span> : null}</td>
                     <td>{t2(`iv.level.${r.evidence_level}`)}</td>
                     <td className="xs">{r.targets.map((x) => x.code).join(", ")}</td>
