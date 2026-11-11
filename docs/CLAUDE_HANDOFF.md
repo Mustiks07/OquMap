@@ -1,152 +1,113 @@
-# Передача Codex: состояние реализации OquMap (Claude, 11.11.2026)
+# Передача: состояние OquMap после доводки по аудиту Codex (Claude, 11.11.2026)
 
-Ветка: `claude/serene-carson-m1pbvz`. Исходные задания и стратегия — `docs/briefs/` (копии пользовательских файлов,
-не изменялись). Файлы `AGENTS.md` и `CODEX_REVIEW_AND_DESIGN_BRIEF.md` в репозитории и во вложениях отсутствовали.
-Репозиторий был пустым — весь код написан с нуля (~14,5 тыс. строк Python/TS без сгенерированных типов).
+Ветка `claude/serene-carson-m1pbvz`. Все изменения этой итерации — **локальные коммиты, не отправлены** (push, merge,
+rebase и force-push не выполнялись по требованию задания). Пользовательские файлы `CLAUDE_IMPLEMENTATION_BRIEF.md`,
+`CODEX_REVIEW_AND_DESIGN_BRIEF.md`, `PROJECT_STRATEGY_RU.md` и файл промпта в этом checkout отсутствуют — не
+создавались, не удалялись и не коммитились. Копии исходных заданий первой итерации — `docs/briefs/` (не менялись).
 
-## 1. Что реализовано и где
+**Статус готовности.** Меры безопасности публичного демо (одноразовые арендаторы, лимиты в БД, очистка, режимы
+развёртывания, заголовки безопасности, проверка Host/загрузок) реализованы и покрыты тестами. Система **не
+объявляется production-ready**: не было внешнего аудита безопасности, нагрузочного теста, настройки TLS/бэкапов и
+проверки живой модели на реальном API.
 
-| Область | Реализация | Код |
-|---|---|---|
-| Схема данных (36 таблиц) | организации/пользователи/сессии/аудит; программа, темы, цели, связи целей; шкалы, формы, задания, связи задание→цель с весами; наборы и версии; школы, учителя, классы, псевдонимные ученики; использование изданий (период, тема, издание, плановые/фактические часы); проверки, присутствие, ответы/попытки; итоговые оценки; импорт; документы, фрагменты, связи фрагмент→цель; ИИ-генерации; снимки анализа; планы; решения (версии), повторные проверки; задачи | `apps/api/oqumap/models.py`, миграция `apps/api/alembic/versions/20261111_d964e255551f_initial_schema.py` |
-| Предметный контент | Математика 6: 8 тем, 20 целей (`DEMO-M6-*`), 14 связей-предпосылок, 52 задания с проверяемыми ответами и кодами 57 типичных ошибок, 6 форм, 4 шкалы | `apps/api/oqumap/demo/content.py`, тест `tests/test_content_items.py` |
-| Генератор и seed | Фиксированные seed, описанный механизм, 5 сценарных наборов + иллюстрация; загрузка через обычный конвейер импорта; 2 демо-пособия (PDF с печатными номерами, DOCX) | `demo/generator.py`, `demo/seed.py`, `demo/materials.py`, `data/demo/MANIFEST.md` |
-| Импорт | CSV (кодировка, разделитель) / XLSX (выбор листа, формулы не вычисляются), автосопоставление колонок (RU/KZ/EN синонимы), построчный отчёт с кодами ошибок, проверка ссылок/диапазонов/дубликатов (в файле и в наборе), хеш файла, версия преобразования, идемпотентный commit (атомарный переход статуса + ключ задачи), запрет повторной загрузки файла, создание школ/классов/учеников/проверок/использования изданий; режим «только оценки» с объяснением недостающих полей | `services/imports.py`, `tests/test_imports.py` |
-| Аналитика | Показатель ученика по весам связей, правила попыток и пропусков, агрегация ученик/класс, кластерно-устойчивые интервалы, статусы и покрытие, распределение дистракторов и гипотезы ошибок, предпосылки, исключения | `analytics/scoring.py`, `services/analysis.py` |
-| Сравнение изданий | Проверки сопоставимости (формы/шкалы, язык, класс, период, разметка, смешение с учителем/школой, мало кластеров, покрытие входного уровня, пустые/малые страты, смешанное использование), прямая стандартизация с выбором весов, кластерный бутстрэп по единице назначения, уровень вывода, разведочная таблица по темам | `analytics/comparison.py`, `tests/test_comparison.py` |
-| Планировщик | CP-SAT, все статусы решателя, независимый валидатор, проверенный минимальный конфликт с арифметикой, сценарии, приоритеты из анализа | `analytics/planner.py`, `services/planning.py`, `tests/test_planner.py` |
-| Документы и поиск | Безопасное хранение (имя = sha256), проверка типа по содержимому, запрет макросов, лимит распаковки, извлечение PDF по физическим страницам + печатные метки, DOCX по якорям, удаление колонтитулов, OCR-адаптер (tesseract, иначе явное «недоступно»), BM25-поиск с совпавшими терминами | `services/documents.py`, `services/search.py` |
-| ИИ | Адаптер провайдера (официальный SDK `anthropic`, ключ только на сервере, лимит входа, timeout/повторы SDK, структурированный JSON по схеме, обработка refusal/max_tokens), задачи: связи фрагмент→цель и задание→цель, интерпретация ошибки, объяснение сравнения, рекомендация с источниками, ассистент с разрешёнными функциями; проверка чисел и ссылок; режимы `live_model`/`recorded_demo`/`template` | `ai/provider.py`, `ai/tasks.py`, `ai/verify.py`, `ai/mapper.py`, `ai/assistant.py` |
-| Решения | Снимок оснований (тема, сравнение, план, источники, ограничения, ИИ-режим), запрет создания из устаревшего анализа, утверждение → новая версия (роль `approver`), история, повторная проверка (общие задания, стандартизация, группа сравнения) | `services/decisions.py` |
-| Экспорт | PDF (reportlab + DejaVu, метка синтетических данных, ограничения вывода), CSV (BOM) и XLSX с защитой от формул — всё из снимка | `services/reports.py` |
-| Доступ | Bearer-токены (хранится хеш), роли, изоляция по `org_id` во всех запросах, задачах worker и функциях ассистента; демо-организация принимает только синтетические загрузки | `services/auth.py`, `tests/test_isolation.py` |
-| API | 40+ маршрутов `/api/v1`, единый формат ошибок с `request_id`, OpenAPI → `packages/contracts/openapi.json` | `api/routes.py`, `main.py`, `schemas/api.py`, `docs/API.md` |
-| Frontend | 8 шагов сценария + ассистент: вход/наборы, импорт и качество, обзор, тема, сравнение, материалы и разметка, планировщик, решение/экспорт/повторная проверка; состояния loading/empty/error+retry/устаревание/конфликт/недостаточно данных; RU/KZ через общий словарь; фильтры и контекст решения сохраняются при смене языка и перезагрузке | `apps/web/src/` |
-| Тесты | 102 pytest (SQLite и PostgreSQL), 7 vitest, 3 Playwright | см. §5 |
+## 1. Пункт → изменённые файлы → тест/команда → фактический результат
 
-## 2. Команды
-См. `README.md`. Кратко:
-* Docker: `docker compose up --build` → http://localhost:8080 (миграции + seed при старте API; отдельный worker).
-  За TLS-прокси: `EXTRA_CA_FILE=… docker compose -f docker-compose.yml -f docker-compose.ca.yml up --build`.
-  Сброс: `docker compose down -v`.
-* Без Docker: `apps/api`: `uv sync && uv run alembic upgrade head && uv run python -m oqumap.demo.seed && uv run uvicorn oqumap.main:app --reload`;
-  `apps/web`: `npm ci && npm run dev`. Windows: `scripts\dev.ps1`.
-* Сброс локальной БД: `cd apps/api && uv run python ../../scripts/reset_demo.py`.
-* Проверки: `scripts/check.sh`; PostgreSQL-прогон тестов: `OQUMAP_TEST_DATABASE_URL=postgresql+psycopg://user@host:5432/postgres uv run pytest`.
-* E2E: `cd tests/e2e && npm ci && OQUMAP_WEB_URL=http://localhost:8080 npx playwright test --trace off` (только на свежем seed).
-* Контракт: `uv run python ../../scripts/export_openapi.py [--check]`, затем `npm run gen:types`.
-* Оценка связывания: `uv run python ../../scripts/eval_ai_mapping.py [--live]`.
-* Lock-файлы: `apps/api/uv.lock`, `apps/api/requirements.lock.txt` (с хешами, для Docker; пересоздать
-  `uv export --frozen --no-dev --no-emit-project -o requirements.lock.txt`), `apps/web/package-lock.json`,
-  `tests/e2e/package-lock.json`. Все версии зафиксированы точно.
+| Пункт | Основные файлы | Тест / команда | Результат |
+|---|---|---|---|
+| P0-1 Провайдер-независимый ИИ | `oqumap/ai/llm/base.py` (контракт: структурированный вывод с серверной проверкой JSON Schema, типизированные инструменты, usage/latency, классифицированные ошибки, ретраи только retryable), `ai/llm/adapters.py` (Gemini, OpenRouter, OpenAI Responses, Anthropic Messages, recorded — чистый HTTP), `ai/provider.py` (диагностика конфигурации, цепочка с явным fallback, circuit breaker, probe), `ai/gate.py` (роли, квоты, потолок токенов, политика реальных данных, audit fallback), `config.py`, `api/routes.py` (`/ai/status`, `/config`), `maintenance.py` (`check-config`, `probe-llm`), `features/AiStatusCard.tsx`, `.env.example`; SDK `anthropic` удалён | `tests/test_llm_adapters.py` (17), `tests/test_llm_config.py` (7), `tests/test_provider_eval.py`, `src/test/aistatus.test.tsx` | passed; **live_model не проверен ни на одном реальном API** (ключей в среде нет; в окружении только `ANTHROPIC_BASE_URL` без ключа) |
+| P0-1 Provider eval | `scripts/eval_llm_provider.py` | `test_provider_eval.py` (сценарный адаптер) | стенд работает; реальные прогоны не выполнялись |
+| P0-2 Безопасность публичного демо | `services/demo_tenants.py`, `services/ratelimit.py`, `services/auth.py`, `worker.py`, `maintenance.py` | `tests/test_public_demo.py` (8) | passed; очистка удаляет все строки арендатора, включая работы/версии диагностики |
+| P0-3 Импорт реальных проектов | `services/onboarding.py`, `services/imports.py`, `data/templates/example_project/*`, `features/ImportPage.tsx` | `tests/test_onboarding.py` (4), Playwright «empty organisation imports a real project» | passed |
+| P0-4 Docker | `docker-compose*.yml`, `apps/api/Dockerfile`, `scripts/docker-entrypoint.sh`, `scripts/docker_cold_start.sh`, `.gitattributes`, `nginx.conf` | `scripts/docker_cold_start.sh 2 --e2e` | 2/2 холодных старта с пустыми томами: все сервисы healthy, рестартов worker 0, трейсбеков 0, selfcheck образа ok, **Playwright 7/7** |
+| P0-5 Уязвимости | `pyproject.toml`/`uv.lock`/`requirements.lock.txt`, `apps/web/package*.json`, `tests/e2e/package*.json` | `pip-audit -r requirements.lock.txt --strict`; `npm audit --omit=dev`; `npm audit` (web, e2e) | 0 / 0 / 0 / 0 |
+| P1-6 CI | `.github/workflows/ci.yml` (actions закреплены по SHA: checkout v7.0.1, setup-node v7.1.0, setup-uv v10.3.3, upload-artifact v7.0.2) | YAML разобран; все шаги выполнены локально эквивалентными командами | **на GitHub Actions не запускался** (push не выполнялся) |
+| P1-6 Детерминизм | `demo/materials.py`, `demo/seed.py`, `services/quizzes.py` (`rl_config.invariant`) | `tests/test_determinism.py` (4), PDF диагностики дважды → байт-в-байт | passed |
+| P1-7 Путь жюри | `LoginPage`, `GuidedDemo`, `DatasetsPage`, `TourPage` | Playwright `full methodist path`, `demo in 3 minutes` | passed |
+| P1-8 Заголовки/загрузки | `main.py`, `nginx.conf`, `services/imports.py` (XLSX: сигнатура, `[Content_Types].xml`, макросы, path traversal, ≤ 2000 членов, ≤ 80 МБ распаковки, коэффициент сжатия, потоковый лимит строк, лимит колонок; CSV: отказ бинарного содержимого; имя хранимого файла — sha256 + белый список расширений) | `tests/test_imports.py` (новые 2), `curl -I` | passed; CSP/`frame-ancestors 'none'`/Permissions-Policy присутствуют, HSTS только при `X-Forwarded-Proto: https`, чужой Host → 400 |
+| WOW-9 Граф доказательств | `services/graph.py`, `features/EvidenceGraph.tsx`, `features/GraphPage.tsx` | `tests/test_wow.py` (граф, пробелы, валидация ID, изоляция), Playwright | passed |
+| WOW-10 Консилиум | `ai/council.py`, `features/Council.tsx` | `test_council_trail_critic_and_verified_card`, `test_council_rejects_invented_ids_and_numbers_from_a_model`, Playwright | passed; в демо критик блокирует сырую разницу (парадокс Симпсона) |
+| WOW-11 Песочница | `services/sandbox.py`, `features/SandboxPage.tsx` | `test_sandbox_*` (2), Playwright | passed |
+| WOW-12 Диагностика | `services/quizzes.py`, модели `Quiz/QuizVersion/QuizResponseSet`, миграция `20261111_d5085df1f375_diagnostic_quizzes.py`, `features/QuizPage.tsx` | `test_quiz_*` (4), Playwright (правка → блокировка → подтверждение ключа → утверждение) | passed; экспорт CSV/XLSX сверен с версией работы (20/20 строк) |
+| WOW-13 Демо за 3 минуты | `services/tour.py`, `features/TourPage.tsx`, `tests/e2e/wow.spec.ts` | Playwright локально и в Docker | passed |
+| P2 Парный follow-up | `analytics/paired.py`, `services/decisions.py`, `DecisionsPage.tsx` | `test_paired_change_*`, `test_api_flow` (`design=cohort`, `no_shared_learner_ids`) | passed |
+| P2 Фильтры класса и языка | `features/Filters.tsx` | tsc, Playwright | passed (в демо все классы русскоязычные — фильтр показывает одно значение) |
+| P2 Доступность | `tests/e2e/a11y.spec.ts` (`@axe-core/playwright` 4.14.0); исправлены имя progressbar, фокусируемые прокручиваемые таблицы, имена узлов графа | Playwright a11y | 0 нарушений уровня serious/critical на вход/обзор/граф/песочница/задания/тур/решения, RU и KZ |
+| Шапка | `Layout.tsx`, `styles/base.css` | замер `scrollWidth` | было 1569 px при окне 1440/1280 (регрессия прошлой итерации), стало = ширине окна |
 
-## 3. Проверенные версии окружения
-Python 3.13.18 (локально), python:3.12-slim (Docker); uv 0.11.32; Node 22.23.4 / npm 10.9.9; PostgreSQL 16.15
-(локально и `postgres:16-alpine`); Docker 29.9.2 (Compose v2); Chromium из Playwright 1.63.0.
-Ключевые зависимости: FastAPI 0.162.4, SQLAlchemy 2.0.44, Alembic 1.20.1, psycopg 3.2.13, OR-Tools 9.15.6755,
-pandas 2.3.3, numpy 2.3.5, scipy 1.16.3, reportlab 4.4.5, pypdf 6.4.0, python-docx 1.2.0, openpyxl 3.1.5,
-anthropic 2.8.0; React 19.2.3, react-router-dom 7.10.1, TanStack Query 5.90.12, Vite 7.2.7, TypeScript 5.9.3,
-Vitest 3.2.4. **Windows/PowerShell не проверялись** (нет среды); скрипты написаны с учётом Windows (пути через
-`pathlib`, `dev.ps1`, `reset_demo.py`).
+## 2. Финальные проверки (запущены 11.11.2026, после последнего изменения кода)
 
-## 4. Деморежим и фикстуры
-Две демо-организации: «Демо-сеть школ» (все синтетические наборы, роли методиста/наблюдателя) и «Другая
-организация» (пустая, для проверки изоляции). Вход без пароля: `methodist` (methodist+approver+teacher),
-`viewer`, `other_org`. Наборы и механизм — `data/demo/MANIFEST.md`. Фикстура 76/63 → 60/75 —
-`data/demo/fixtures/composition_fixture.json`. Файлы для загрузки — `data/demo/imports/`. Записанные примеры —
-`data/demo/recorded/misconceptions.json` (подготовлены при разработке, помечены как не живой ответ модели).
-Сгенерированные CSV пишутся в `data/demo/generated/` (в .gitignore); seed перезаписывает `data/demo/manifest.json`,
-`data/demo/imports/*.csv` и `data/demo/materials/*` детерминированно (кроме даты в manifest).
-
-## 5. Результаты реально запущенных проверок (11.11.2026)
-| Проверка | Результат |
+| Команда | Результат |
 |---|---|
-| `ruff check oqumap tests` | чисто |
-| `pytest` (SQLite) | **102 passed**, ≈50 с |
-| `pytest` на PostgreSQL 16 через Alembic | **102 passed**, ≈90 с |
-| `vitest` | **7 passed** (словарь RU/KZ, форматирование, сохранение фильтров при смене языка, состояния UI) |
-| `tsc -b` и `vite build` | без ошибок |
-| `openapi.json --check` | актуален |
-| Playwright на локальном стеке (uvicorn + vite preview + PostgreSQL) | **3 passed** |
-| Playwright на `docker compose up` (чистый том, отдельный worker) | **3 passed** (17,5 с) |
-| Визуальная проверка PDF (рендер pypdfium2) | 3 страницы, кириллица, таблицы читаемы |
-| Мобильная ширина (iPhone 13) | обзор без горизонтальной прокрутки страницы (таблицы прокручиваются внутри) |
+| `ruff check oqumap tests ../../scripts` | All checks passed |
+| `pytest` (SQLite) | **156 passed** (≈95 с) |
+| `pytest` на PostgreSQL 16.15 через Alembic (`OQUMAP_TEST_DATABASE_URL`) | **156 passed** (≈163 с) |
+| `export_openapi.py --check` | up to date |
+| `npm run typecheck`, `vitest run`, `npm run build` | без ошибок, **8 passed** |
+| `npm audit --omit=dev` / `npm audit` (web), `npm audit` (e2e), `pip-audit --strict` | 0 / 0 / 0 / 0 |
+| `scripts/docker_cold_start.sh 2 --e2e` | 2/2 healthy, worker restarts 0, Traceback 0, **Playwright 7 passed** |
+| Playwright на локальном стеке (uvicorn + vite preview + PostgreSQL, `public_demo`) | 6 passed (тест пустой организации требует `docker compose exec`, прогнан в Docker) |
+| PDF/CSV/XLSX | PDF диагностики отрендерен (pypdfium2) и просмотрен: кириллица, обоснования, метка «не входит в итоговую оценку»; CSV/XLSX совпадают с сохранённой версией; отчёт решения сверяется с снимком в `test_api_flow` |
+| RU/KZ | 604 ключа, все есть в KZ с теми же плейсхолдерами (`i18n.test.tsx`); 12 совпадающих строк — общие слова («Модель», «Экспорт»). **KZ не проверен носителем/переводчиком** |
 
-Покрытые требования §14 задания: идемпотентность/двойной commit (`test_row_report_and_partial_commit`),
-null ≠ 0 (`test_absent_learner_has_no_score…`, `test_responses_have_no_nan`), попытки и мультицелевые задания
-(`test_scoring.py`), 76/63 и 60/75 (`test_composition_fixture…`, `test_comparison_scenarios`), несопоставимые тесты
-и пустые страты, единица кластеризации и симуляция покрытия (`test_comparison.py`), валидатор плана и статусы
-решателя (`test_planner.py`), версия данных и согласованность экспорта (`test_full_methodist_path`), ссылки
-источников (`test_sources_have_pages…`, `test_recommendation_with_foreign_citation…`), изоляция через API/worker/
-ассистента (`test_isolation.py`), отсутствие модели/OCR (`test_ai_status…`, `test_document_upload_pdf_without_text…`),
-сквозной путь и RU/KZ (Playwright + vitest). Запуск из чистого checkout проверен через Docker.
+Выборочный повтор после последней правки (несократимые дроби в условиях): `tests/test_wow.py` 12 passed.
 
-## 6. Статус live-model и OCR
-* **live_model: реализован, не проверен с реальным ключом.** Адаптер на официальном SDK протестирован с поддельным
-  клиентом (форма запроса `output_config.format`, разбор JSON, refusal, лимит входа) и поддельным провайдером
-  (проверка чисел отклоняет выдуманное «37%», проверенный ответ помечается live). Не проверено: принятие параметров
-  реальным API для `claude-opus-5-5`, качество ответов, tool-loop ассистента на реальной модели, задержки.
-  Проверить: задать `OQUMAP_LLM_PROVIDER=anthropic`, `OQUMAP_LLM_API_KEY`, вызвать «Объяснить результат»,
-  «Интерпретировать с ИИ», ассистента; затем `eval_ai_mapping.py --live`.
-* **OCR: адаптер tesseract реализован, не проверен** (бинарника нет). Без движка страницы без текста получают
-  `ocr_status=unavailable`, фрагменты не создаются (тест).
-* Оценка связывания (шаблон): фрагменты P=0,667 R=0,759; задания P=0,700 R=0,712 — см. `docs/AI_EVAL.md`
-  (разметка разработчика, не внешний эталон).
+## 3. Что не проверено (честно)
+* **live_model** — ни один провайдер не вызывался: ключей нет. Адаптеры проверены контрактными тестами на фикстурах,
+  которые **составлены по публичной документации, а не записаны с реальных ответов**. Не проверены: принятие
+  `responseJsonSchema`/`json_schema`/`output_config.format` реальными моделями, tool-loop, задержки, стоимость,
+  качество RU/KZ. Записанного прогона живой модели для «Демо за 3 минуты» нет — не выдумывался.
+* Идентификаторы `claude-opus-5-5` / `claude-sonnet-5-5`: по официальной таблице моделей Anthropic (проверено в
+  прошлой итерации) — действующие; замечание аудита об их некорректности не подтвердилось. Модели по умолчанию
+  больше нет: провайдер и model ID задаются явно.
+* GitHub Actions — workflow не запускался на GitHub.
+* Windows/PowerShell — не проверялись (нет среды).
+* OCR (tesseract) — адаптер есть, бинарника нет; страницы без текста помечаются, текст не выдумывается.
+* Excel/LibreOffice — XLSX открывался только openpyxl.
+* Казахские тексты — черновой перевод разработчика (`KZ_REVIEWED=false`).
+* Нагрузка, внешний pentest, TLS-терминация, резервное копирование — не делались.
+* Docker Hub периодически отвечал 429 на HEAD-запросы манифестов; сборка прошла после повторной загрузки образов.
 
-## 7. Аналитические решения
-Полностью — `docs/METHODOLOGY.md`. Ключевое: пропуск = 0 баллов по умолчанию (переключаемо), отсутствие — исключение;
-первая попытка по умолчанию; только подтверждённые связи по умолчанию; кластерно-устойчивые интервалы по классам,
-нет интервала при < 5 классах; стандартизация по заранее заданным группам входного уровня с общими весами (pooled);
-кластерный бутстрэп по единице назначения; пустые страты блокируют поправку; `causal_protocol` недоступен;
-планировщик — приоритет с убывающей отдачей (r = 0,5^{1/mean h0}) и штраф λ, не прогноз; повторная проверка —
-сравнение когорт на общих заданиях.
+## 4. Как устроены новые части
+* **ИИ.** `OQUMAP_LLM_PROVIDER=none|recorded|gemini|openrouter|openai|anthropic`, `OQUMAP_LLM_MODEL` (точный ID),
+  ключ только своего провайдера (`OQUMAP_<PROVIDER>_API_KEY`), базовые URL, лимиты, `OQUMAP_LLM_FALLBACKS`
+  (`provider:model`; другой провайдер — только с `OQUMAP_LLM_ALLOW_CROSS_PROVIDER_FALLBACK=true`, каждое
+  использование пишется в аудит `llm.fallback_provider`). Бесплатный Gemini = политика `may_train`: только
+  синтетика, предупреждение в UI; реальные данные не отправляются (ещё и `OQUMAP_LLM_REAL_DATA_ALLOWED=false` по
+  умолчанию). Анонимное публичное демо live-модель не использует. Ключ не попадает в frontend, ответы API, логи,
+  снимки, экспорт, трейсбеки (тест `test_llm_config.py` проверяет ответы, `/config`, `/ai/status`, логи, БД).
+* **Граф** — `docs/METHODOLOGY.md §7а`; **консилиум** — §7б (критик детерминирован); **песочница** — §7в;
+  **диагностика** — §7г; **парный follow-up** — §5.
+* **Демо за 3 минуты** — `docs/DEMO_SCENARIO.md`.
 
-## 8. Известные дефекты и ограничения
-| Приоритет | Проблема | Воспроизведение / где |
-|---|---|---|
-| P1 | Live-режим модели не проверен на реальном API | §6 |
-| P1 | Казахские тексты (словарь UI, названия тем/целей, условия заданий, сообщения причин) — черновой перевод разработчика, `kz_verified=false`, специалист не проверял. Отчёт PDF только на русском | `apps/web/src/i18n/dict.ts`, `demo/content.py`, `services/messages.py` |
-| P1 | Для реальных данных нет импорта банка заданий/форм/программы: импорт ответов ссылается на задания и формы демо-программы организации | `services/imports.py` (`unknown_item`, `unknown_form`) |
-| P2 | Нет UI входа по паролю и управления пользователями/организациями (API `POST /auth/login` есть, пользователей создаёт только seed) | `services/auth.py` |
-| P2 | Нет ограничения частоты запросов и очистки истёкших сессий | `api_sessions` |
-| P2 | Повторная загрузка изменённого документа создаёт новый документ (версия всегда 1), а не версию того же издания | `services/documents.py` |
-| P2 | Повторная проверка сравнивает разные когорты; парное сравнение тех же учеников не реализовано | `services/decisions.py` |
-| P2 | Кластеризация по классам при выраженных школьных эффектах может занижать неопределённость (документировано) | `analytics/comparison.py` |
-| P2 | Подтверждение связи задания создаёт новую версию данных → черновики решений из прежних анализов нельзя утвердить без пересчёта (намеренно, но может удивить на демо — подтверждать связи до подготовки решения) | `services/mappings.py` |
-| P2 | Сквозной e2e изменяет данные (загружает повторную проверку): повторный запуск требует сброса демо | `tests/e2e` |
-| P3 | Фильтры языка и классов есть в API, но не выведены в UI | `features/Filters.tsx` |
-| P3 | `data/demo/manifest.json` меняет дату при каждом seed | `demo/seed.py` |
-| P3 | Доступность не проверялась инструментом (axe); вручную: подписи полей, видимый focus, текстовые статусы рядом с цветом, клавиатурная навигация по нативным элементам | `apps/web` |
-| P3 | Планировщик не строит календарь по неделям и не учитывает последовательность тем (UI и отчёт это прямо сообщают) | `analytics/planner.py` |
+## 5. Команды
+* Docker: `docker compose up --build` → http://localhost:8080; холодный старт: `scripts/docker_cold_start.sh 2 --e2e`.
+  За TLS-прокси: `EXTRA_CA_FILE=… COMPOSE_FILES="-f docker-compose.yml -f docker-compose.ca.yml" scripts/docker_cold_start.sh`.
+* Без Docker: см. README; тесты — `cd apps/api && uv run pytest`; PostgreSQL — `OQUMAP_TEST_DATABASE_URL=… uv run pytest`.
+* Контракт: `uv run python ../../scripts/export_openapi.py [--check]` → `npm run gen:types`.
+* ИИ: `uv run python -m oqumap.maintenance check-config | probe-llm`; сравнение моделей —
+  `uv run python ../../scripts/eval_llm_provider.py`.
 
-## 9. Точки изменения дизайна и карта компонентов
-* Токены: `apps/web/src/styles/tokens.css` (цвета, типографика, отступы, радиусы, палитра графиков, размеры
-  раскладки). Примитивы: `src/styles/components.css` + `src/ui/index.tsx` (Button, Card, Badge, Alert, Loading,
-  ErrorState, EmptyState, QueryView, Field, Select, Tabs, Metric, ShareBar, Diff, StatusBadge, SyntheticBadge,
-  ModeBadge, ReasonList, StaleBanner, Disclosure, CI), графики `src/ui/charts.tsx` (GroupedBars, HoursChart,
-  heatColor), форматирование `src/ui/format.ts`.
-* Каркас: `src/features/Layout.tsx` (шапка, шаги, ассистент), раскладка `src/styles/base.css`.
-* Страницы (только представление + вызовы хуков): `LoginPage`, `DatasetsPage` (+ `QualityPanel`), `ImportPage`
-  (+ переиспользуемый `ImportWizard`), `OverviewPage`, `TopicPage`, `ComparePage`, `MaterialsPage`, `PlannerPage`,
-  `DecisionsPage`, `Assistant`, `SourceDialog`, `Filters`.
-* Данные: `src/api/client.ts` (fetch, ошибки, скачивание), `src/api/hooks.ts` (TanStack Query; ключи включают
-  версию набора), `src/api/types.ts` (алиасы сгенерированных типов). Состояние сценария: `src/state/AppState.tsx`.
-  Бизнес-логики во фронтенде нет: все числа, статусы и тексты причин приходят с сервера.
-* Тексты: `src/i18n/dict.ts` (`t(key)`), серверные объекты выбираются через `pick(obj, "title")`.
-* Для доводки UX: обзор и тема информационно плотные; графики минимальные (SVG); тепловая карта широкая;
-  карточки сценариев планировщика узкие для графика; нет пошаговой «проводки» демонстрации.
+## 6. Версии окружения
+Python 3.13.18 (локально), python:3.12-slim (Docker); uv 0.11.32; Node 22.23.4; PostgreSQL 16.15 / postgres:16-alpine;
+Docker 29.9.2. Backend: FastAPI 0.162.4, pydantic 2.13.5, pydantic-settings 2.16.2, SQLAlchemy 2.0.44, Alembic 1.20.1,
+psycopg 3.2.13, OR-Tools 9.15.6755, numpy 2.3.5, pandas 2.3.3, scipy 1.16.3, reportlab 4.4.5, pypdf 7.0.1,
+pypdfium2 5.0.0, openpyxl 3.1.5, httpx 0.28.1, python-multipart 0.0.33. Frontend: React 19.2.3, react-router-dom 7.18.5,
+TanStack Query 5.90.12, Vite 7.3.8, TypeScript 5.9.3, Vitest 4.1.12. E2E: @playwright/test 1.63.0,
+@axe-core/playwright 4.14.0.
 
-## 10. Экспорт и визуальная проверка
-PDF/CSV/XLSX формируются из `decision.snapshot` (+ записанные повторные проверки), тест сверяет разницу из сравнения
-с PDF-текстом и XLSX-ячейкой. PDF отрендерен в PNG и просмотрен (3 страницы). XLSX: строки принудительно текстовые,
-значения, начинающиеся с `= + - @`, экранируются апострофом. Открытие в Excel/LibreOffice вручную не проверялось.
+## 7. Известные ограничения
+| Приоритет | Ограничение |
+|---|---|
+| P1 | live_model и provider eval не запускались на реальных API (§3) |
+| P1 | KZ-тексты не проверены носителем; PDF-отчёты только на русском |
+| P2 | Семейства диагностических заданий есть только для дробей, НОК и процентов; для других гипотез генерация честно отказывает (`no_template_family`) — нужен живой режим или ручное составление (живой режим генерации заданий не реализован) |
+| P2 | Парсер намерений песочницы — правила (RU, частично KZ); модель подключается только для нераспознанных фрагментов и при разрешённом live |
+| P2 | Критик консилиума — правила; живого «критика-модели» нет (сознательно: воспроизводимость) |
+| P2 | Кластеризация по классам при выраженных школьных эффектах может занижать неопределённость (документировано) |
+| P3 | Планировщик не строит календарь по неделям и не учитывает последовательность тем |
+| P3 | Граф в режиме «весь граф» широкий (горизонтальная прокрутка); визуальный редизайн не выполнялся по заданию |
 
-## 11. Изменения общих контрактов
-Изменений семантики §5 нет. Уточнения: `dataset_version` — целое число (растёт при commit и при ревью связи задания);
-фильтры передаются в `GET /topics/{id}/evidence` как JSON-строка `filters`; добавлены маршруты из `docs/API.md`;
-`causal_protocol` присутствует в перечислении, но никогда не выставляется.
-
-## 12. Пользовательские материалы, которые нельзя заменять
-Финальных презентаций, видео и иных материалов пользователя в репозитории нет. Копии исходных заданий в
-`docs/briefs/` — пользовательские документы, не редактировать. Публикация, push в иные ветки и отправка материалов
-третьим лицам не выполнялись.
+## 8. `git status --short` после финальных проверок
+Пусто, кроме файлов, перечисленных в итоговом сообщении (если есть). Временные артефакты не отслеживаются:
+`.ca-tmp.pem` (CA для сборки за прокси), `tests/e2e/test-results/`, `*.tsbuildinfo`, `data/demo/generated/` —
+в `.gitignore`.

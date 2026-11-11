@@ -5,8 +5,9 @@
   mechanical, checkable rationale. Families are chosen by the misconception hypotheses that the topic analysis
   actually observed, and every item links back to evidence (graph node IDs of the signalling items and the
   misconception).
-* Live mode (when allowed): a model may draft items in the same schema; they pass the same checks, are marked
-  as requiring teacher verification of the key, and are never auto-approved.
+* Only template families are implemented; for hypotheses without a family generation refuses honestly
+  (``no_template_family``). Items whose numbers a teacher changes lose the recomputed key and need the
+  teacher's explicit key confirmation before approval.
 * Review: draft → edited (each teacher edit creates a new version) → approved | rejected. Approval requires
   every blocking check to pass. Quizzes are formative only: ``use = diagnostic_only``; responses imported back
   are summarised per item and per hypothesis and are never written into grades or the outcome assessments.
@@ -296,8 +297,8 @@ def generate(session: Session, p, req: GenerateReq, persist: bool = True) -> dic
         if fam and all(f != fam for f, _ in plan):
             plan.append((fam, mc))
     if not plan:
-        raise ApiError("no_template_family", "Для гипотез этой темы нет шаблонного семейства заданий; нужен живой режим "
-                       "модели или ручное составление", 422, {"misconceptions": [x["code"] for x in ev["misconceptions"]]})
+        raise ApiError("no_template_family", "Для гипотез этой темы нет шаблонного семейства заданий: автоматическая "
+                       "генерация недоступна, задания нужно составить вручную", 422, {"misconceptions": [x["code"] for x in ev["misconceptions"]]})
     rng = random.Random(req.seed if req.seed is not None else int(sha256_bytes(f"{req.topic_id}{ds.version}".encode())[:8], 16))
     items: list[dict] = []
     stems = set()
