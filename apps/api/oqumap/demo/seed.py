@@ -94,7 +94,11 @@ def _hash_password(raw: str) -> str:
 def seed(session: Session, reset: bool = False) -> dict:
     existing = session.get(m.Organization, DEMO_ORG_ID)
     if existing is not None and not reset:
-        return {"status": "exists"}
+        from .measurement_seed import (
+            seed_measurement,  # idempotent add-on for databases seeded before it existed
+        )
+
+        return {"status": "exists", "measurement": seed_measurement(session, DEMO_ORG_ID)["status"]}
     if existing is not None and reset:
         raise SystemExit("Use scripts/reset_db to drop the database before reseeding.")
     s = get_settings()
@@ -128,6 +132,9 @@ def seed(session: Session, reset: bool = False) -> dict:
     datasets["illustration"] = _seed_illustration(session)
     _seed_plan(session, datasets["base"])
     session.commit()
+    from .measurement_seed import seed_measurement
+
+    datasets["measurement_loop"] = session.get(m.Dataset, seed_measurement(session, DEMO_ORG_ID)["dataset_id"])
     _write_manifest(datasets)
     try:
         from ..ai.tasks import propose_fragment_links_for_document
