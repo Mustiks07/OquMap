@@ -6,6 +6,7 @@ import { App } from "./App";
 import { ApiError } from "./api/client";
 import { I18nProvider } from "./i18n/I18n";
 import { AppStateProvider } from "./state/AppState";
+import "@fontsource-variable/onest";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/components.css";

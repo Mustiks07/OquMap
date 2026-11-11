@@ -2,31 +2,33 @@
    Codex: the visual system can be reworked by editing this file and src/ui/* without touching features. */
 :root {
   /* palette */
-  --color-bg: #f5f7fa;
-  --color-surface: #ffffff;
-  --color-surface-muted: #eef2f6;
-  --color-border: #d5dde6;
-  --color-border-strong: #a9b6c4;
-  --color-text: #1a2533;
-  --color-text-muted: #4f5d6d;
+  --color-bg: #f7f6f2;
+  --color-surface: #fcfbf8;
+  --color-surface-raised: #ffffff;
+  --color-surface-muted: #efeee9;
+  --color-border: rgba(23, 24, 26, 0.12);
+  --color-border-strong: rgba(23, 24, 26, 0.24);
+  --color-text: #17181a;
+  --color-text-muted: #62656b;
+  --color-text-tertiary: #686c73;
   --color-text-inverse: #ffffff;
-  --color-primary: #1f4e79;
-  --color-primary-hover: #183e61;
-  --color-primary-soft: #e3edf7;
-  --color-focus: #f2a900;
+  --color-primary: #3157d5;
+  --color-primary-hover: #2547bd;
+  --color-primary-soft: #e8ecfa;
+  --color-focus: #3157d5;
 
   /* semantic status colours (always paired with text/icon, never colour alone) */
-  --color-ok: #1e6b46;
-  --color-ok-soft: #e1f2e8;
-  --color-warn: #8a5300;
-  --color-warn-soft: #fdf1dc;
-  --color-danger: #a1261b;
-  --color-danger-soft: #fbe5e2;
-  --color-info: #23517e;
-  --color-info-soft: #e3edf7;
-  --color-neutral-soft: #e9edf1;
-  --color-synthetic: #6b3fa0;
-  --color-synthetic-soft: #f0e8fa;
+  --color-ok: #2e7357;
+  --color-ok-soft: #e8f1ec;
+  --color-warn: #80500f;
+  --color-warn-soft: #f7eddc;
+  --color-danger: #993a30;
+  --color-danger-soft: #f7e7e3;
+  --color-info: #3157d5;
+  --color-info-soft: #e8ecfa;
+  --color-neutral-soft: #eae9e5;
+  --color-synthetic: #71518b;
+  --color-synthetic-soft: #eee8f3;
 
   /* chart palette: colour-blind safe (Okabe–Ito based), checked for contrast on white */
   --chart-a: #0072b2;
@@ -41,19 +43,19 @@
   --heat-4: #c6e6d4;
 
   /* typography — sized for laptop + projector */
-  --font-sans: "Inter", "Segoe UI", "Roboto", "Noto Sans", "DejaVu Sans", system-ui, sans-serif;
+  --font-sans: "Onest Variable", "Noto Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Consolas", "DejaVu Sans Mono", monospace;
-  --text-xs: 0.78rem;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.15rem;
-  --text-xl: 1.4rem;
-  --text-2xl: 1.8rem;
-  --text-metric: 2.1rem;
-  --leading: 1.5;
-  --weight-regular: 400;
-  --weight-medium: 550;
-  --weight-bold: 700;
+  --text-xs: 0.73rem;
+  --text-sm: 0.825rem;
+  --text-md: 0.925rem;
+  --text-lg: 1.02rem;
+  --text-xl: 1.32rem;
+  --text-2xl: 1.65rem;
+  --text-metric: 2rem;
+  --leading: 1.46;
+  --weight-regular: 430;
+  --weight-medium: 560;
+  --weight-bold: 680;
 
   /* spacing scale */
   --space-1: 4px;
@@ -65,16 +67,16 @@
   --space-7: 48px;
 
   /* shape & elevation */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --shadow-card: 0 1px 2px rgba(16, 32, 48, 0.06), 0 1px 6px rgba(16, 32, 48, 0.05);
-  --shadow-pop: 0 8px 28px rgba(16, 32, 48, 0.18);
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
+  --shadow-card: none;
+  --shadow-pop: 0 18px 48px rgba(23, 24, 26, 0.16);
 
   /* layout */
-  --sidebar-width: 248px;
-  --header-height: 60px;
-  --assistant-width: 400px;
-  --content-max: 1280px;
-  --focus-ring: 0 0 0 3px var(--color-focus);
+  --sidebar-width: 208px;
+  --header-height: 52px;
+  --assistant-width: 384px;
+  --content-max: 1440px;
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-focus) 28%, transparent);
 }

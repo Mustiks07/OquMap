@@ -30,11 +30,14 @@ export function Layout() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <a className="brand" href="/datasets" onClick={(e) => { e.preventDefault(); nav("/datasets"); }}>
-          OquMap
-        </a>
+        <div className="brand-lockup">
+          <a className="brand" href="/datasets" onClick={(e) => { e.preventDefault(); nav("/datasets"); }}>
+            OquMap
+          </a>
+          <span>{lang === "kz" ? "Оқу картасы" : "Карта обучения"}</span>
+        </div>
         {dataset ? (
-          <span className="row small" style={{ gap: 8, flexWrap: "nowrap", minWidth: 0, flex: "0 1 auto", overflow: "hidden" }} data-testid="dataset-chip">
+          <span className="row small header-context" style={{ gap: 8, flexWrap: "nowrap", minWidth: 0, flex: "0 1 auto", overflow: "hidden" }} data-testid="dataset-chip">
             <span className="muted">{t("header.dataset")}:</span>
             <strong style={{ maxWidth: 320, minWidth: 40, flexShrink: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={lang === "kz" ? dataset.name_kz : dataset.name_ru}>
               {lang === "kz" ? dataset.name_kz : dataset.name_ru}
