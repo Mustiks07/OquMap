@@ -557,6 +557,9 @@ class Job(IdMixin, TimestampMixin, Base):
 
 __all__ = [name for name in dir() if name[0].isupper()]
 
+# Measurement & learning-loop tables live in a separate module (registered on the same metadata).
+from . import measurement_models as _measurement_models  # noqa: E402,F401
+
 _ = relationship  # relationships are intentionally explicit queries; keeps tenant scoping visible
 
 

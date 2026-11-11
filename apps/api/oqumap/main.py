@@ -8,10 +8,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from . import db
+from .api.intervention_routes import router as intervention_router
+from .api.quality_routes import router as quality_router
 from .api.routes import router
 from .config import CODE_VERSION, get_settings
 from .errors import ApiError
@@ -91,6 +94,11 @@ def create_app(database_url: str | None = None) -> FastAPI:
     async def http_error(_: Request, exc: StarletteHTTPException):
         return err(exc.status_code, "http_error", str(exc.detail))
 
+    @app.exception_handler(IntegrityError)
+    async def integrity_error(_: Request, exc: IntegrityError):
+        # a uniqueness/foreign-key race that no service mapped explicitly: a conflict, not an internal error
+        return err(409, "integrity_conflict", "Данные одновременно изменены другим запросом; повторите действие")
+
     @app.exception_handler(Exception)
     async def unhandled(_: Request, exc: Exception):
         log.exception("unhandled error request_id=%s", request_id_var.get())
@@ -142,6 +150,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
         return ready()
 
     app.include_router(router)
+    app.include_router(quality_router)
+    app.include_router(intervention_router)
     return app
 
 

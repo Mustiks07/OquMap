@@ -9,6 +9,7 @@ import { Badge, Button, SyntheticBadge } from "../ui";
 import { dateTime } from "../ui/format";
 import { Assistant } from "./Assistant";
 import { GuidedDemo } from "./GuidedDemo";
+import { MeasurementNav } from "./measurement/MeasurementNav";
 
 const STEPS: { to: string; key: DictKey }[] = [
   { to: "/datasets", key: "nav.datasets" },
@@ -110,7 +111,7 @@ export function Layout() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/quality" className={({ isActive }) => (isActive ? "active" : "")}>
+            <NavLink to="/data-quality" className={({ isActive }) => (isActive ? "active" : "")}>
               <span className="nav-step" aria-hidden="true">i</span>
               {t("quality.title")}
             </NavLink>
@@ -131,6 +132,7 @@ export function Layout() {
           )}
         </ol>
         {user?.org_is_demo && <GuidedDemo />}
+        <MeasurementNav />
         {dataset?.is_synthetic && <p className="xs muted" style={{ marginTop: 16 }}>{t("synthetic.note")}</p>}
       </nav>
       <main className="app-main" id="main">

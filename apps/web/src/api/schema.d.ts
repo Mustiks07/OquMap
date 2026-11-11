@@ -538,6 +538,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/design-studio/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Design Studio
+         * @description Deterministic design comparison for planning; never approves or changes a pilot.
+         */
+        post: operations["design_studio_api_v1_design_studio_evaluate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/documents": {
         parameters: {
             query?: never;
@@ -763,6 +783,178 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/intervention-evidence/{entry_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Review Evidence Entry */
+        post: operations["review_evidence_entry_api_v1_intervention_evidence__entry_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Interventions */
+        get: operations["list_interventions_api_v1_interventions_get"];
+        put?: never;
+        /** Create Intervention */
+        post: operations["create_intervention_api_v1_interventions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Suggest Interventions */
+        get: operations["suggest_interventions_api_v1_interventions_suggest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions/{intervention_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Intervention */
+        get: operations["get_intervention_api_v1_interventions__intervention_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Intervention */
+        patch: operations["update_intervention_api_v1_interventions__intervention_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/interventions/{intervention_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive Intervention */
+        post: operations["archive_intervention_api_v1_interventions__intervention_id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions/{intervention_id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Intervention Evidence */
+        get: operations["intervention_evidence_api_v1_interventions__intervention_id__evidence_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions/{intervention_id}/targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Link Intervention Target */
+        post: operations["link_intervention_target_api_v1_interventions__intervention_id__targets_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions/{intervention_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** New Intervention Version */
+        post: operations["new_intervention_version_api_v1_interventions__intervention_id__versions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions/{intervention_id}/versions/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Intervention Draft */
+        delete: operations["delete_intervention_draft_api_v1_interventions__intervention_id__versions__version__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/interventions/{intervention_id}/versions/{version}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Review Intervention Version */
+        post: operations["review_intervention_version_api_v1_interventions__intervention_id__versions__version__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/items/{item_id}/suggest-links": {
         parameters: {
             query?: never;
@@ -789,6 +981,23 @@ export interface paths {
         };
         /** Get Job */
         get: operations["get_job_api_v1_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Summary */
+        get: operations["learning_summary_api_v1_learning_summary_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -831,6 +1040,215 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pilots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Pilots */
+        get: operations["list_pilots_api_v1_pilots_get"];
+        put?: never;
+        /** Create Pilot */
+        post: operations["create_pilot_api_v1_pilots_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Pilot */
+        get: operations["get_pilot_api_v1_pilots__pilot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Pilot */
+        patch: operations["update_pilot_api_v1_pilots__pilot_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/conclusions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Conclusions */
+        get: operations["list_conclusions_api_v1_pilots__pilot_id__conclusions_get"];
+        put?: never;
+        /** Create Conclusion */
+        post: operations["create_conclusion_api_v1_pilots__pilot_id__conclusions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/fidelity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pilot Fidelity */
+        get: operations["pilot_fidelity_api_v1_pilots__pilot_id__fidelity_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/fidelity-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Fidelity Log */
+        post: operations["add_fidelity_log_api_v1_pilots__pilot_id__fidelity_logs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/follow-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run Follow Up */
+        post: operations["run_follow_up_api_v1_pilots__pilot_id__follow_up_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/outcomes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pilot Outcomes */
+        get: operations["pilot_outcomes_api_v1_pilots__pilot_id__outcomes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/randomize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Randomize Pilot */
+        post: operations["randomize_pilot_api_v1_pilots__pilot_id__randomize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pilot Sessions */
+        get: operations["pilot_sessions_api_v1_pilots__pilot_id__sessions_get"];
+        put?: never;
+        /** Add Session */
+        post: operations["add_session_api_v1_pilots__pilot_id__sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/sessions/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate Sessions */
+        post: operations["generate_sessions_api_v1_pilots__pilot_id__sessions_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Session */
+        delete: operations["delete_session_api_v1_pilots__pilot_id__sessions__session_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Session */
+        patch: operations["update_session_api_v1_pilots__pilot_id__sessions__session_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/pilots/{pilot_id}/transition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transition Pilot */
+        post: operations["transition_pilot_api_v1_pilots__pilot_id__transition_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/plans/context": {
         parameters: {
             query?: never;
@@ -859,6 +1277,129 @@ export interface paths {
         put?: never;
         /** Solve Plan */
         post: operations["solve_plan_api_v1_plans_solve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portfolio/interventions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Intervention Portfolio */
+        get: operations["intervention_portfolio_api_v1_portfolio_interventions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quality/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Quality */
+        get: operations["list_quality_api_v1_quality_assessments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quality/assessments/{assessment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assessment Quality */
+        get: operations["assessment_quality_api_v1_quality_assessments__assessment_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quality/assessments/{assessment_id}/assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Assignments */
+        get: operations["get_assignments_api_v1_quality_assessments__assessment_id__assignments_get"];
+        /** Put Assignments */
+        put: operations["put_assignments_api_v1_quality_assessments__assessment_id__assignments_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quality/assessments/{assessment_id}/dif": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dif Screening
+         * @description Language DIF screening (Mantel–Haenszel) on one form; screening signals, not evidence of bias.
+         */
+        get: operations["dif_screening_api_v1_quality_assessments__assessment_id__dif_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quality/assessments/{assessment_id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assessment Items */
+        get: operations["assessment_items_api_v1_quality_assessments__assessment_id__items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quality/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Item Quality */
+        get: operations["item_quality_api_v1_quality_items__item_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1186,6 +1727,18 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AdherenceItem */
+        AdherenceItem: {
+            /** Done */
+            done: boolean;
+            /** Key */
+            key: string;
+            /**
+             * Label
+             * @default
+             */
+            label: string;
+        };
         /** AnalysisContext */
         AnalysisContext: {
             /** Analysis Id */
@@ -1228,10 +1781,225 @@ export interface components {
              */
             lang: string;
         };
+        /** AnalysisPlan */
+        AnalysisPlan: {
+            /**
+             * Adjustment
+             * @default none
+             * @enum {string}
+             */
+            adjustment: "none" | "baseline_strata";
+            /**
+             * Attempt Rule
+             * @default first
+             * @enum {string}
+             */
+            attempt_rule: "first" | "last";
+            /**
+             * External Analysis Acknowledged
+             * @default false
+             */
+            external_analysis_acknowledged: boolean;
+            /**
+             * Min Matched Learners
+             * @default 30
+             */
+            min_matched_learners: number;
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+            /**
+             * Omitted Policy
+             * @default as_incorrect
+             * @enum {string}
+             */
+            omitted_policy: "as_incorrect" | "exclude";
+            /** Primary Estimand */
+            primary_estimand?: ("mean_paired_change" | "difference_in_mean_changes") | null;
+            /**
+             * Strata Scheme
+             * @default pre_three_level
+             * @enum {string}
+             */
+            strata_scheme: "pre_three_level" | "pre_two_level";
+        };
         /** ApproveRequest */
         ApproveRequest: {
             /** Note */
             note?: string | null;
+        };
+        /** ArchiveRequest */
+        ArchiveRequest: {
+            /** Reason */
+            reason: string;
+        };
+        /** AssessmentItemsOut */
+        AssessmentItemsOut: {
+            assessment: components["schemas"]["QualityAssessmentRef"];
+            /** Dataset Id */
+            dataset_id: string;
+            /** Dataset Version */
+            dataset_version: number;
+            /** Generated At */
+            generated_at: string;
+            /** Is Synthetic */
+            is_synthetic: boolean;
+            /** Items */
+            items: components["schemas"]["ItemQuality"][];
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Method Version */
+            method_version: string;
+            provenance: components["schemas"]["Provenance"];
+            /** Rules */
+            rules: {
+                [key: string]: string;
+            };
+            /** Thresholds */
+            thresholds: {
+                [key: string]: number;
+            };
+        } & {
+            [key: string]: unknown;
+        };
+        /** AssessmentQualityList */
+        AssessmentQualityList: {
+            /** Assessments */
+            assessments: components["schemas"]["AssessmentQualitySummary"][];
+            /** Limit */
+            limit: number;
+            /** Method Version */
+            method_version: string;
+            /** Offset */
+            offset: number;
+            /** Rules */
+            rules: {
+                [key: string]: string;
+            };
+            /** Total */
+            total: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AssessmentQualityOut */
+        AssessmentQualityOut: {
+            assessment: components["schemas"]["QualityAssessmentRef"];
+            /** Current Dataset Version */
+            current_dataset_version: number;
+            /** Dataset Id */
+            dataset_id: string;
+            /** Dataset Version */
+            dataset_version: number;
+            exclusions: components["schemas"]["QualityExclusions"];
+            /** Flag Counts */
+            flag_counts: {
+                [key: string]: number;
+            };
+            form: components["schemas"]["FormQuality"];
+            /** Generated At */
+            generated_at: string;
+            /** Is Stale */
+            is_stale: boolean;
+            /** Is Synthetic */
+            is_synthetic: boolean;
+            /** Items */
+            items: components["schemas"]["ItemQuality"][];
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Method Version */
+            method_version: string;
+            /** N Flagged Items */
+            n_flagged_items: number;
+            provenance: components["schemas"]["Provenance"];
+            /** Rules */
+            rules: {
+                [key: string]: string;
+            };
+            /** Slices */
+            slices: {
+                [key: string]: components["schemas"]["SliceRow"][];
+            };
+            /** Thresholds */
+            thresholds: {
+                [key: string]: number;
+            };
+        } & {
+            [key: string]: unknown;
+        };
+        /** AssessmentQualitySummary */
+        AssessmentQualitySummary: {
+            assessment: components["schemas"]["QualityAssessmentRef"];
+            /** Completion Rate */
+            completion_rate: number | null;
+            cronbach_alpha: components["schemas"]["StatValue"];
+            dataset: components["schemas"]["QualityDatasetRef"];
+            /** Dataset Version */
+            dataset_version: number;
+            denominators: components["schemas"]["FormDenominators"];
+            /** Flag Counts */
+            flag_counts: {
+                [key: string]: number;
+            };
+            /** Generated At */
+            generated_at: string;
+            /** Is Synthetic */
+            is_synthetic: boolean;
+            /** Mean Score */
+            mean_score: number | null;
+            /** Method Version */
+            method_version: string;
+            /** N Flagged Items */
+            n_flagged_items: number;
+            /** N Items */
+            n_items: number;
+            /** Omission Rate */
+            omission_rate: number | null;
+            provenance: components["schemas"]["Provenance"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** AssignmentRow */
+        AssignmentRow: {
+            /** Assigned */
+            assigned: boolean;
+            /** Code */
+            code: string;
+            /** Cohort Id */
+            cohort_id: string;
+            /** Sitting Records */
+            sitting_records: number;
+            /** Source */
+            source: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AssignmentsIn */
+        AssignmentsIn: {
+            /** Cohort Ids */
+            cohort_ids: string[];
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** AssignmentsOut */
+        AssignmentsOut: {
+            /** Assessment Code */
+            assessment_code: string;
+            /** Assessment Id */
+            assessment_id: string;
+            /**
+             * Assignment Scope
+             * @enum {string}
+             */
+            assignment_scope: "explicit" | "inferred_from_sittings";
+            /** Cohorts */
+            cohorts: components["schemas"]["AssignmentRow"][];
+        } & {
+            [key: string]: unknown;
         };
         /** AssistantAnswer */
         AssistantAnswer: {
@@ -1487,6 +2255,98 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** ConclusionCreate */
+        ConclusionCreate: {
+            /** Acknowledged Limitation Codes */
+            acknowledged_limitation_codes?: string[];
+            /**
+             * Create Next Decision Version
+             * @default true
+             */
+            create_next_decision_version: boolean;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "continue" | "modify" | "stop" | "extend_data_collection";
+            /**
+             * Decision Basis
+             * @default insufficient_evidence
+             * @enum {string}
+             */
+            decision_basis: "evidence_supports" | "operational" | "insufficient_evidence" | "external_factors";
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /**
+             * Lessons Ru
+             * @default
+             */
+            lessons_ru: string;
+            /**
+             * Next Action Ru
+             * @default
+             */
+            next_action_ru: string;
+            /** Open Questions */
+            open_questions?: string[];
+            /** Outcome Id */
+            outcome_id: string;
+            /**
+             * Propose Evidence Update
+             * @default true
+             */
+            propose_evidence_update: boolean;
+            /** Stop Reason Code */
+            stop_reason_code?: ("implementation_not_feasible" | "resource_constraints" | "priority_change" | "safety_or_harm_concern" | "replaced_by_alternative" | "other") | null;
+            /**
+             * Summary Kz
+             * @default
+             */
+            summary_kz: string;
+            /** Summary Ru */
+            summary_ru: string;
+        };
+        /** ConclusionOut */
+        ConclusionOut: {
+            /** Acknowledged Limitation Codes */
+            acknowledged_limitation_codes: string[];
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string | null;
+            /** Decision */
+            decision: string;
+            /** Decision Basis */
+            decision_basis: string;
+            /** Evidence Entry */
+            evidence_entry: {
+                [key: string]: unknown;
+            } | null;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Id */
+            id: string;
+            /** Lessons Ru */
+            lessons_ru: string;
+            /** Next Decision Id */
+            next_decision_id: string | null;
+            /** Open Questions */
+            open_questions: string[];
+            /** Outcome Id */
+            outcome_id: string;
+            /** Outcome Status */
+            outcome_status: string;
+            /** Pilot Id */
+            pilot_id: string;
+            /** Stop Reason Code */
+            stop_reason_code: string | null;
+            /** Summary Kz */
+            summary_kz: string;
+            /** Summary Ru */
+            summary_ru: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** CouncilReq */
         CouncilReq: {
             /** Dataset Id */
@@ -1535,6 +2395,19 @@ export interface components {
             version_updated_at: string;
         } & {
             [key: string]: unknown;
+        };
+        /** DateRange */
+        DateRange: {
+            /**
+             * From
+             * Format: date
+             */
+            from: string;
+            /**
+             * To
+             * Format: date
+             */
+            to: string;
         };
         /** DecisionCreate */
         DecisionCreate: {
@@ -1652,6 +2525,228 @@ export interface components {
             /** Persona */
             persona?: string | null;
         };
+        /** DesignOption */
+        DesignOption: {
+            /** Admissible */
+            admissible: boolean;
+            /** Analysis Mode */
+            analysis_mode: string;
+            /** Causal Ceiling */
+            causal_ceiling: string;
+            /** Clusters */
+            clusters: {
+                [key: string]: unknown;
+            };
+            /** Design */
+            design: string;
+            /** Mde Range */
+            mde_range: {
+                [key: string]: unknown;
+            } | null;
+            /** Meets Mde Target */
+            meets_mde_target: boolean | null;
+            /** Messages */
+            messages: components["schemas"]["Message"][];
+            /** Power Range */
+            power_range: {
+                [key: string]: unknown;
+            } | null;
+            /** Precision Unavailable Reason */
+            precision_unavailable_reason: string | null;
+            /** Reasons */
+            reasons: string[];
+            /** Risks */
+            risks: {
+                [key: string]: string;
+            };
+            /** Sensitivity */
+            sensitivity: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** DesignStudioOut */
+        DesignStudioOut: {
+            /** Assumptions */
+            assumptions: {
+                [key: string]: unknown;
+            };
+            /** Auto Approval */
+            auto_approval: boolean;
+            /** Designs */
+            designs: components["schemas"]["DesignOption"][];
+            /** Formula */
+            formula: string;
+            /** Method Version */
+            method_version: string;
+            /** Warning Messages */
+            warning_messages: components["schemas"]["Message"][];
+            /** Warnings */
+            warnings: string[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** DesignStudioRequest */
+        DesignStudioRequest: {
+            /**
+             * Alpha
+             * @default 0.05
+             */
+            alpha: number;
+            /**
+             * Assignment Unit
+             * @default cohort
+             * @enum {string}
+             */
+            assignment_unit: "cohort" | "school";
+            /**
+             * Attrition
+             * @default 0.1
+             */
+            attrition: number;
+            /**
+             * Baseline R
+             * @default 0.5
+             */
+            baseline_r: number;
+            /**
+             * Calendar Weeks
+             * @default 12
+             */
+            calendar_weeks: number;
+            /**
+             * Classes Share Schools
+             * @default false
+             */
+            classes_share_schools: boolean;
+            /** Cluster Sizes */
+            cluster_sizes?: number[];
+            /** Cohort Ids */
+            cohort_ids?: string[];
+            /**
+             * Comparison Available
+             * @default true
+             */
+            comparison_available: boolean;
+            /** Dataset Id */
+            dataset_id?: string | null;
+            /**
+             * Effect High
+             * @default 0.3
+             */
+            effect_high: number;
+            /**
+             * Effect Low
+             * @default 0.1
+             */
+            effect_low: number;
+            /**
+             * Icc High
+             * @default 0.2
+             */
+            icc_high: number;
+            /**
+             * Icc Low
+             * @default 0.05
+             */
+            icc_low: number;
+            /**
+             * Intervention Weeks
+             * @default 6
+             */
+            intervention_weeks: number;
+            /** Mde Target */
+            mde_target?: number | null;
+            /**
+             * N Post Measurements
+             * @default 1
+             */
+            n_post_measurements: number;
+            /**
+             * N Pre Measurements
+             * @default 1
+             */
+            n_pre_measurements: number;
+            /**
+             * Target Power
+             * @default 0.8
+             */
+            target_power: number;
+        };
+        /** DifItem */
+        DifItem: {
+            /** Alpha Mh */
+            alpha_mh: number | null;
+            /** Category */
+            category: ("A" | "B" | "C") | null;
+            /** Chi2 */
+            chi2: number | null;
+            /** Ci High */
+            ci_high: number | null;
+            /** Ci Low */
+            ci_low: number | null;
+            /** Code */
+            code: string;
+            /** Item Id */
+            item_id: string;
+            /** Mh D Dif */
+            mh_d_dif: number | null;
+            /** N Focal */
+            n_focal: number;
+            /** N Reference */
+            n_reference: number;
+            /** N Strata */
+            n_strata: number;
+            /** P Value */
+            p_value: number | null;
+            /** Se */
+            se: number | null;
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** DifOut */
+        DifOut: {
+            /** Assessment */
+            assessment: {
+                [key: string]: unknown;
+            };
+            /** Available */
+            available: boolean;
+            /** Excluded Items */
+            excluded_items: {
+                [key: string]: unknown;
+            }[];
+            /** Focal */
+            focal: string;
+            /** Group Sizes */
+            group_sizes: {
+                [key: string]: number | null;
+            };
+            /** Is Synthetic */
+            is_synthetic: boolean;
+            /** Items */
+            items: components["schemas"]["DifItem"][];
+            /**
+             * Label
+             * @constant
+             */
+            label: "dif_screening_signal";
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Method Version */
+            method_version: string;
+            /** Min Group N */
+            min_group_n: number;
+            /** Reference */
+            reference: string;
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** EditReq */
         EditReq: {
             /** Items */
@@ -1710,6 +2805,241 @@ export interface components {
             error: components["schemas"]["ErrorBody"];
             /** Request Id */
             request_id?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** EvidenceLink */
+        EvidenceLink: {
+            /**
+             * Kind
+             * @default source
+             */
+            kind: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url?: string | null;
+        };
+        /** EvidenceReview */
+        EvidenceReview: {
+            /** Accept */
+            accept: boolean;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** EvidenceSummary */
+        EvidenceSummary: {
+            /** Accepted Entries */
+            accepted_entries: number;
+            /** Accepted Synthetic Entries */
+            accepted_synthetic_entries: number;
+            /** By Status */
+            by_status: {
+                [key: string]: number;
+            };
+            /** By Status Synthetic */
+            by_status_synthetic: {
+                [key: string]: number;
+            };
+            /** Comparable Positive Signals */
+            comparable_positive_signals: number;
+            /** Entries */
+            entries: {
+                [key: string]: unknown;
+            }[];
+            /** Note Kz */
+            note_kz: string;
+            /** Note Ru */
+            note_ru: string;
+            /** Observed Real Entries */
+            observed_real_entries: number;
+            /** Proposed Entries */
+            proposed_entries: number;
+            /** Proposed Synthetic Entries */
+            proposed_synthetic_entries: number;
+            /** Repeated Positive Signal */
+            repeated_positive_signal: boolean;
+            /** Synthetic Comparable Positive Signals */
+            synthetic_comparable_positive_signals: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FidelityCohortRow */
+        FidelityCohortRow: {
+            /** Code */
+            code: string | null;
+            /** Cohort Id */
+            cohort_id: string;
+            metrics: components["schemas"]["FidelityMetrics"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** FidelityLogCreate */
+        FidelityLogCreate: {
+            /**
+             * Activities Completed
+             * @default 0
+             */
+            activities_completed: number;
+            /**
+             * Activities Planned
+             * @default 0
+             */
+            activities_planned: number;
+            /**
+             * Adaptation Note
+             * @default
+             */
+            adaptation_note: string;
+            /** Adherence */
+            adherence?: components["schemas"]["AdherenceItem"][];
+            /** Cohort Id */
+            cohort_id: string;
+            /** Completed Tasks */
+            completed_tasks?: string[];
+            /** Corrects Log Id */
+            corrects_log_id?: string | null;
+            /** Delivered Minutes */
+            delivered_minutes: number;
+            /**
+             * Disruption
+             * @default none
+             * @enum {string}
+             */
+            disruption: "none" | "cancelled" | "shortened" | "teacher_absent" | "holiday" | "other";
+            /**
+             * Disruption Note
+             * @default
+             */
+            disruption_note: string;
+            /** Learners Assigned */
+            learners_assigned?: number | null;
+            /** Learners Present */
+            learners_present?: number | null;
+            /** Planned Minutes */
+            planned_minutes: number;
+            /**
+             * Session Date
+             * Format: date
+             */
+            session_date: string;
+            /**
+             * Source
+             * @default teacher_log
+             * @enum {string}
+             */
+            source: "teacher_log" | "observation" | "coach_visit" | "import";
+        };
+        /** FidelityLogOut */
+        FidelityLogOut: {
+            /** Activities Completed */
+            activities_completed: number;
+            /** Activities Planned */
+            activities_planned: number;
+            /** Adaptation Note */
+            adaptation_note: string;
+            /** Adherence */
+            adherence: {
+                [key: string]: unknown;
+            }[];
+            /** Cohort Code */
+            cohort_code: string | null;
+            /** Cohort Id */
+            cohort_id: string;
+            /** Completed Tasks */
+            completed_tasks: string[];
+            /** Corrects Log Id */
+            corrects_log_id: string | null;
+            /** Created At */
+            created_at: string;
+            /** Delivered Minutes */
+            delivered_minutes: number;
+            /** Disruption */
+            disruption: string;
+            /** Disruption Note */
+            disruption_note: string;
+            /** Id */
+            id: string;
+            /** Learners Assigned */
+            learners_assigned: number | null;
+            /** Learners Present */
+            learners_present: number | null;
+            /** Pilot Id */
+            pilot_id: string;
+            /** Planned Minutes */
+            planned_minutes: number;
+            /** Recorder */
+            recorder: string | null;
+            /** Session Date */
+            session_date: string;
+            /** Source */
+            source: string;
+            /** Superseded By */
+            superseded_by: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FidelityMetrics */
+        FidelityMetrics: {
+            /** Adherence */
+            adherence: number | null;
+            /** Cancelled Sessions */
+            cancelled_sessions: number;
+            classification: components["schemas"]["Label"];
+            /** Delivered Sessions */
+            delivered_sessions: number;
+            /** Dosage Completion */
+            dosage_completion: number | null;
+            /** Expected Sessions */
+            expected_sessions: number;
+            /** Log Coverage */
+            log_coverage: number | null;
+            /** Logged Sessions */
+            logged_sessions: number;
+            /** Missing Logs */
+            missing_logs: number;
+            /** Reach */
+            reach: number | null;
+            /** Reasons */
+            reasons: string[];
+            /** Session Completion */
+            session_completion: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FidelityOut */
+        FidelityOut: {
+            /** As Of */
+            as_of: string;
+            /** Cohort Detail Visible */
+            cohort_detail_visible: boolean;
+            /** Cohorts */
+            cohorts: components["schemas"]["FidelityCohortRow"][] | null;
+            /** Distribution */
+            distribution: {
+                [key: string]: number;
+            };
+            /**
+             * Expected Source
+             * @enum {string}
+             */
+            expected_source: "calendar" | "uniform";
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Logs */
+            logs: components["schemas"]["FidelityLogOut"][] | null;
+            /** Method Version */
+            method_version: string;
+            overall: components["schemas"]["FidelityMetrics"];
+            /** Pilot Id */
+            pilot_id: string;
+            /** Rule Set */
+            rule_set: {
+                [key: string]: unknown;
+            };
         } & {
             [key: string]: unknown;
         };
@@ -1775,6 +3105,63 @@ export interface components {
             result: {
                 [key: string]: unknown;
             };
+        } & {
+            [key: string]: unknown;
+        };
+        /** FollowUpRun */
+        FollowUpRun: {
+            /** As Of */
+            as_of?: string | null;
+            /** Outcome Assessment Id */
+            outcome_assessment_id?: string | null;
+        };
+        /** FormDenominators */
+        FormDenominators: {
+            /** Absent */
+            absent: number;
+            /** Absent Outside Assignment */
+            absent_outside_assignment: number;
+            /** Assigned */
+            assigned: number;
+            /** Assigned Cohorts */
+            assigned_cohorts: number | null;
+            /** Assigned Is Exact */
+            assigned_is_exact: boolean;
+            /**
+             * Assignment Scope
+             * @enum {string}
+             */
+            assignment_scope: "explicit" | "inferred_from_sittings";
+            /** Expected Item Responses */
+            expected_item_responses: number;
+            /** N Items */
+            n_items: number;
+            /** No Sitting Record */
+            no_sitting_record: number;
+            /** Present */
+            present: number;
+            /** Present Outside Assignment */
+            present_outside_assignment: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** FormQuality */
+        FormQuality: {
+            /** Completion Rate */
+            completion_rate: number | null;
+            denominators: components["schemas"]["FormDenominators"];
+            /** Item Responses */
+            item_responses: {
+                [key: string]: number;
+            };
+            /** Missing Rate */
+            missing_rate: number | null;
+            /** Omission Rate */
+            omission_rate: number | null;
+            /** Participation Rate */
+            participation_rate: number | null;
+            reliability: components["schemas"]["Reliability"];
+            score_distribution: components["schemas"]["ScoreDistribution"];
         } & {
             [key: string]: unknown;
         };
@@ -1879,6 +3266,17 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** HistogramBin */
+        HistogramBin: {
+            /** Count */
+            count: number;
+            /** From */
+            from: number;
+            /** To */
+            to: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** ImportBatchOut */
         ImportBatchOut: {
             /** Column Mapping */
@@ -1936,6 +3334,310 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** InterventionCreate */
+        InterventionCreate: {
+            /**
+             * Cadence Ru
+             * @default
+             */
+            cadence_ru: string;
+            /** Code */
+            code: string;
+            /**
+             * Contraindications Ru
+             * @default
+             */
+            contraindications_ru: string;
+            /** Dataset Id */
+            dataset_id?: string | null;
+            /**
+             * Description Kz
+             * @default
+             */
+            description_kz: string;
+            /**
+             * Description Ru
+             * @default
+             */
+            description_ru: string;
+            /**
+             * Duration Weeks
+             * @default 4
+             */
+            duration_weeks: number;
+            /**
+             * Evidence Level
+             * @default practice_based
+             * @enum {string}
+             */
+            evidence_level: "practice_based" | "observational" | "experimental";
+            /** Evidence Links */
+            evidence_links?: components["schemas"]["EvidenceLink"][];
+            /** Grades */
+            grades?: number[];
+            /**
+             * Instructions Kz
+             * @default
+             */
+            instructions_kz: string;
+            /**
+             * Instructions Ru
+             * @default
+             */
+            instructions_ru: string;
+            /** Languages */
+            languages?: string[];
+            /**
+             * Limitations Kz
+             * @default
+             */
+            limitations_kz: string;
+            /**
+             * Limitations Ru
+             * @default
+             */
+            limitations_ru: string;
+            /**
+             * Minutes Per Session
+             * @default 20
+             */
+            minutes_per_session: number;
+            /** Resources */
+            resources?: string[];
+            /**
+             * Sessions Per Week
+             * @default 2
+             */
+            sessions_per_week: number;
+            /** Targets */
+            targets?: components["schemas"]["TargetIn"][];
+            /**
+             * Title Kz
+             * @default
+             */
+            title_kz: string;
+            /** Title Ru */
+            title_ru: string;
+        };
+        /** InterventionListItem */
+        InterventionListItem: {
+            /** Accepted Evidence */
+            accepted_evidence: number;
+            /** Accepted Synthetic Evidence */
+            accepted_synthetic_evidence: number;
+            /** Code */
+            code: string;
+            /** Current Status */
+            current_status: string;
+            /** Dataset Id */
+            dataset_id: string | null;
+            /** Evidence Level */
+            evidence_level: string;
+            /** Grades */
+            grades: number[];
+            /** Id */
+            id: string;
+            /** Languages */
+            languages: string[];
+            /** Latest Version */
+            latest_version: number;
+            /** N Pilots */
+            n_pilots: number;
+            /** Reviewed Version */
+            reviewed_version: number | null;
+            /** Status */
+            status: string;
+            /** Targets */
+            targets: components["schemas"]["TargetOut"][];
+            /** Title Kz */
+            title_kz: string;
+            /** Title Ru */
+            title_ru: string;
+            /** Total Minutes */
+            total_minutes: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** InterventionOut */
+        InterventionOut: {
+            /** Archived At */
+            archived_at: string | null;
+            /** Archived Reason */
+            archived_reason: string | null;
+            /** Code */
+            code: string;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string | null;
+            current: components["schemas"]["InterventionVersionOut"];
+            /** Dataset Id */
+            dataset_id: string | null;
+            evidence_summary: components["schemas"]["EvidenceSummary"];
+            /** Id */
+            id: string;
+            /** Latest Version */
+            latest_version: number;
+            /** Org Id */
+            org_id: string;
+            /** Reviewed Version */
+            reviewed_version: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "archived";
+            /** Versions */
+            versions: components["schemas"]["InterventionVersionOut"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** InterventionPage */
+        InterventionPage: {
+            /** Items */
+            items: components["schemas"]["InterventionListItem"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * InterventionPatch
+         * @description Partial update of a *draft* version (reviewed versions are immutable).
+         */
+        InterventionPatch: {
+            /** Cadence Ru */
+            cadence_ru?: string | null;
+            /** Contraindications Ru */
+            contraindications_ru?: string | null;
+            /** Description Kz */
+            description_kz?: string | null;
+            /** Description Ru */
+            description_ru?: string | null;
+            /** Duration Weeks */
+            duration_weeks?: number | null;
+            /** Evidence Level */
+            evidence_level?: ("practice_based" | "observational" | "experimental") | null;
+            /** Evidence Links */
+            evidence_links?: components["schemas"]["EvidenceLink"][] | null;
+            /** Expected Version */
+            expected_version?: number | null;
+            /** Grades */
+            grades?: number[] | null;
+            /** Instructions Kz */
+            instructions_kz?: string | null;
+            /** Instructions Ru */
+            instructions_ru?: string | null;
+            /** Languages */
+            languages?: string[] | null;
+            /** Limitations Kz */
+            limitations_kz?: string | null;
+            /** Limitations Ru */
+            limitations_ru?: string | null;
+            /** Minutes Per Session */
+            minutes_per_session?: number | null;
+            /** Resources */
+            resources?: string[] | null;
+            /** Sessions Per Week */
+            sessions_per_week?: number | null;
+            /** Targets */
+            targets?: components["schemas"]["TargetIn"][] | null;
+            /** Title Kz */
+            title_kz?: string | null;
+            /** Title Ru */
+            title_ru?: string | null;
+        };
+        /** InterventionVersionOut */
+        InterventionVersionOut: {
+            /** Author */
+            author: string | null;
+            /** Cadence Ru */
+            cadence_ru: string;
+            /** Change Note */
+            change_note: string;
+            /** Content Sha256 */
+            content_sha256: string;
+            /** Contraindications Ru */
+            contraindications_ru: string;
+            /** Created At */
+            created_at: string;
+            /** Description Kz */
+            description_kz: string;
+            /** Description Ru */
+            description_ru: string;
+            /** Duration Weeks */
+            duration_weeks: number;
+            /**
+             * Evidence Level
+             * @enum {string}
+             */
+            evidence_level: "practice_based" | "observational" | "experimental";
+            /** Evidence Links */
+            evidence_links: {
+                [key: string]: unknown;
+            }[];
+            /** Grades */
+            grades: number[];
+            /** Id */
+            id: string;
+            /** Instructions Kz */
+            instructions_kz: string;
+            /** Instructions Ru */
+            instructions_ru: string;
+            /** Intervention Id */
+            intervention_id: string;
+            /** Languages */
+            languages: string[];
+            /** Limitations Kz */
+            limitations_kz: string;
+            /** Limitations Ru */
+            limitations_ru: string;
+            /** Minutes Per Session */
+            minutes_per_session: number;
+            /** Resources */
+            resources: string[];
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Sessions Per Week */
+            sessions_per_week: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "reviewed" | "archived";
+            /** Targets */
+            targets: components["schemas"]["TargetOut"][];
+            /** Title Kz */
+            title_kz: string;
+            /** Title Ru */
+            title_ru: string;
+            /** Total Minutes */
+            total_minutes: number;
+            /** Used By Pilots */
+            used_by_pilots: number;
+            /** Version */
+            version: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** ItemAdministration */
+        ItemAdministration: {
+            assessment: components["schemas"]["QualityAssessmentRef"];
+            /** Dataset Version */
+            dataset_version: number;
+            /** Generated At */
+            generated_at: string;
+            provenance: components["schemas"]["Provenance"];
+            stats: components["schemas"]["ItemQuality"];
+        } & {
+            [key: string]: unknown;
+        };
         /** ItemEvidence */
         ItemEvidence: {
             /** Code */
@@ -1962,6 +3664,81 @@ export interface components {
             stem_ru: string;
             /** Topic Weight */
             topic_weight: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** ItemObjectiveRef */
+        ItemObjectiveRef: {
+            /** Code */
+            code: string | null;
+            /** Objective Id */
+            objective_id: string;
+            /** Status */
+            status: string;
+            /** Topic Code */
+            topic_code: string | null;
+            /** Weight */
+            weight: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** ItemQuality */
+        ItemQuality: {
+            /** Code */
+            code: string;
+            /** Denominators */
+            denominators: {
+                [key: string]: number;
+            };
+            /** Flags */
+            flags: components["schemas"]["Message"][];
+            /** Invalid Response Values */
+            invalid_response_values: number;
+            /** Item Id */
+            item_id: string;
+            item_rest_correlation: components["schemas"]["StatValue"];
+            /** Max Points */
+            max_points: number;
+            /** Misconceptions */
+            misconceptions: string[];
+            /** Missing Rate */
+            missing_rate: number | null;
+            /** Objectives */
+            objectives: components["schemas"]["ItemObjectiveRef"][];
+            /** Omission Rate */
+            omission_rate: number | null;
+            /** Options */
+            options: components["schemas"]["OptionQuality"][];
+            /** P Value */
+            p_value: number | null;
+            /** P Value Among Answered */
+            p_value_among_answered: number | null;
+            /** Stem Kz */
+            stem_kz: string;
+            /** Stem Ru */
+            stem_ru: string;
+            upper_lower: components["schemas"]["UpperLower"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** ItemQualityDetail */
+        ItemQualityDetail: {
+            /** Administrations */
+            administrations: components["schemas"]["ItemAdministration"][];
+            /** Item */
+            item: {
+                [key: string]: unknown;
+            };
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Method Version */
+            method_version: string;
+            /** Pooled */
+            pooled: {
+                [key: string]: unknown;
+            } | null;
+            /** Pooled Unavailable Reason */
+            pooled_unavailable_reason: string;
         } & {
             [key: string]: unknown;
         };
@@ -1994,6 +3771,42 @@ export interface components {
              * @enum {string}
              */
             status: "queued" | "running" | "succeeded" | "failed" | "cancelled";
+        } & {
+            [key: string]: unknown;
+        };
+        /** Label */
+        Label: {
+            /** Code */
+            code: string | null;
+            /** Label Kz */
+            label_kz: string;
+            /** Label Ru */
+            label_ru: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** LearningSummary */
+        LearningSummary: {
+            /** Interventions */
+            interventions: {
+                [key: string]: unknown;
+            }[];
+            /** Lessons */
+            lessons: {
+                [key: string]: unknown;
+            }[];
+            /** Note Kz */
+            note_kz: string;
+            /** Note Ru */
+            note_ru: string;
+            /** Open Questions */
+            open_questions: {
+                [key: string]: unknown;
+            }[];
+            /** Pending Evidence Reviews */
+            pending_evidence_reviews: {
+                [key: string]: unknown;
+            }[];
         } & {
             [key: string]: unknown;
         };
@@ -2030,6 +3843,26 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** Message */
+        Message: {
+            /** Code */
+            code: string;
+            /** Message Kz */
+            message_kz: string;
+            /** Message Ru */
+            message_ru: string;
+            /** Params */
+            params?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Severity
+             * @default info
+             */
+            severity: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** Misconception */
         Misconception: {
             /** Code */
@@ -2063,6 +3896,54 @@ export interface components {
              */
             lang: string;
         };
+        /** NewVersionRequest */
+        NewVersionRequest: {
+            /** Cadence Ru */
+            cadence_ru?: string | null;
+            /**
+             * Change Note
+             * @default
+             */
+            change_note: string;
+            /** Contraindications Ru */
+            contraindications_ru?: string | null;
+            /** Description Kz */
+            description_kz?: string | null;
+            /** Description Ru */
+            description_ru?: string | null;
+            /** Duration Weeks */
+            duration_weeks?: number | null;
+            /** Evidence Level */
+            evidence_level?: ("practice_based" | "observational" | "experimental") | null;
+            /** Evidence Links */
+            evidence_links?: components["schemas"]["EvidenceLink"][] | null;
+            /** Expected Version */
+            expected_version?: number | null;
+            /** Grades */
+            grades?: number[] | null;
+            /** Instructions Kz */
+            instructions_kz?: string | null;
+            /** Instructions Ru */
+            instructions_ru?: string | null;
+            /** Languages */
+            languages?: string[] | null;
+            /** Limitations Kz */
+            limitations_kz?: string | null;
+            /** Limitations Ru */
+            limitations_ru?: string | null;
+            /** Minutes Per Session */
+            minutes_per_session?: number | null;
+            /** Resources */
+            resources?: string[] | null;
+            /** Sessions Per Week */
+            sessions_per_week?: number | null;
+            /** Targets */
+            targets?: components["schemas"]["TargetIn"][] | null;
+            /** Title Kz */
+            title_kz?: string | null;
+            /** Title Ru */
+            title_ru?: string | null;
+        };
         /** ObjectiveEvidence */
         ObjectiveEvidence: {
             /** Code */
@@ -2093,6 +3974,26 @@ export interface components {
             topic?: string | null;
             /** Value */
             value?: number | null;
+        };
+        /** OptionQuality */
+        OptionQuality: {
+            /** Count */
+            count: number;
+            /** Is Key */
+            is_key: boolean;
+            /** Key */
+            key: string;
+            /** Mean Rest Score */
+            mean_rest_score: number | null;
+            /** Misconception */
+            misconception: string | null;
+            point_biserial_rest: components["schemas"]["StatValue"];
+            /** Share Of Answered */
+            share_of_answered: number | null;
+            /** Text */
+            text: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** OptionStat */
         OptionStat: {
@@ -2149,6 +4050,384 @@ export interface components {
             password: string;
             /** Username */
             username: string;
+        };
+        /** PilotCohortIn */
+        PilotCohortIn: {
+            /**
+             * Arm
+             * @default intervention
+             * @enum {string}
+             */
+            arm: "intervention" | "comparison";
+            /** Cohort Id */
+            cohort_id: string;
+            /** Wave */
+            wave?: number | null;
+        };
+        /** PilotCohortOut */
+        PilotCohortOut: {
+            /** Arm */
+            arm: string;
+            /** Code */
+            code: string | null;
+            /** Cohort Id */
+            cohort_id: string;
+            /** N Learners */
+            n_learners: number | null;
+            /** School Code */
+            school_code: string | null;
+            /** School Id */
+            school_id: string | null;
+            /** Wave */
+            wave: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PilotCreate */
+        PilotCreate: {
+            analysis_plan?: components["schemas"]["AnalysisPlan"];
+            /**
+             * Assignment Unit
+             * @default cohort
+             * @enum {string}
+             */
+            assignment_unit: "cohort" | "school";
+            /** Baseline Assessment Id */
+            baseline_assessment_id?: string | null;
+            /** Cohorts */
+            cohorts?: components["schemas"]["PilotCohortIn"][];
+            /** Dataset Id */
+            dataset_id: string;
+            /** Decision Id */
+            decision_id?: string | null;
+            /**
+             * Design
+             * @default single_group
+             * @enum {string}
+             */
+            design: "single_group" | "matched_comparison" | "cluster_randomized" | "interrupted_time_series" | "stepped_wedge";
+            /** Duration Weeks */
+            duration_weeks?: number | null;
+            /** End Date */
+            end_date?: string | null;
+            /**
+             * Exclusion Criteria
+             * @default
+             */
+            exclusion_criteria: string;
+            /** Follow Up Due */
+            follow_up_due?: string | null;
+            /**
+             * Inclusion Criteria
+             * @default
+             */
+            inclusion_criteria: string;
+            /** Intervention Id */
+            intervention_id: string;
+            /** Intervention Version */
+            intervention_version?: number | null;
+            /** Minutes Per Session */
+            minutes_per_session?: number | null;
+            /** Objective Id */
+            objective_id?: string | null;
+            /** Outcome Assessment Id */
+            outcome_assessment_id?: string | null;
+            /**
+             * Owner
+             * @default
+             */
+            owner: string;
+            /** Pre Period Assessment Ids */
+            pre_period_assessment_ids?: string[];
+            /**
+             * Primary Outcome Ru
+             * @default
+             */
+            primary_outcome_ru: string;
+            /** Sessions Per Week */
+            sessions_per_week?: number | null;
+            /** Start Date */
+            start_date?: string | null;
+            /** Title */
+            title: string;
+            /** Topic Id */
+            topic_id: string;
+        };
+        /** PilotEventOut */
+        PilotEventOut: {
+            /** At */
+            at: string;
+            /** By */
+            by: string | null;
+            /** From Status */
+            from_status: string | null;
+            /** Note */
+            note: string;
+            /** To Status */
+            to_status: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PilotListItem */
+        PilotListItem: {
+            /** Code */
+            code: string;
+            /** Dataset Id */
+            dataset_id: string;
+            /** Design */
+            design: string;
+            /** End Date */
+            end_date: string | null;
+            /** Fidelity */
+            fidelity: string | null;
+            /** Follow Up Due */
+            follow_up_due: string | null;
+            /** Id */
+            id: string;
+            /** Intervention Code */
+            intervention_code: string;
+            /** Intervention Version */
+            intervention_version: number;
+            /** N Cohorts */
+            n_cohorts: number;
+            /** Outcome Status */
+            outcome_status: string | null;
+            /** Start Date */
+            start_date: string | null;
+            /** Status */
+            status: string;
+            /** Title */
+            title: string;
+            /** Topic Code */
+            topic_code: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PilotOut */
+        PilotOut: {
+            /** Allowed Transitions */
+            allowed_transitions: string[];
+            /**
+             * Analysis Mode
+             * @enum {string}
+             */
+            analysis_mode: "built_in" | "protocol_only_external_analysis";
+            /** Analysis Plan */
+            analysis_plan: {
+                [key: string]: unknown;
+            };
+            /** Assignment Unit */
+            assignment_unit: string;
+            /** Baseline Assessment */
+            baseline_assessment: {
+                [key: string]: unknown;
+            } | null;
+            causal_ceiling: components["schemas"]["Label"];
+            /** Code */
+            code: string;
+            /** Cohorts */
+            cohorts: components["schemas"]["PilotCohortOut"][];
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string | null;
+            /** Dataset Id */
+            dataset_id: string;
+            /** Decision Id */
+            decision_id: string | null;
+            /**
+             * Design
+             * @enum {string}
+             */
+            design: "single_group" | "matched_comparison" | "cluster_randomized" | "interrupted_time_series" | "stepped_wedge";
+            /** End Date */
+            end_date: string | null;
+            /** Events */
+            events: components["schemas"]["PilotEventOut"][];
+            /** Exclusion Criteria */
+            exclusion_criteria: string;
+            /** Follow Up Due */
+            follow_up_due: string | null;
+            /** Id */
+            id: string;
+            /** Inclusion Criteria */
+            inclusion_criteria: string;
+            /** Intervention Id */
+            intervention_id: string;
+            /** Intervention Snapshot */
+            intervention_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Intervention Version */
+            intervention_version: number;
+            /** Intervention Version Id */
+            intervention_version_id: string;
+            /** Is Synthetic */
+            is_synthetic: boolean;
+            /** Latest Outcome */
+            latest_outcome: {
+                [key: string]: unknown;
+            } | null;
+            /** Objective */
+            objective: {
+                [key: string]: unknown;
+            } | null;
+            /** Outcome Assessment */
+            outcome_assessment: {
+                [key: string]: unknown;
+            } | null;
+            /** Owner */
+            owner: string;
+            /** Planned */
+            planned: {
+                [key: string]: number;
+            };
+            /** Pre Period Assessment Ids */
+            pre_period_assessment_ids: string[];
+            /** Primary Outcome Ru */
+            primary_outcome_ru: string;
+            /** Randomization */
+            randomization: {
+                [key: string]: unknown;
+            } | null;
+            /** Snapshot Locked */
+            snapshot_locked: boolean;
+            /** Snapshot Sha256 */
+            snapshot_sha256: string;
+            /** Start Date */
+            start_date: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "ready" | "active" | "completed" | "stopped";
+            /** Title */
+            title: string;
+            /** Topic */
+            topic: {
+                [key: string]: unknown;
+            } | null;
+            /** Validation */
+            validation: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
+        };
+        /** PilotOutcomeOut */
+        PilotOutcomeOut: {
+            /** As Of */
+            as_of: string | null;
+            causal_ceiling: components["schemas"]["Label"];
+            causal_level: components["schemas"]["Label"];
+            /** Created At */
+            created_at: string;
+            /** Current Dataset Version */
+            current_dataset_version: number;
+            /** Dataset Version */
+            dataset_version: number;
+            fidelity: components["schemas"]["Label"];
+            /** Id */
+            id: string;
+            /** Interim */
+            interim: boolean;
+            /** Is Stale */
+            is_stale: boolean;
+            /** Method Version */
+            method_version: string;
+            /** Pilot Id */
+            pilot_id: string;
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            status_label: components["schemas"]["Label"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PilotPage */
+        PilotPage: {
+            /** Items */
+            items: components["schemas"]["PilotListItem"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PilotPatch */
+        PilotPatch: {
+            analysis_plan?: components["schemas"]["AnalysisPlan"] | null;
+            /** Assignment Unit */
+            assignment_unit?: ("cohort" | "school") | null;
+            /** Baseline Assessment Id */
+            baseline_assessment_id?: string | null;
+            /** Cohorts */
+            cohorts?: components["schemas"]["PilotCohortIn"][] | null;
+            /** Decision Id */
+            decision_id?: string | null;
+            /** Design */
+            design?: ("single_group" | "matched_comparison" | "cluster_randomized" | "interrupted_time_series" | "stepped_wedge") | null;
+            /** Duration Weeks */
+            duration_weeks?: number | null;
+            /** End Date */
+            end_date?: string | null;
+            /** Exclusion Criteria */
+            exclusion_criteria?: string | null;
+            /** Follow Up Due */
+            follow_up_due?: string | null;
+            /** Inclusion Criteria */
+            inclusion_criteria?: string | null;
+            /** Intervention Version */
+            intervention_version?: number | null;
+            /** Minutes Per Session */
+            minutes_per_session?: number | null;
+            /** Objective Id */
+            objective_id?: string | null;
+            /** Outcome Assessment Id */
+            outcome_assessment_id?: string | null;
+            /** Owner */
+            owner?: string | null;
+            /** Pre Period Assessment Ids */
+            pre_period_assessment_ids?: string[] | null;
+            /** Primary Outcome Ru */
+            primary_outcome_ru?: string | null;
+            /** Sessions Per Week */
+            sessions_per_week?: number | null;
+            /** Start Date */
+            start_date?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Topic Id */
+            topic_id?: string | null;
+        };
+        /** PilotSessionOut */
+        PilotSessionOut: {
+            /** Cohort Code */
+            cohort_code: string | null;
+            /** Cohort Id */
+            cohort_id: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Id */
+            id: string;
+            /** Note */
+            note: string;
+            /** Planned Date */
+            planned_date: string;
+            /** Rescheduled To Id */
+            rescheduled_to_id: string | null;
+            /** Source */
+            source: string;
+            /** Status */
+            status: string;
+        } & {
+            [key: string]: unknown;
         };
         /** PlanChange */
         PlanChange: {
@@ -2264,6 +4543,65 @@ export interface components {
             /** Topics */
             topics: components["schemas"]["TopicInput"][];
         };
+        /** PortfolioOut */
+        PortfolioOut: {
+            /** Action Queue */
+            action_queue: {
+                [key: string]: unknown;
+            }[];
+            /** As Of */
+            as_of: string;
+            /** Best Intervention */
+            best_intervention: null;
+            /** Best Intervention Reason */
+            best_intervention_reason: string;
+            /** Counts By Status */
+            counts_by_status: {
+                [key: string]: number;
+            };
+            /** Coverage */
+            coverage: {
+                [key: string]: unknown;
+            };
+            /** Dataset Id */
+            dataset_id: string | null;
+            /** Fidelity Distribution */
+            fidelity_distribution: {
+                [key: string]: number;
+            };
+            /** Follow Ups */
+            follow_ups: {
+                [key: string]: unknown;
+            };
+            /** Generated At */
+            generated_at: string;
+            /** Interventions With Repeated Signals */
+            interventions_with_repeated_signals: {
+                [key: string]: unknown;
+            }[];
+            /** Learners By Outcome Status */
+            learners_by_outcome_status: {
+                [key: string]: unknown;
+            };
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Missing For Conclusions */
+            missing_for_conclusions: {
+                [key: string]: unknown;
+            }[];
+            /** Outcome Distribution */
+            outcome_distribution: {
+                [key: string]: number;
+            };
+            /** Pilots */
+            pilots: components["schemas"]["PilotListItem"][];
+            /** Synthetic Evidence */
+            synthetic_evidence: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
+        };
         /** ProjectCreate */
         ProjectCreate: {
             /**
@@ -2280,6 +4618,85 @@ export interface components {
             name_kz?: string | null;
             /** Name Ru */
             name_ru: string;
+        };
+        /** Provenance */
+        Provenance: {
+            /** Analysis Id */
+            analysis_id: string;
+            /** Code Version */
+            code_version: string;
+            /** Kind */
+            kind: string;
+            /** Method Version */
+            method_version: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** QualityAssessmentRef */
+        QualityAssessmentRef: {
+            /** Administered On */
+            administered_on: string | null;
+            /** Assessment Id */
+            assessment_id: string;
+            /** Code */
+            code: string;
+            /** Dataset Id */
+            dataset_id: string;
+            /** Form Code */
+            form_code: string;
+            /** Form Id */
+            form_id: string;
+            /** Form Name */
+            form_name: string;
+            /** Linking Method */
+            linking_method: string;
+            /** Scale Code */
+            scale_code: string;
+            /** Stage */
+            stage: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** QualityDatasetRef */
+        QualityDatasetRef: {
+            /** Code */
+            code: string;
+            /** Id */
+            id: string;
+            /** Name Kz */
+            name_kz: string;
+            /** Name Ru */
+            name_ru: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** QualityExclusions */
+        QualityExclusions: {
+            /** Absent Learners */
+            absent_learners: number;
+            /** Assigned Cohorts Without Records */
+            assigned_cohorts_without_records: number;
+            /** Assigned Without Sitting Record */
+            assigned_without_sitting_record: number;
+            /** Learners With Repeat Attempts */
+            learners_with_repeat_attempts: number;
+            /** Present Outside Assignment */
+            present_outside_assignment: number;
+            /** Rejected Import Rows In Dataset */
+            rejected_import_rows_in_dataset: number;
+            /** Responses Outside Form */
+            responses_outside_form: number;
+            /** Rows Excluded By Attempt Rule */
+            rows_excluded_by_attempt_rule: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RandomizeRequest */
+        RandomizeRequest: {
+            /** Cohort Ids */
+            cohort_ids: string[];
+            /** Seed */
+            seed: number;
         };
         /** Reason */
         Reason: {
@@ -2313,6 +4730,22 @@ export interface components {
             /** Topic Analysis Id */
             topic_analysis_id: string;
         };
+        /** Reliability */
+        Reliability: {
+            cronbach_alpha: components["schemas"]["StatValue"];
+            /** Min Items */
+            min_items: number;
+            /** Min Learners */
+            min_learners: number;
+            /** N Complete Learners */
+            n_complete_learners: number;
+            /** N Items */
+            n_items: number;
+            /** N Zero Variance Items */
+            n_zero_variance_items: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** ReviewReq */
         ReviewReq: {
             /** Action */
@@ -2322,13 +4755,6 @@ export interface components {
              * @default
              */
             note: string;
-        };
-        /** ReviewRequest */
-        ReviewRequest: {
-            /** Decision */
-            decision: string;
-            /** Note */
-            note?: string | null;
         };
         /** SandboxRequest */
         SandboxRequest: {
@@ -2344,6 +4770,112 @@ export interface components {
             name: string;
             /** Ops */
             ops?: components["schemas"]["Op"][];
+        };
+        /** ScoreDistribution */
+        ScoreDistribution: {
+            /** Ceiling Share */
+            ceiling_share: number | null;
+            /** Floor Share */
+            floor_share: number | null;
+            /** Histogram */
+            histogram: components["schemas"]["HistogramBin"][];
+            /** Max */
+            max: number | null;
+            /** Mean */
+            mean: number | null;
+            /** Median */
+            median: number | null;
+            /** Min */
+            min: number | null;
+            /** N */
+            n: number;
+            /** Sd */
+            sd: number | null;
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** SessionCalendarOut */
+        SessionCalendarOut: {
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Default Weekdays */
+            default_weekdays: number[];
+            /** Editable */
+            editable: boolean;
+            /** Events */
+            events: {
+                [key: string]: unknown;
+            }[];
+            /** Pilot Id */
+            pilot_id: string;
+            /** Pilot Status */
+            pilot_status: string;
+            /** Sessions */
+            sessions: components["schemas"]["PilotSessionOut"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** SessionCreate */
+        SessionCreate: {
+            /** Cohort Id */
+            cohort_id: string;
+            /** Duration Minutes */
+            duration_minutes?: number | null;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /**
+             * Planned Date
+             * Format: date
+             */
+            planned_date: string;
+        };
+        /** SessionGenerate */
+        SessionGenerate: {
+            /** Blackout Dates */
+            blackout_dates?: string[];
+            /** Blackout Ranges */
+            blackout_ranges?: components["schemas"]["DateRange"][];
+            /** Duration Minutes */
+            duration_minutes?: number | null;
+            /** Weekdays */
+            weekdays?: number[];
+        };
+        /** SessionPatch */
+        SessionPatch: {
+            /** Duration Minutes */
+            duration_minutes?: number | null;
+            /** Note */
+            note?: string | null;
+            /** Planned Date */
+            planned_date?: string | null;
+            /** Status */
+            status?: ("planned" | "completed" | "cancelled" | "rescheduled") | null;
+        };
+        /** SliceRow */
+        SliceRow: {
+            /** Mean */
+            mean: number | null;
+            /** Median */
+            median: number | null;
+            /** N */
+            n: number | null;
+            /** Sd */
+            sd: number | null;
+            /** Suppressed */
+            suppressed: boolean;
+            /** Suppression */
+            suppression: string | null;
+            /** Value */
+            value: string;
+        } & {
+            [key: string]: unknown;
         };
         /** SourceOut */
         SourceOut: {
@@ -2412,6 +4944,106 @@ export interface components {
             source_id: string;
             /** Status */
             status: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** StatValue */
+        StatValue: {
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+            /** Value */
+            value: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** Suggestion */
+        Suggestion: {
+            /** Code */
+            code: string;
+            /** Components */
+            components: components["schemas"]["SuggestionComponent"][];
+            /** Contraindications Ru */
+            contraindications_ru: string;
+            /** Evidence Level */
+            evidence_level: string;
+            /** Intervention Id */
+            intervention_id: string;
+            /** Limitations Ru */
+            limitations_ru: string;
+            /** Score */
+            score: number;
+            /** Title Kz */
+            title_kz: string;
+            /** Title Ru */
+            title_ru: string;
+            /** Version */
+            version: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** SuggestionComponent */
+        SuggestionComponent: {
+            /** Code */
+            code: string;
+            /** Detail */
+            detail: string;
+            /** Points */
+            points: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** SuggestionsOut */
+        SuggestionsOut: {
+            /** Excluded */
+            excluded: {
+                [key: string]: unknown;
+            }[];
+            /** Limitations */
+            limitations: components["schemas"]["Message"][];
+            /** Query */
+            query: {
+                [key: string]: unknown;
+            };
+            /**
+             * Ranking Kind
+             * @constant
+             */
+            ranking_kind: "explainable_match_score";
+            /** Scoring Rule */
+            scoring_rule: {
+                [key: string]: number;
+            };
+            /** Suggestions */
+            suggestions: components["schemas"]["Suggestion"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** TargetIn */
+        TargetIn: {
+            /** Misconception Code */
+            misconception_code?: string | null;
+            /** Target Id */
+            target_id?: string | null;
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "topic" | "objective" | "misconception";
+        };
+        /** TargetOut */
+        TargetOut: {
+            /** Code */
+            code: string | null;
+            /** Label Kz */
+            label_kz: string | null;
+            /** Label Ru */
+            label_ru: string | null;
+            /** Misconception Code */
+            misconception_code: string | null;
+            /** Target Id */
+            target_id: string | null;
+            /** Target Type */
+            target_type: string;
         } & {
             [key: string]: unknown;
         };
@@ -2522,6 +5154,39 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** TransitionRequest */
+        TransitionRequest: {
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /**
+             * Override Future End
+             * @default false
+             */
+            override_future_end: boolean;
+            /**
+             * To Status
+             * @enum {string}
+             */
+            to_status: "draft" | "ready" | "active" | "completed" | "stopped";
+        };
+        /** UpperLower */
+        UpperLower: {
+            /** Group Size */
+            group_size: number;
+            /** P Lower */
+            p_lower: number | null;
+            /** P Upper */
+            p_upper: number | null;
+            /** Unavailable Reason */
+            unavailable_reason: string | null;
+            /** Value */
+            value: number | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** UserCreate */
         UserCreate: {
             /**
@@ -2570,6 +5235,21 @@ export interface components {
             password?: string | null;
             /** Roles */
             roles?: string[] | null;
+        };
+        /** ReviewRequest */
+        oqumap__schemas__interventions__ReviewRequest: {
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** ReviewRequest */
+        oqumap__services__mappings__ReviewRequest: {
+            /** Decision */
+            decision: string;
+            /** Note */
+            note?: string | null;
         };
     };
     responses: never;
@@ -5214,6 +7894,86 @@ export interface operations {
             };
         };
     };
+    design_studio_api_v1_design_studio_evaluate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DesignStudioRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DesignStudioOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     list_documents_api_v1_documents_get: {
         parameters: {
             query?: never;
@@ -6321,6 +9081,987 @@ export interface operations {
             };
         };
     };
+    review_evidence_entry_api_v1_intervention_evidence__entry_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvidenceReview"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvidenceSummary"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_interventions_api_v1_interventions_get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                status?: string | null;
+                evidence_level?: string | null;
+                topic_id?: string | null;
+                objective_id?: string | null;
+                misconception?: string | null;
+                grade?: number | null;
+                language?: string | null;
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionPage"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_intervention_api_v1_interventions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    suggest_interventions_api_v1_interventions_suggest_get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                topic_id?: string | null;
+                objective_id?: string | null;
+                misconception?: string | null;
+                grade?: number | null;
+                language?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionsOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_intervention_api_v1_interventions__intervention_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_intervention_api_v1_interventions__intervention_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    archive_intervention_api_v1_interventions__intervention_id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArchiveRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    intervention_evidence_api_v1_interventions__intervention_id__evidence_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvidenceSummary"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    link_intervention_target_api_v1_interventions__intervention_id__targets_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TargetIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    new_intervention_version_api_v1_interventions__intervention_id__versions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_intervention_draft_api_v1_interventions__intervention_id__versions__version__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    review_intervention_version_api_v1_interventions__intervention_id__versions__version__review_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                intervention_id: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["oqumap__schemas__interventions__ReviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     suggest_item_links_api_v1_items__item_id__suggest_links_post: {
         parameters: {
             query?: never;
@@ -6479,6 +10220,84 @@ export interface operations {
             };
         };
     };
+    learning_summary_api_v1_learning_summary_get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningSummary"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     list_mappings_api_v1_mappings_get: {
         parameters: {
             query?: {
@@ -6573,7 +10392,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ReviewRequest"];
+                "application/json": components["schemas"]["oqumap__services__mappings__ReviewRequest"];
             };
         };
         responses: {
@@ -6586,6 +10405,1378 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_pilots_api_v1_pilots_get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                status?: string | null;
+                intervention_id?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotPage"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_pilot_api_v1_pilots_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PilotCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_pilot_api_v1_pilots__pilot_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_pilot_api_v1_pilots__pilot_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PilotPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_conclusions_api_v1_pilots__pilot_id__conclusions_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConclusionOut"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_conclusion_api_v1_pilots__pilot_id__conclusions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConclusionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConclusionOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pilot_fidelity_api_v1_pilots__pilot_id__fidelity_get: {
+        parameters: {
+            query?: {
+                as_of?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FidelityOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    add_fidelity_log_api_v1_pilots__pilot_id__fidelity_logs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FidelityLogCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FidelityLogOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    run_follow_up_api_v1_pilots__pilot_id__follow_up_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowUpRun"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotOutcomeOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pilot_outcomes_api_v1_pilots__pilot_id__outcomes_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotOutcomeOut"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    randomize_pilot_api_v1_pilots__pilot_id__randomize_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RandomizeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pilot_sessions_api_v1_pilots__pilot_id__sessions_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionCalendarOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    add_session_api_v1_pilots__pilot_id__sessions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionCalendarOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    generate_sessions_api_v1_pilots__pilot_id__sessions_generate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionGenerate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionCalendarOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_session_api_v1_pilots__pilot_id__sessions__session_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionCalendarOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_session_api_v1_pilots__pilot_id__sessions__session_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionCalendarOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    transition_pilot_api_v1_pilots__pilot_id__transition_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pilot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransitionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotOut"];
                 };
             };
             /** @description Bad Request */
@@ -6747,6 +11938,655 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_PlanResult_"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    intervention_portfolio_api_v1_portfolio_interventions_get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                as_of?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortfolioOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_quality_api_v1_quality_assessments_get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                attempt_rule?: string;
+                omitted_policy?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssessmentQualityList"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    assessment_quality_api_v1_quality_assessments__assessment_id__get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                attempt_rule?: string;
+                omitted_policy?: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssessmentQualityOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_assignments_api_v1_quality_assessments__assessment_id__assignments_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignmentsOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    put_assignments_api_v1_quality_assessments__assessment_id__assignments_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignmentsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignmentsOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    dif_screening_api_v1_quality_assessments__assessment_id__dif_get: {
+        parameters: {
+            query?: {
+                reference?: string;
+                focal?: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DifOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    assessment_items_api_v1_quality_assessments__assessment_id__items_get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                attempt_rule?: string;
+                omitted_policy?: string;
+                flag?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssessmentItemsOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    item_quality_api_v1_quality_items__item_id__get: {
+        parameters: {
+            query?: {
+                dataset_id?: string | null;
+                attempt_rule?: string;
+                omitted_policy?: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemQualityDetail"];
                 };
             };
             /** @description Bad Request */

@@ -52,3 +52,5 @@ ignore = ["E501", "B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E741", "N806", "B017", "E402"]
+# Alembic-generated files keep the generator's header style.
+"alembic/*" = ["I001", "UP007", "UP035", "F401", "W291"]

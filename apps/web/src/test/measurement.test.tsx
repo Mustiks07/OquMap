@@ -1,0 +1,300 @@
+/** Measurement & learning-loop screens: RU/KZ dictionary, rendering from API payloads, empty/error/forbidden states and
+ *  real actions (requests sent with the right method and body). fetch is mocked per URL. */
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { vi } from "vitest";
+import { I18nProvider, useI18n } from "../i18n/I18n";
+import { AppStateProvider, useAppState } from "../state/AppState";
+import { useEffect } from "react";
+import { mdict } from "../features/measurement/i18n";
+import { QualityDetailPage, QualityListPage } from "../features/quality/QualityPages";
+import { PortfolioPage } from "../features/followup/PortfolioPage";
+import { FollowUpPage } from "../features/followup/FollowUpPage";
+import { PilotDetailPage } from "../features/interventions/PilotPages";
+import { InterventionsPage } from "../features/interventions/InterventionPages";
+
+type Handler = (init: RequestInit | undefined, url: string) => { status?: number; body: unknown };
+let routes: [RegExp, Handler][] = [];
+const calls: { url: string; method: string; body: unknown }[] = [];
+
+function mockFetch() {
+  globalThis.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = init?.method ?? "GET";
+    calls.push({ url, method, body: init?.body ? JSON.parse(String(init.body)) : undefined });
+    const hit = routes.find(([re]) => re.test(`${method} ${url}`));
+    const res = hit ? hit[1](init, url) : { status: 404, body: { error: { code: "not_found", message: "not found", details: {} }, request_id: "t" } };
+    return new Response(JSON.stringify(res.body), { status: res.status ?? 200, headers: { "Content-Type": "application/json" } });
+  }) as typeof fetch;
+}
+
+const USER = { id: "u", username: "m", display_name: "Методист", roles: ["methodist", "approver"], org_id: "o", org_name: "Org", org_is_demo: true };
+
+function SetUser({ roles }: { roles: string[] }) {
+  const { setUser } = useAppState();
+  useEffect(() => setUser({ ...USER, roles }), [roles, setUser]);
+  return null;
+}
+
+function LangButton() {
+  const { setLang } = useI18n();
+  return <button onClick={() => setLang("kz")}>to-kz</button>;
+}
+
+function renderAt(path: string, route: string, el: React.ReactNode, roles = ["methodist", "approver"]) {
+  localStorage.clear();
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={qc}>
+      <I18nProvider initial="ru">
+        <AppStateProvider>
+          <SetUser roles={roles} />
+          <LangButton />
+          <MemoryRouter initialEntries={[path]}>
+            <Routes><Route path={route} element={el} /></Routes>
+          </MemoryRouter>
+        </AppStateProvider>
+      </I18nProvider>
+    </QueryClientProvider>,
+  );
+}
+
+const msg = (code: string, severity = "warn") => ({ code, severity, params: {}, message_ru: `RU ${code}`, message_kz: `KZ ${code}` });
+const stat = (value: number | null, reason: string | null = null) => ({ value, unavailable_reason: reason });
+const ASSESSMENT = { assessment_id: "a1", code: "DIAG-BASE", stage: "followup", administered_on: "2026-09-14", form_id: "f", form_code: "F-T3-DIAG",
+  form_name: "Диагностика", scale_code: "S-T3-DIAG", linking_method: "identical_form", dataset_id: "d" };
+const ITEM = {
+  item_id: "i5", code: "Q05", max_points: 1, stem_ru: "Вычислите: 3/5 − 1/5.", stem_kz: "Есептеңіз: 3/5 − 1/5.",
+  denominators: { present: 595, answered: 577, omitted: 18, missing: 0 }, p_value: 0.12, p_value_among_answered: 0.13, omission_rate: 0.03,
+  missing_rate: 0, item_rest_correlation: stat(-0.23), upper_lower: { value: -0.2, unavailable_reason: null, group_size: 160, p_upper: 0.02, p_lower: 0.22 },
+  options: [{ key: "A", text: "2/5", is_key: false, misconception: null, count: 367, share_of_answered: 0.64, mean_rest_score: 0.5, point_biserial_rest: stat(0.34) },
+    { key: "C", text: "2/10", is_key: true, misconception: null, count: 73, share_of_answered: 0.13, mean_rest_score: 0.32, point_biserial_rest: stat(-0.23) }],
+  invalid_response_values: 0, flags: [msg("negative_discrimination")], objectives: [{ objective_id: "o", code: "DEMO-M6-3.1", status: "confirmed", weight: 1, topic_code: "T3" }],
+  misconceptions: ["wrong_operation"],
+};
+const QUALITY = {
+  method_version: "aq-v1", dataset_id: "d", dataset_version: 1, current_dataset_version: 1, is_stale: false, is_synthetic: true, generated_at: "2026-11-11T10:00:00Z",
+  provenance: { analysis_id: "abcdef123456", code_version: "0.1.0", kind: "assessment_quality", method_version: "aq-v1" }, assessment: ASSESSMENT,
+  rules: { attempt_rule: "first", omitted_policy: "as_incorrect" },
+  form: { denominators: { assigned: 612, present: 595, absent: 17, no_sitting_record: 0, n_items: 12, expected_item_responses: 7140,
+    assignment_scope: "inferred_from_sittings", assigned_is_exact: false, present_outside_assignment: 0, absent_outside_assignment: 0, assigned_cohorts: 24 }, participation_rate: 0.97,
+    completion_rate: 0.945, omission_rate: 0.055, missing_rate: 0, item_responses: {}, reliability: { cronbach_alpha: stat(null, "too_few_learners"),
+      n_complete_learners: 20, n_items: 12, n_zero_variance_items: 0, min_learners: 30, min_items: 3 },
+    score_distribution: { n: 595, mean: 0.42, median: 0.41, sd: 0.19, min: 0, max: 1, floor_share: 0.01, ceiling_share: 0, histogram: [{ from: 0, to: 0.1, count: 3 }], unavailable_reason: null } },
+  slices: { language: [{ value: "kz", n: null, mean: null, median: null, sd: null, suppressed: true, suppression: "primary" }] },
+  items: [ITEM], flag_counts: { negative_discrimination: 1 }, n_flagged_items: 1,
+  exclusions: { absent_learners: 17, assigned_without_sitting_record: 0, rows_excluded_by_attempt_rule: 0, learners_with_repeat_attempts: 0, responses_outside_form: 0, rejected_import_rows_in_dataset: 0 },
+  thresholds: {}, limitations: [msg("quality_flags_are_signals", "info")],
+};
+
+beforeEach(() => {
+  routes = [];
+  calls.length = 0;
+  mockFetch();
+});
+
+test("measurement dictionary has a Kazakh string with the same placeholders for every key", () => {
+  const ph = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort().join(",");
+  for (const key of Object.keys(mdict.ru) as (keyof typeof mdict.ru)[]) {
+    expect(mdict.kz[key], key).toBeTruthy();
+    expect(ph(mdict.kz[key]), key).toBe(ph(mdict.ru[key]));
+  }
+});
+
+test("quality detail shows denominators, unavailable alpha with reason, suppressed slice and item flags; switches to KZ", async () => {
+  routes = [[/GET .*\/quality\/assessments\/a1\/assignments/, () => ({ body: { assessment_id: "a1", assessment_code: "DIAG-BASE",
+    assignment_scope: "inferred_from_sittings", cohorts: [] } })], [/GET .*\/quality\/assessments\/a1/, () => ({ body: QUALITY })]];
+  renderAt("/quality/a1", "/quality/:assessmentId", <QualityDetailPage />);
+  expect(await screen.findByText("Диагностика проверки DIAG-BASE")).toBeInTheDocument();
+  expect(screen.getByText(/too_few_learners/)).toBeInTheDocument();
+  expect(screen.getByText(/скрыто \(мало учеников\)/)).toBeInTheDocument();
+  expect(screen.getByText("отрицательная различающая способность")).toBeInTheDocument(); // localised flag, code in tooltip
+  expect(screen.queryByText("negative_discrimination")).toBeNull();
+  expect(screen.getByText("Назначение выведено из записей присутствия (не точно)")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: /Q05/ }));
+  expect(screen.getByText("RU negative_discrimination")).toBeInTheDocument();
+  expect(screen.getByText("ключ")).toBeInTheDocument();
+  act(() => screen.getByText("to-kz").click());
+  expect(await screen.findByText("DIAG-BASE тексеруінің диагностикасы")).toBeInTheDocument();
+  expect(screen.getByText("KZ negative_discrimination")).toBeInTheDocument();
+  // changing a rule re-requests with the rule in the query string
+  fireEvent.change(screen.getAllByRole("combobox")[0], { target: { value: "last" } });
+  await waitFor(() => expect(calls.some((c) => c.url.includes("attempt_rule=last"))).toBe(true));
+});
+
+test("quality list: empty state and forbidden state", async () => {
+  routes = [[/GET .*\/quality\/assessments/, () => ({ body: { method_version: "aq-v1", rules: {}, assessments: [], total: 0, limit: 25, offset: 0 } })]];
+  const { unmount } = renderAt("/quality", "/quality", <QualityListPage />);
+  expect(await screen.findByText("Нет данных")).toBeInTheDocument();
+  unmount();
+  routes = [[/GET .*\/quality\/assessments/, () => ({ status: 403, body: { error: { code: "forbidden", message: "no", details: {} }, request_id: "r" } })]];
+  renderAt("/quality", "/quality", <QualityListPage />);
+  expect(await screen.findByText("Недостаточно прав для этого действия")).toBeInTheDocument();
+});
+
+const PILOT = {
+  id: "p1", code: "PIL-M02", title: "Пилот", dataset_id: "d", status: "ready", design: "single_group", assignment_unit: "cohort",
+  causal_ceiling: { code: "descriptive_change", label_ru: "Описательная динамика", label_kz: "Сипаттамалық динамика" },
+  intervention_id: "iv", intervention_version_id: "v", intervention_version: 1, intervention_snapshot: { title_ru: "Взаимная проверка" }, snapshot_sha256: "abcdef1234567890",
+  snapshot_locked: true, decision_id: null, topic: { code: "T3", title_ru: "Дроби", title_kz: "Бөлшек" }, objective: null, primary_outcome_ru: "Доля", cohorts: [
+    { cohort_id: "c1", code: "M01-6В", school_id: "s", school_code: "M01", arm: "intervention", wave: null, n_learners: 25 }],
+  randomization: null, baseline_assessment: null, outcome_assessment: null, pre_period_assessment_ids: [], start_date: "2026-09-21", end_date: "2026-10-23",
+  follow_up_due: "2026-10-30", owner: "М", planned: { minutes_per_session: 20, sessions_per_week: 3, duration_weeks: 5, total_sessions: 15, total_minutes: 300 },
+  inclusion_criteria: "", exclusion_criteria: "", analysis_plan: { adjustment: "none" }, validation: { ok: true, errors: [], warnings: [msg("single_group_no_causal", "info")] },
+  allowed_transitions: ["draft", "active", "stopped"], events: [], latest_outcome: null, created_at: "2026-11-11T10:00:00Z", created_by: "М", is_synthetic: true,
+};
+
+test("pilot actions use server-provided transitions; stop requires a reason; the request carries the target status", async () => {
+  routes = [[/GET .*\/pilots\/p1$/, () => ({ body: PILOT })], [/POST .*\/pilots\/p1\/transition/, () => ({ body: { ...PILOT, status: "active", allowed_transitions: ["completed", "stopped"] } })]];
+  renderAt("/pilots/p1", "/pilots/:id", <PilotDetailPage />);
+  expect(await screen.findByText("Протокол готов к переходу")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Остановить" })).toBeDisabled();
+  fireEvent.click(screen.getByRole("button", { name: "Запустить пилот" }));
+  await waitFor(() => expect(calls.find((c) => c.method === "POST")?.body).toEqual({ to_status: "active", note: "", override_future_end: false }));
+  expect(screen.getByText("Описательная динамика")).toBeInTheDocument();
+});
+
+test("follow-up shows 'not interpretable' for low fidelity and never 'ineffective'", async () => {
+  const outcome = {
+    id: "o1", pilot_id: "p1", status: "invalid_due_to_fidelity", status_label: { code: "invalid_due_to_fidelity", label_ru: "x", label_kz: "x" },
+    causal_level: { code: "none", label_ru: "Вывод невозможен", label_kz: "Қорытынды мүмкін емес" }, causal_ceiling: PILOT.causal_ceiling,
+    fidelity: { code: "low", label_ru: "Низкая", label_kz: "Төмен" }, method_version: "loop-v1", dataset_version: 1, current_dataset_version: 1, is_stale: false,
+    interim: false, created_at: "2026-11-11T10:00:00Z",
+    result: { primary: { estimand: "mean_paired_change", estimate: 0.075, ci_low: 0.05, ci_high: 0.1, ci_unavailable_reason: null, source: "raw" },
+      arms: {}, cohorts: null, status_rules_fired: ["fidelity_low"], interpretation_ru: "Результат нельзя считать проверкой интервенции — ни её эффективности, ни неэффективности.",
+      comparability: { code: "identical_form" }, n_outcome_items: 12, attrition: 0.05, reasons: [msg("fidelity_low")] },
+  };
+  routes = [[/GET .*\/pilots\/p1$/, () => ({ body: { ...PILOT, status: "completed" } })], [/GET .*\/outcomes/, () => ({ body: [outcome] })],
+    [/GET .*\/conclusions/, () => ({ body: [] })], [/GET .*\/curriculum/, () => ({ body: { assessments: [] } })]];
+  renderAt("/pilots/p1/follow-up", "/pilots/:id/follow-up", <FollowUpPage />);
+  expect(await screen.findByText("Не интерпретируется: реализация")).toBeInTheDocument();
+  expect(screen.getByText(/ни её эффективности, ни неэффективности/)).toBeInTheDocument();
+  expect(screen.getByText("Вывод и следующий цикл")).toBeInTheDocument();
+  expect(screen.queryByText(/не работает/)).toBeNull();
+  expect(screen.getByRole("button", { name: "Сохранить вывод" })).toBeDisabled(); // summary is required
+});
+
+test("viewer does not get drafting actions in the library", async () => {
+  routes = [[/GET .*\/interventions/, () => ({ body: { items: [], total: 0, limit: 25, offset: 0 } })]];
+  renderAt("/interventions", "/interventions", <InterventionsPage />, ["viewer"]);
+  expect(await screen.findByText("Библиотека интервенций")).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Новая интервенция" })).toBeNull();
+});
+
+test("portfolio shows aggregates and no 'best intervention'", async () => {
+  const pf = {
+    generated_at: "x", as_of: "2026-11-11", dataset_id: null, counts_by_status: { draft: 1, ready: 0, active: 1, completed: 2, stopped: 0 },
+    follow_ups: { overdue: [], due_within_14_days: [], upcoming: [] }, fidelity_distribution: { high: 1, moderate: 0, low: 1, unknown: 1 },
+    outcome_distribution: { positive_signal: 1, invalid_due_to_fidelity: 1 }, interventions_with_repeated_signals: [], coverage: { topics: [] },
+    learners_by_outcome_status: { total: 157, min_cell: 10, suppression_applied: true, cells: {
+      positive_signal: { value: 150, suppressed: false, reason: null }, invalid_due_to_fidelity: { value: null, suppressed: true, reason: "small_cell" } } },
+    synthetic_evidence: { accepted_entries: 1, repeated_signals_demo_only: [], counts_toward_recommendations: false },
+    missing_for_conclusions: [], action_queue: [{ pilot_id: "p2", code: "PIL-M02", title: "t", action: "record_conclusion" }], best_intervention: null,
+    best_intervention_reason: "not_shown", pilots: [], limitations: [msg("no_league_tables", "info")],
+  };
+  routes = [[/GET .*\/portfolio\/interventions/, () => ({ body: pf })],
+    [/GET .*\/api\/v1\/pilots/, () => ({ body: { items: [], total: 0, limit: 20, offset: 0 } })],
+    [/GET .*\/learning\/summary/, () => ({ body: { interventions: [], lessons: [], open_questions: [], pending_evidence_reviews: [], note_ru: "n", note_kz: "n" } })]];
+  renderAt("/portfolio/interventions", "/portfolio/interventions", <PortfolioPage />);
+  expect(await screen.findByText("Сохранить вывод по результату")).toBeInTheDocument();
+  expect(screen.getByText(/«Лучшая интервенция» не показывается/)).toBeInTheDocument();
+  expect(screen.getByText("RU no_league_tables")).toBeInTheDocument();
+  expect(screen.getByText("скрыто: малая группа")).toBeInTheDocument(); // suppressed learner cell
+});
+
+
+test("list rows are real links: keyboard Tab + Enter opens the item (no clickable <tr>)", async () => {
+  const user = (await import("@testing-library/user-event")).default.setup();
+  const row = { id: "iv1", code: "INT-A", status: "active", dataset_id: null, latest_version: 1, reviewed_version: 1, current_status: "reviewed",
+    title_ru: "Полоса дробей", title_kz: "Жолақ", evidence_level: "observational", grades: [6], languages: ["ru"], targets: [], total_minutes: 300,
+    n_pilots: 0, accepted_evidence: 0, accepted_synthetic_evidence: 0 };
+  routes = [[/GET .*\/interventions\?/, () => ({ body: { items: [row], total: 30, limit: 25, offset: 0 } })]];
+  localStorage.clear();
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(
+    <QueryClientProvider client={qc}><I18nProvider initial="ru"><AppStateProvider><SetUser roles={["viewer"]} />
+      <MemoryRouter initialEntries={["/interventions"]}>
+        <Routes>
+          <Route path="/interventions" element={<InterventionsPage />} />
+          <Route path="/interventions/:id" element={<p>detail opened</p>} />
+        </Routes>
+      </MemoryRouter>
+    </AppStateProvider></I18nProvider></QueryClientProvider>,
+  );
+  const link = await screen.findByRole("link", { name: "INT-A: Полоса дробей" });
+  expect(link.closest("tr")?.getAttribute("class") ?? "").not.toContain("clickable");
+  expect(screen.getByRole("navigation", { name: /Страница 1 из 2/ })).toBeInTheDocument(); // pager
+  link.focus();
+  expect(link).toHaveFocus();
+  await user.keyboard("{Enter}");
+  expect(await screen.findByText("detail opened")).toBeInTheDocument();
+});
+
+test("pager moves the offset and keeps it in the URL", async () => {
+  const user = (await import("@testing-library/user-event")).default.setup();
+  const row = { id: "iv1", code: "INT-A", status: "active", dataset_id: null, latest_version: 1, reviewed_version: 1, current_status: "reviewed",
+    title_ru: "А", title_kz: "А", evidence_level: "observational", grades: [], languages: [], targets: [], total_minutes: 1, n_pilots: 0,
+    accepted_evidence: 0, accepted_synthetic_evidence: 0 };
+  routes = [[/GET .*\/interventions\?/, (_, url) => ({ body: { items: [row], total: 60, limit: 25, offset: Number(new URL(url, "http://x").searchParams.get("offset")) } })]];
+  renderAt("/interventions", "/interventions", <InterventionsPage />, ["viewer"]);
+  const next = await screen.findByRole("button", { name: "Вперёд" });
+  await user.click(next);
+  await waitFor(() => expect(calls.some((c) => c.url.includes("offset=25"))).toBe(true));
+  expect(screen.getByText(/Страница 2 из 3/)).toBeInTheDocument();
+});
+
+test("design studio sends the selected classes and never approves a design itself", async () => {
+  const { DesignStudio } = await import("../features/interventions/DesignStudio");
+  const used: string[] = [];
+  const design = (code: string, admissible: boolean, mde: { low: number; high: number } | null) => ({
+    design: code, admissible, analysis_mode: "built_in", causal_ceiling: code === "cluster_randomized" ? "causal_estimate" : "descriptive_change",
+    clusters: { intervention: 3, comparison: 3, total: 6, mean_size: 25 }, mde_range: mde, power_range: mde ? { low: 0.3, high: 0.6 } : null,
+    meets_mde_target: null, precision_unavailable_reason: mde ? null : "too_few_clusters", sensitivity: [], risks: { contamination: "high" },
+    reasons: [], messages: [] });
+  routes = [[/POST .*\/design-studio\/evaluate/, () => ({ body: { method_version: "eds-v1", assumptions: {}, formula: "f", auto_approval: false,
+    warnings: [], warning_messages: [], designs: [design("single_group", true, { low: 0.2, high: 0.3 }), design("cluster_randomized", false, null)] } })]];
+  localStorage.clear();
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={qc}><I18nProvider initial="ru"><MemoryRouter>
+    <DesignStudio datasetId="d" cohortIds={["c1", "c2"]} assignmentUnit="cohort" onUseDesign={(d) => used.push(d)} /></MemoryRouter></I18nProvider></QueryClientProvider>);
+  fireEvent.click(screen.getByRole("button", { name: "Рассчитать варианты" }));
+  expect(await screen.findByTestId("design-studio-result")).toBeInTheDocument();
+  expect((calls.find((c) => c.method === "POST")?.body as { cohort_ids: string[] }).cohort_ids).toEqual(["c1", "c2"]);
+  expect(screen.getByText("мало кластеров — точность не показывается")).toBeInTheDocument();
+  expect(screen.getAllByRole("button", { name: "Выбрать дизайн" })).toHaveLength(1); // only admissible designs
+  fireEvent.click(screen.getByRole("button", { name: "Выбрать дизайн" }));
+  expect(used).toEqual(["single_group"]);
+  expect(screen.getByText(/Расчёт не утверждает дизайн/)).toBeInTheDocument();
+});
+
+test("session calendar after activation: reschedule sends a new date, no delete button", async () => {
+  const { SessionCalendar } = await import("../features/interventions/SessionCalendar");
+  const cal = { pilot_id: "p1", pilot_status: "active", editable: false, default_weekdays: [1, 3], counts: { planned: 1, rescheduled: 1 },
+    sessions: [{ id: "s1", cohort_id: "c1", cohort_code: "M01-6Г", planned_date: "2026-11-12", duration_minutes: 25, status: "planned", rescheduled_to_id: null, source: "generated", note: "" },
+      { id: "s0", cohort_id: "c1", cohort_code: "M01-6Г", planned_date: "2026-11-10", duration_minutes: 25, status: "rescheduled", rescheduled_to_id: "s1", source: "generated", note: "" }],
+    events: [{ action: "rescheduled", from_date: "2026-11-10", to_date: "2026-11-12", to_status: "rescheduled", by: "М", source: "user", at: "2026-11-11T10:00:00Z" }] };
+  routes = [[/GET .*\/sessions$/, () => ({ body: cal })], [/PATCH .*\/sessions\/s1/, () => ({ body: cal })]];
+  renderAt("/x", "/x", <SessionCalendar pilotId="p1" />, ["methodist"]);
+  expect(await screen.findByText("перенесено")).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Удалить" })).toBeNull();
+  fireEvent.change(screen.getByLabelText("Новая дата 2026-11-12 M01-6Г"), { target: { value: "2026-11-19" } });
+  fireEvent.click(screen.getByRole("button", { name: "Перенести" }));
+  await waitFor(() => expect(calls.find((c) => c.method === "PATCH")?.body).toEqual({ planned_date: "2026-11-19" }));
+});
+
+
+test("DIF screening is labelled as a signal and shows unavailable reasons", async () => {
+  const dif = { method_version: "dif-mh-v1", assessment: {}, reference: "ru", focal: "kz", group_sizes: { ru: 400, kz: 210 }, available: true,
+    unavailable_reason: null, excluded_items: [], min_group_n: 100, label: "dif_screening_signal", is_synthetic: true,
+    limitations: [msg("dif_screening_only", "info")],
+    items: [{ item_id: "i10", code: "Q10", n_reference: 400, n_focal: 210, alpha_mh: 4.1, mh_d_dif: -3.3, se: 0.4, ci_low: -4.1, ci_high: -2.5, chi2: 60, p_value: 0, category: "C", n_strata: 11, unavailable_reason: null },
+      { item_id: "i8", code: "Q08", n_reference: 400, n_focal: 210, alpha_mh: 1.0, mh_d_dif: 0.1, se: 0.3, ci_low: -0.5, ci_high: 0.7, chi2: 0.1, p_value: 0.7, category: "A", n_strata: 11, unavailable_reason: null }] };
+  routes = [[/GET .*\/quality\/assessments\/a1\/assignments/, () => ({ body: { assessment_id: "a1", assessment_code: "DIAG-BASE", assignment_scope: "explicit", cohorts: [] } })],
+    [/GET .*\/quality\/assessments\/a1\/dif/, () => ({ body: dif })], [/GET .*\/quality\/assessments\/a1/, () => ({ body: QUALITY })]];
+  renderAt("/quality/a1", "/quality/:assessmentId", <QualityDetailPage />);
+  fireEvent.click(await screen.findByRole("button", { name: "Выполнить скрининг" }));
+  expect(await screen.findByText("C — сильный сигнал: проверить задание")).toBeInTheDocument();
+  expect(screen.getByText("A — нет сигнала")).toBeInTheDocument();
+  expect(screen.getByText("RU dif_screening_only")).toBeInTheDocument();
+});

@@ -11,6 +11,7 @@ import { Alert, Badge, Button, Card, Diff, EmptyState, ErrorState, Field, Loadin
 import { dateTime, num, pct, pp } from "../ui/format";
 import { ImportWizard } from "./ImportPage";
 import { NeedDataset } from "./OverviewPage";
+import { LearningLoopCard, type LearningLoopSnapshot } from "./measurement/LearningLoopCard";
 
 export function DecisionsPage() {
   const { t, lang } = useI18n();
@@ -235,6 +236,7 @@ function DecisionDetail({ id }: { id: string }) {
               {error ? <ErrorState error={error} /> : null}
             </Card>
             <SnapshotView s={s} />
+            <LearningLoopCard loop={(d.snapshot as { learning_loop?: LearningLoopSnapshot }).learning_loop} />
             <Card title={t("decision.history")}>
               <ol className="small">
                 {d.history.map((h) => <li key={h.id as string}>v{h.version as number} · {t(`decision.status.${h.status}` as DictKey)} · {dateTime(h.created_at as string, lang)}{h.approved_by ? ` · ${h.approved_by}` : ""}</li>)}
