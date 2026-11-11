@@ -1,0 +1,303 @@
+{
+  "M2": {
+    "backend_code": "numerators_not_scaled",
+    "by_edition": {
+      "JURY-A": 0.8287153652392947,
+      "JURY-B": 0.8668555240793201
+    },
+    "n_learners": 316,
+    "rate_denominator": "incorrect answered target-item responses; not all learners"
+  },
+  "adjusted_A_minus_B": 0.06254620431834135,
+  "comparison": {
+    "adjusted": {
+      "a": 0.6428150970708599,
+      "b": 0.5802688927525186,
+      "difference": -0.06254620431834135,
+      "strata": [
+        {
+          "mean_a": 0.4771825396825397,
+          "mean_b": 0.3928571428571429,
+          "n_a": 84,
+          "n_b": 35,
+          "stratum": "low",
+          "weight": 0.34293948126801155
+        },
+        {
+          "mean_a": 0.5570175438596492,
+          "mean_b": 0.5075757575757576,
+          "n_a": 38,
+          "n_b": 22,
+          "stratum": "mid",
+          "weight": 0.1729106628242075
+        },
+        {
+          "mean_a": 0.7907801418439716,
+          "mean_b": 0.7389807162534434,
+          "n_a": 47,
+          "n_b": 121,
+          "stratum": "high",
+          "weight": 0.484149855907781
+        }
+      ],
+      "strata_scheme": "pre_three_level",
+      "unavailable_reason": null,
+      "weight_mode": "pooled",
+      "weights": {
+        "high": 0.484149855907781,
+        "low": 0.34293948126801155,
+        "mid": 0.1729106628242075
+      }
+    },
+    "arms": {
+      "a": "JURY-A",
+      "b": "JURY-B"
+    },
+    "baseline_coverage": 0.9532967032967034,
+    "causal_protocol_available": false,
+    "exclusions": {
+      "a": {
+        "no_baseline": 11,
+        "no_outcome": 12
+      },
+      "b": {
+        "no_baseline": 6,
+        "no_outcome": 8
+      }
+    },
+    "inference_level": "adjusted_association",
+    "method_version": "std-v1",
+    "ranking_allowed": true,
+    "raw": {
+      "a": {
+        "mean": 0.5824074074074074,
+        "n_classes": 8,
+        "n_learners": 180,
+        "n_schools": 8,
+        "n_teachers": 8
+      },
+      "b": {
+        "mean": 0.6431159420289855,
+        "n_classes": 8,
+        "n_learners": 184,
+        "n_schools": 8,
+        "n_teachers": 8
+      },
+      "difference": 0.0607085346215781
+    },
+    "reasons": [],
+    "signal": "a_higher",
+    "status": "comparable",
+    "uncertainty": {
+      "adjusted_difference_ci": {
+        "high": -0.03439454928946563,
+        "low": -0.08928076852894386
+      },
+      "cluster_unit": "class",
+      "clusters_per_arm": {
+        "a": 8,
+        "b": 8
+      },
+      "confidence": 0.95,
+      "method": "cluster_bootstrap_percentile",
+      "raw_difference_ci": {
+        "high": 0.10581170058873707,
+        "low": 0.019383916539083647
+      },
+      "replicates": 2000,
+      "seed": 20261111,
+      "unavailable_reason": null
+    }
+  },
+  "counts": {
+    "absence_rows": 55,
+    "assessments": 3,
+    "classes": 16,
+    "forms": 3,
+    "import_response_file_rows": 46129,
+    "items": 42,
+    "learners": 384,
+    "objectives": 18,
+    "response_rows": 46074,
+    "schools": 8,
+    "topics": 6
+  },
+  "diagnostic": {
+    "n_items": 3,
+    "valid": true
+  },
+  "documents": [
+    {
+      "edition": "JURY-A",
+      "pages": 50,
+      "status": "ready"
+    },
+    {
+      "edition": "JURY-B",
+      "pages": 50,
+      "status": "ready"
+    }
+  ],
+  "donor": {
+    "followup_mean": 0.8701180744777472,
+    "post_class_sd": 0.03824876265281426,
+    "post_mean": 0.8585164835164835,
+    "topic": "JURY-T2"
+  },
+  "fractions_mean": 0.6130952380952381,
+  "fractions_pre_mean": 0.6958105646630236,
+  "imports": {
+    "editions": {
+      "rows_accepted": 2,
+      "rows_rejected": 0,
+      "rows_total": 2
+    },
+    "item_bank": {
+      "rows_accepted": 126,
+      "rows_rejected": 0,
+      "rows_total": 126
+    },
+    "program": {
+      "rows_accepted": 18,
+      "rows_rejected": 0,
+      "rows_total": 18
+    },
+    "responses": {
+      "rows_accepted": 46129,
+      "rows_rejected": 0,
+      "rows_total": 46129
+    },
+    "roster": {
+      "rows_accepted": 384,
+      "rows_rejected": 0,
+      "rows_total": 384
+    }
+  },
+  "is_synthetic": true,
+  "item_quality": {
+    "JURY-I13": {
+      "item_rest_correlation": 0.10809600163749289,
+      "omission_rate": 0.019230769230769232,
+      "option_counts": {
+        "A": 2,
+        "B": 1,
+        "D": 354
+      },
+      "p_answered": 0.9915966386554622
+    },
+    "JURY-I14": {
+      "item_rest_correlation": 0.21470563420051253,
+      "omission_rate": 0.016483516483516484,
+      "option_counts": {
+        "B": 58,
+        "C": 4,
+        "D": 296
+      },
+      "p_answered": 0.8268156424581006
+    },
+    "JURY-I30": {
+      "item_rest_correlation": 0.029047242559831557,
+      "omission_rate": 0.024725274725274724,
+      "option_counts": {
+        "A": 113,
+        "B": 110,
+        "C": 9,
+        "D": 123
+      },
+      "p_answered": 0.02535211267605634
+    },
+    "JURY-I34": {
+      "item_rest_correlation": 0.3219643594604876,
+      "omission_rate": 0.038461538461538464,
+      "option_counts": {
+        "8": 279,
+        "Неверное преобразование": 27,
+        "Шаг 1 верен; вычисление не завершено": 44
+      },
+      "p_answered": 0.86
+    },
+    "JURY-I35": {
+      "item_rest_correlation": 0.22718307463035217,
+      "omission_rate": 0.19505494505494506,
+      "option_counts": {
+        "A": 13,
+        "B": 12,
+        "C": 252,
+        "D": 16
+      },
+      "p_answered": 0.8600682593856656
+    },
+    "JURY-I36": {
+      "item_rest_correlation": -0.49457224502562713,
+      "omission_rate": 0.024725274725274724,
+      "option_counts": {
+        "A": 231,
+        "B": 37,
+        "C": 43,
+        "D": 44
+      },
+      "p_answered": 0.6507042253521127
+    }
+  },
+  "limitations": [
+    "Pilot statuses are fixture-only; no interventions/pilots/fidelity core schema on the base commit.",
+    "Existing API marks small filters insufficient_data but still returns numerical summaries; production privacy suppression remains a blocker for real data.",
+    "Fixture pilot report suppresses n<10 outcomes. All provided students and schools are synthetic.",
+    "Source mappings require the explicit local fixture adapter after document upload; no CSV material-link endpoint exists.",
+    "No browser or live deployment verification; API integration only."
+  ],
+  "pilots": {
+    "A": {
+      "backend_paired_available": false,
+      "backend_paired_reason": "too_few_pairs",
+      "fidelity": 1.0,
+      "fixture_only": true,
+      "inference": "descriptive_paired_change; no causal identification; identical form retest",
+      "n_paired": 46,
+      "observed_gain": 0.09239130434782608,
+      "status": "positive_signal",
+      "suppressed": false,
+      "uncertainty": null
+    },
+    "B": {
+      "backend_paired_available": false,
+      "backend_paired_reason": "too_few_pairs",
+      "fidelity": 0.1875,
+      "fixture_only": true,
+      "inference": "descriptive_paired_change; no causal identification; identical form retest",
+      "n_paired": 45,
+      "observed_gain": 0.03333333333333333,
+      "status": "invalid_due_to_fidelity",
+      "suppressed": false,
+      "uncertainty": null
+    },
+    "C": {
+      "backend_paired_available": false,
+      "backend_paired_reason": "too_few_pairs",
+      "fidelity": 0.75,
+      "fixture_only": true,
+      "inference": "descriptive_paired_change; no causal identification; identical form retest",
+      "n_paired": null,
+      "observed_gain": null,
+      "status": "needs_more_data",
+      "suppressed": true,
+      "uncertainty": null
+    }
+  },
+  "planner": {
+    "budget": 38,
+    "requested_hours": {
+      "JURY-T1": 8,
+      "JURY-T2": 6
+    },
+    "status": "optimal",
+    "validation": {
+      "valid": true,
+      "violations": []
+    }
+  },
+  "production_small_filter_numbers_suppressed": false,
+  "raw_A_minus_B": -0.0607085346215781,
+  "seed": 20261111,
+  "target_mean": 0.46016483516483514
+}
