@@ -26,6 +26,9 @@ docker compose up --build
 При первом старте применяются миграции и загружается синтетический демо-корпус (≈30–50 с); сервисы стартуют по
 готовности (`/health/ready`: БД, миграции, демо-шаблон). По умолчанию режим `OQUMAP_DEPLOYMENT_MODE=public_demo`:
 каждый посетитель получает свою одноразовую копию демо-организации (TTL 6 ч, очистка воркером), лимиты частоты в БД.
+Контур «Качество проверок → интервенции → пилоты» подготавливается для этой копии фоновой задачей. Пока задача
+идёт, интерфейс показывает наблюдаемый статус подготовки и не открывает неполный набор; после завершения набор
+появляется без перезагрузки страницы и открывается сразу на экране качества проверок.
 Режимы: `dev` (QA-персоны, локальная разработка), `public_demo`, `production` (только вход по паролю; организация и
 администратор — `OQUMAP_ADMIN_PASSWORD=… docker compose exec -e OQUMAP_ADMIN_PASSWORD api python -m oqumap.admin
 create-org --name "…" --admin <логин>`).
@@ -81,7 +84,8 @@ cd apps/api && uv run pytest                                   # SQLite во в�
 cd apps/api && OQUMAP_TEST_DATABASE_URL=postgresql+psycopg://postgres@localhost:5432/postgres uv run pytest   # тот же набор на PostgreSQL (создаёт/удаляет базы oqu_*)
 cd apps/web && npm test && npm run typecheck && npm run build
 ```
-Сквозные тесты браузером (`scenario.spec.ts`, `wow.spec.ts`, `a11y.spec.ts` — axe, WCAG 2.1 A/AA). В режиме
+Сквозные тесты браузером (`scenario.spec.ts`, `measurement.spec.ts`, `wow.spec.ts`, `a11y.spec.ts` — axe,
+`calendar.spec.ts`). В режиме
 `public_demo` каждый тест получает свою одноразовую копию, поэтому повторный запуск не требует сброса:
 ```bash
 cd tests/e2e && npm ci && OQUMAP_WEB_URL=http://localhost:8080 npx playwright test --trace off
