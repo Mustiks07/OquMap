@@ -29,7 +29,7 @@ function mockFetch() {
   }) as typeof fetch;
 }
 
-const USER = { id: "u", username: "m", display_name: "Методист", roles: ["methodist", "approver"], org_id: "o", org_name: "Org", org_is_demo: true };
+const USER = { id: "u", username: "m", display_name: "Методист", roles: ["methodist", "approver"], org_id: "o", org_name: "Org", org_is_demo: true, org_is_ephemeral: false };
 
 function SetUser({ roles }: { roles: string[] }) {
   const { setUser } = useAppState();

@@ -63,6 +63,8 @@ def test_api_on_demo_form(client, H, datasets):
     assert any(lim["code"] == "dif_screening_only" for lim in r["limitations"])
     base = next(a for a in client.get("/api/v1/quality/assessments", params={"dataset_id": datasets["base"]["id"]}, headers=H).json()["assessments"])
     rb = client.get(f"/api/v1/quality/assessments/{base['assessment']['assessment_id']}/dif", headers=H).json()
-    assert rb["available"] is False and rb["unavailable_reason"] == "single_language_group" and rb["items"] == []
+    # integration: the base corpus now has three Kazakh-medium classes (~75 learners) from the platform branch, so DIF on
+    # it is unavailable because the focal group is below MIN_GROUP_N — not because there is only one language
+    assert rb["available"] is False and rb["unavailable_reason"] == "insufficient_sample" and rb["items"] == []
     assert client.get(f"/api/v1/quality/assessments/{aid}/dif", headers=login(client, "other_org")).status_code == 404
     assert client.get(f"/api/v1/quality/assessments/{aid}/dif", params={"focal": "ru"}, headers=H).status_code == 422
