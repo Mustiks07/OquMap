@@ -106,7 +106,8 @@ def test_database_constraints(env):
     with db.session_factory()() as s:
         v = s.query(mm.InterventionVersion).first()
         o2 = s.query(mm.PilotOutcome).filter(mm.PilotOutcome.pilot_id == p2["id"]).first()
-        other_iv = s.query(mm.Intervention).filter(mm.Intervention.id != v.intervention_id).first()
+        own_iv = s.get(mm.Pilot, p1["id"]).intervention_id
+        other_iv = s.query(mm.Intervention).filter(mm.Intervention.id != own_iv).order_by(mm.Intervention.code).first()
         vid, iid, o2id, org = v.id, v.intervention_id, o2.id, v.org_id
         log = s.query(mm.FidelityLog).filter(mm.FidelityLog.pilot_id == p1["id"]).first()
         log_id, cohort = log.id, log.cohort_id
