@@ -53,9 +53,13 @@ def upgrade() -> None:
         batch_op.create_index(batch_op.f('ix_organizations_expires_at'), ['expires_at'], unique=False)
         batch_op.create_index(batch_op.f('ix_organizations_is_ephemeral'), ['is_ephemeral'], unique=False)
 
-    with op.batch_alter_table('scales', schema=None) as batch_op:
+    # PostgreSQL names the original UNIQUE(code) "scales_code_key"; SQLite keeps it unnamed, so in SQLite batch mode a
+    # naming convention gives the reflected constraint a name to drop (integration fix: the PostgreSQL path is unchanged).
+    sqlite = op.get_bind().dialect.name == "sqlite"
+    with op.batch_alter_table('scales', schema=None,
+                              naming_convention={"uq": "uq_%(table_name)s_%(column_0_name)s"} if sqlite else None) as batch_op:
         batch_op.add_column(sa.Column('org_id', sa.String(length=36), nullable=True))
-        batch_op.drop_constraint(batch_op.f('scales_code_key'), type_='unique')
+        batch_op.drop_constraint('uq_scales_code' if sqlite else batch_op.f('scales_code_key'), type_='unique')
         batch_op.create_index(batch_op.f('ix_scales_org_id'), ['org_id'], unique=False)
         batch_op.create_unique_constraint('uq_scales_org_code', ['org_id', 'code'])
         batch_op.create_foreign_key('fk_scales_org', 'organizations', ['org_id'], ['id'])
