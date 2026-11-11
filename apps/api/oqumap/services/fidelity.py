@@ -84,7 +84,7 @@ def classify(metrics: dict) -> tuple[str, list[str]]:
     return "moderate", reasons
 
 
-def aggregate_logs(logs: list[LogRow], expected: int, minutes_per_session: int) -> dict:
+def aggregate_logs(logs: list[LogRow], expected: int, minutes_per_session: int, planned_minutes: int | None = None) -> dict:
     delivered = [x for x in logs if x.disruption != "cancelled" and x.delivered_minutes > 0]
     cancelled = len(logs) - len(delivered)
     pres = [(x.learners_present, x.learners_assigned) for x in delivered
@@ -98,7 +98,8 @@ def aggregate_logs(logs: list[LogRow], expected: int, minutes_per_session: int) 
         "cancelled_sessions": cancelled,
         "missing_logs": max(0, expected - len(logs)),
         "log_coverage": _ratio(len(logs), expected),
-        "dosage_completion": _ratio(sum(x.delivered_minutes for x in logs), expected * minutes_per_session),
+        "dosage_completion": _ratio(sum(x.delivered_minutes for x in logs),
+                                    planned_minutes if planned_minutes is not None else expected * minutes_per_session),
         "session_completion": _ratio(len(delivered), expected),
         "reach": (sum(p for p, _ in pres) / sum(a for _, a in pres)) if pres else None,
         "adherence": (adh_done / adh_total) if adh_total else None,
@@ -110,13 +111,29 @@ def aggregate_logs(logs: list[LogRow], expected: int, minutes_per_session: int) 
 
 
 def compute(cohort_ids: list[str], logs: list[LogRow], total_sessions: int, minutes_per_session: int,
-            start: date | None, end: date | None, as_of: date) -> dict:
+            start: date | None, end: date | None, as_of: date,
+            calendar: dict[str, list[tuple[date, int, str]]] | None = None) -> dict:
     """Pure aggregation over intervention cohorts. Returns per-cohort metrics, pooled overall metrics and the
-    distribution of cohort classifications."""
-    exp = expected_sessions(total_sessions, start, end, as_of)
+    distribution of cohort classifications.
+
+    With a session calendar, the expected sessions of a class are its sessions planned up to ``as_of`` that were
+    not rescheduled (a rescheduled session is replaced by its new date, so it is not a missed one) and the planned
+    minutes are their durations. Without a calendar the planned sessions are spread uniformly over the period."""
     eff = [x for x in logs if x.session_date <= as_of]
-    per = {c: aggregate_logs([x for x in eff if x.cohort_id == c], exp, minutes_per_session) for c in cohort_ids}
-    overall = aggregate_logs([x for x in eff if x.cohort_id in set(cohort_ids)], exp * len(cohort_ids), minutes_per_session)
+    exp_per: dict[str, int] = {}
+    min_per: dict[str, int | None] = {}
+    if calendar is not None:
+        for c in cohort_ids:
+            due = [(d, dur) for d, dur, st in calendar.get(c, []) if d <= as_of and st != "rescheduled"]
+            exp_per[c] = len(due)
+            min_per[c] = sum(dur for _, dur in due)
+    else:
+        u = expected_sessions(total_sessions, start, end, as_of)
+        exp_per = {c: u for c in cohort_ids}
+        min_per = {c: None for c in cohort_ids}
+    per = {c: aggregate_logs([x for x in eff if x.cohort_id == c], exp_per[c], minutes_per_session, min_per[c]) for c in cohort_ids}
+    total_minutes = sum(v for v in min_per.values() if v is not None) if calendar is not None else None
+    overall = aggregate_logs([x for x in eff if x.cohort_id in set(cohort_ids)], sum(exp_per.values()), minutes_per_session, total_minutes)
     dist = {k: 0 for k in FIDELITY_LABELS}
     for v in per.values():
         dist[v["classification"]["code"]] += 1
@@ -124,7 +141,10 @@ def compute(cohort_ids: list[str], logs: list[LogRow], total_sessions: int, minu
     if cohort_ids and overall["classification"]["code"] == "high" and weak / len(cohort_ids) >= RULES["overall_downgrade_share"]:
         overall["classification"] = label(FIDELITY_LABELS, "moderate")
         overall["reasons"] = overall["reasons"] + ["third_of_cohorts_low_or_unknown"]
-    return {"per_cohort": per, "overall": overall, "distribution": dist, "expected_per_cohort": exp}
+    first = next(iter(exp_per.values()), 0)
+    return {"per_cohort": per, "overall": overall, "distribution": dist,
+            "expected_per_cohort": first if calendar is None else exp_per,
+            "expected_source": "calendar" if calendar is not None else "uniform"}
 
 
 def effective_logs(session: Session, pl: mm.Pilot) -> list[mm.FidelityLog]:
@@ -158,13 +178,20 @@ def fidelity_for(session: Session, pl: mm.Pilot, as_of: date | None = None) -> d
     logs = [LogRow(r.cohort_id, r.session_date, r.planned_minutes, r.delivered_minutes, r.activities_planned,
                    r.activities_completed, r.learners_present, r.learners_assigned, r.adherence or [], r.disruption)
             for r in effective_logs(session, pl)]
-    res = compute(inter, logs, pl.sessions_per_week * pl.duration_weeks, pl.minutes_per_session, pl.start_date, pl.end_date, as_of)
+    from .sessions import planned_by_cohort
+
+    res = compute(inter, logs, pl.sessions_per_week * pl.duration_weeks, pl.minutes_per_session, pl.start_date, pl.end_date, as_of,
+                  planned_by_cohort(session, pl))
     res["as_of"] = as_of
     return res
 
 
-def logs_fingerprint(session: Session, pl: mm.Pilot) -> list[str]:
-    return [r.id for r in effective_logs(session, pl)]
+def logs_fingerprint(session: Session, pl: mm.Pilot) -> list:
+    """Inputs of the fidelity calculation: effective logs and the state of the session calendar."""
+    from .sessions import calendar_rows
+
+    return [r.id for r in effective_logs(session, pl)] + [
+        (s.id, s.planned_date.isoformat(), s.status, s.duration_minutes) for s in calendar_rows(session, pl)]
 
 
 def correction_exists(session: Session, log_id: str) -> bool:
@@ -208,6 +235,10 @@ def add_log(session: Session, p: Principal, pilot_id: str, body: S.FidelityLogCr
     session.add(log)
     with conflict_as(session, "already_corrected", "Эта запись уже исправлена; исправляйте последнюю версию"):
         session.flush()  # unique(corrects_log_id) closes the race between two simultaneous corrections
+    from .sessions import on_fidelity_log
+
+    on_fidelity_log(session, pl, body.cohort_id, body.session_date,
+                    body.disruption == "cancelled" or body.delivered_minutes == 0, p.user_id)
     # audit without free-text notes (may contain personal data)
     audit(session, p.org_id, p.user_id, "fidelity.log", "pilot", pl.id, log_id=log.id, corrects=body.corrects_log_id,
           disruption=body.disruption)
@@ -249,7 +280,9 @@ def fidelity_payload(session: Session, p: Principal, pilot_id: str, as_of: date 
                             "message_ru": "Данные по отдельным классам и журналы доступны методисту/утверждающему.",
                             "message_kz": "Жеке сыныптар бойынша деректер әдіскерге/бекітушіге қолжетімді."})
     return {"pilot_id": pl.id, "method_version": METHOD_VERSION_FIDELITY, "as_of": res["as_of"].isoformat(),
-            "rule_set": RULES | {"expected_per_cohort": res["expected_per_cohort"],
+            "expected_source": res["expected_source"],
+            "rule_set": RULES | {"expected_per_cohort": res["expected_per_cohort"] if isinstance(res["expected_per_cohort"], int) else None,
+                                 "expected_source": res["expected_source"],
                                  "planned_minutes_per_session": pl.minutes_per_session,
                                  "planned_total_sessions": pl.sessions_per_week * pl.duration_weeks},
             "overall": res["overall"], "distribution": res["distribution"], "cohorts": cohorts,

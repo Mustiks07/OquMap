@@ -36,6 +36,7 @@ from ..services import imports as imp
 from ..services import interventions as ivs
 from ..services import learning_loop as loop
 from ..services import pilots as pls
+from ..services import sessions as cal
 from ..services.auth import Principal
 from . import generator as gen
 from .content import FORMS, ITEMS_BY_CODE, PROGRAM
@@ -331,6 +332,10 @@ def seed_measurement(session: Session, org_id: str) -> dict:
     p4 = session.scalar(select(mm.Pilot).where(mm.Pilot.org_id == org_id, mm.Pilot.code == "PIL-M04"))
     pls.randomize(session, p, p4.id, S.RandomizeRequest(seed=2027, cohort_ids=[cohorts[f"{s}-6{letter[ci]}"] for s, _ in SCHOOLS[:4] for ci in (0, 1)]))
 
+    # planned session calendars (draft schedules from the cadence, before activation)
+    for pl in (p1, p2):
+        cal.generate(session, p, pl["id"], S.SessionGenerate())  # Mon/Wed/Fri, 21.09–23.10 → 15 sessions per class
+    cal.generate(session, p, p3["id"], S.SessionGenerate(blackout_ranges=[S.DateRange(**{"from": date(2026, 12, 21), "to": date(2026, 12, 25)})]))
     for pl in (p1, p2, p3):
         pls.transition(session, p, pl["id"], S.TransitionRequest(to_status="ready"))
         pls.transition(session, p, pl["id"], S.TransitionRequest(to_status="active", note="Демо: запуск утверждён"))
@@ -362,6 +367,10 @@ def seed_measurement(session: Session, org_id: str) -> dict:
                 cohort_id=cid, session_date=d, planned_minutes=25, delivered_minutes=25 - 5 * (i % 2), activities_planned=3,
                 activities_completed=3, learners_present=sizes[cid] - 1, learners_assigned=sizes[cid],
                 adherence=[S.AdherenceItem(key=k, label=lbl, done=True) for k, lbl in checklist], source="observation"))
+    # PIL-M03: one class had its 05.11 session moved to 13.11 (a reschedule is not a missed session)
+    moved = next(x for x in cal.get_calendar(session, p, p3["id"])["sessions"]
+                 if x["cohort_id"] == group(3)[5] and x["planned_date"] == "2026-11-05")
+    cal.update(session, p, p3["id"], moved["id"], S.SessionPatch(planned_date=date(2026, 11, 13), note="Перенос: экскурсия"))
     for pl in (p1, p2):
         pls.transition(session, p, pl["id"], S.TransitionRequest(to_status="completed", note="Период пилота завершён"))
     o1 = loop.run_follow_up(session, p, p1["id"], S.FollowUpRun())

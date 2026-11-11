@@ -21,6 +21,7 @@ from ..services import interventions as ivs
 from ..services import learning_loop as loop
 from ..services import pilots as pls
 from ..services import portfolio as pf
+from ..services import sessions as cal
 from .routes import DB, P
 
 router = APIRouter(prefix="/api/v1")
@@ -197,3 +198,33 @@ def intervention_portfolio(p: P, session: DB, dataset_id: str | None = None, as_
 def design_studio(body: S.DesignStudioRequest, p: P, session: DB):
     """Deterministic design comparison for planning; never approves or changes a pilot."""
     return eds.evaluate(session, p.org_id, body)
+
+
+# ---------------------------------------------------------------------------
+# Session calendar
+# ---------------------------------------------------------------------------
+
+
+@router.get("/pilots/{pilot_id}/sessions", response_model=S.SessionCalendarOut, tags=["calendar"])
+def pilot_sessions(pilot_id: str, p: P, session: DB):
+    return cal.get_calendar(session, p, pilot_id)
+
+
+@router.post("/pilots/{pilot_id}/sessions/generate", response_model=S.SessionCalendarOut, tags=["calendar"])
+def generate_sessions(pilot_id: str, body: S.SessionGenerate, p: P, session: DB):
+    return cal.generate(session, p, pilot_id, body)
+
+
+@router.post("/pilots/{pilot_id}/sessions", response_model=S.SessionCalendarOut, tags=["calendar"])
+def add_session(pilot_id: str, body: S.SessionCreate, p: P, session: DB):
+    return cal.add(session, p, pilot_id, body)
+
+
+@router.patch("/pilots/{pilot_id}/sessions/{session_id}", response_model=S.SessionCalendarOut, tags=["calendar"])
+def update_session(pilot_id: str, session_id: str, body: S.SessionPatch, p: P, session: DB):
+    return cal.update(session, p, pilot_id, session_id, body)
+
+
+@router.delete("/pilots/{pilot_id}/sessions/{session_id}", response_model=S.SessionCalendarOut, tags=["calendar"])
+def delete_session(pilot_id: str, session_id: str, p: P, session: DB):
+    return cal.delete(session, p, pilot_id, session_id)

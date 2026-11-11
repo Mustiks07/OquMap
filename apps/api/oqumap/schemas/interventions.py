@@ -763,6 +763,7 @@ class FidelityOut(Model):
     pilot_id: str
     method_version: str
     as_of: str
+    expected_source: Literal["calendar", "uniform"]
     rule_set: dict[str, Any]
     overall: FidelityMetrics
     distribution: dict[str, int]
@@ -923,3 +924,58 @@ class DesignStudioOut(Model):
     auto_approval: bool
     warnings: list[str]
     warning_messages: list[Message]
+
+
+# ---------------------------------------------------------------------------
+# Session calendar
+# ---------------------------------------------------------------------------
+
+
+class DateRange(BaseModel):
+    from_: date = Field(alias="from")
+    to: date
+
+    model_config = {"populate_by_name": True}
+
+
+class SessionGenerate(BaseModel):
+    weekdays: list[int] = Field(default_factory=list, max_length=7)  # 0 = Monday; empty → derived from sessions per week
+    blackout_dates: list[date] = Field(default_factory=list, max_length=200)
+    blackout_ranges: list[DateRange] = Field(default_factory=list, max_length=20)
+    duration_minutes: int | None = Field(default=None, ge=1, le=600)
+
+
+class SessionCreate(BaseModel):
+    cohort_id: str
+    planned_date: date
+    duration_minutes: int | None = Field(default=None, ge=1, le=600)
+    note: str = Field(default="", max_length=300)
+
+
+class SessionPatch(BaseModel):
+    planned_date: date | None = None  # after activation: reschedule (creates a new session)
+    duration_minutes: int | None = Field(default=None, ge=1, le=600)
+    status: Literal["planned", "completed", "cancelled", "rescheduled"] | None = None
+    note: str | None = Field(default=None, max_length=300)
+
+
+class PilotSessionOut(Model):
+    id: str
+    cohort_id: str
+    cohort_code: str | None
+    planned_date: str
+    duration_minutes: int
+    status: str
+    rescheduled_to_id: str | None
+    source: str
+    note: str
+
+
+class SessionCalendarOut(Model):
+    pilot_id: str
+    pilot_status: str
+    editable: bool
+    default_weekdays: list[int]
+    counts: dict[str, int]
+    sessions: list[PilotSessionOut]
+    events: list[dict[str, Any]]

@@ -16,9 +16,9 @@ from oqumap.db import Base
 API = Path(__file__).resolve().parents[1]
 PREVIOUS = "d964e255551f"
 MEASUREMENT = "c2a7e5f1b3d9"
-HEAD = "a4d6e9f1c3b5"
+HEAD = "b5e7f0a2d4c6"
 NEW_TABLES = {"interventions", "intervention_versions", "intervention_targets", "pilots", "pilot_cohorts", "pilot_events",
-              "fidelity_logs", "pilot_outcomes", "pilot_conclusions", "intervention_evidence", "assessment_cohorts"}
+              "fidelity_logs", "pilot_outcomes", "pilot_conclusions", "intervention_evidence", "assessment_cohorts", "pilot_sessions", "pilot_session_events"}
 
 
 def _url(name: str) -> str:

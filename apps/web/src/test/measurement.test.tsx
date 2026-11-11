@@ -267,3 +267,18 @@ test("design studio sends the selected classes and never approves a design itsel
   expect(used).toEqual(["single_group"]);
   expect(screen.getByText(/Расчёт не утверждает дизайн/)).toBeInTheDocument();
 });
+
+test("session calendar after activation: reschedule sends a new date, no delete button", async () => {
+  const { SessionCalendar } = await import("../features/interventions/SessionCalendar");
+  const cal = { pilot_id: "p1", pilot_status: "active", editable: false, default_weekdays: [1, 3], counts: { planned: 1, rescheduled: 1 },
+    sessions: [{ id: "s1", cohort_id: "c1", cohort_code: "M01-6Г", planned_date: "2026-11-12", duration_minutes: 25, status: "planned", rescheduled_to_id: null, source: "generated", note: "" },
+      { id: "s0", cohort_id: "c1", cohort_code: "M01-6Г", planned_date: "2026-11-10", duration_minutes: 25, status: "rescheduled", rescheduled_to_id: "s1", source: "generated", note: "" }],
+    events: [{ action: "rescheduled", from_date: "2026-11-10", to_date: "2026-11-12", to_status: "rescheduled", by: "М", source: "user", at: "2026-11-11T10:00:00Z" }] };
+  routes = [[/GET .*\/sessions$/, () => ({ body: cal })], [/PATCH .*\/sessions\/s1/, () => ({ body: cal })]];
+  renderAt("/x", "/x", <SessionCalendar pilotId="p1" />, ["methodist"]);
+  expect(await screen.findByText("перенесено")).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Удалить" })).toBeNull();
+  fireEvent.change(screen.getByLabelText("Новая дата 2026-11-12 M01-6Г"), { target: { value: "2026-11-19" } });
+  fireEvent.click(screen.getByRole("button", { name: "Перенести" }));
+  await waitFor(() => expect(calls.find((c) => c.method === "PATCH")?.body).toEqual({ planned_date: "2026-11-19" }));
+});

@@ -9,6 +9,7 @@ import { useIntervention, useInterventions, useMAction, usePilot, type PilotCrea
 import { ActionError, FidelityBadge, KV, LabelText, MQuery, Messages, OutcomeBadge, PilotStatusBadge, useRoles } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
 import { DesignStudio } from "./DesignStudio";
+import { SessionCalendar } from "./SessionCalendar";
 
 const DESIGNS = ["single_group", "matched_comparison", "cluster_randomized", "interrupted_time_series", "stepped_wedge"] as const;
 type Arm = "intervention" | "comparison" | "";
@@ -203,6 +204,7 @@ export function PilotDetailPage() {
               {p.randomization && <p className="small">{t2("pilot.randomized", { seed: String(p.randomization.seed), unit: String(p.randomization.unit) })}</p>}
               <ActionError error={tr.error || rnd.error} />
             </Card>
+            <SessionCalendar pilotId={p.id} />
             <div className="grid grid-2">
               <Card title={t2("pilot.title")}>
                 <KV rows={[

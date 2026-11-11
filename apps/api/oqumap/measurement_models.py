@@ -316,3 +316,42 @@ class AssessmentCohort(IdMixin, TimestampMixin, Base):
 from .models import Decision  # noqa: E402
 
 Index("uq_decisions_group_version", Decision.decision_group_id, Decision.version, unique=True)
+
+
+class PilotSession(IdMixin, TimestampMixin, Base):
+    """A planned session of a pilot for one intervention class. Before activation the calendar is freely edited;
+    after activation sessions are never deleted: they are completed, cancelled or rescheduled (the original keeps
+    status 'rescheduled' and points to its replacement). Every change is recorded in ``pilot_session_events``."""
+
+    __tablename__ = "pilot_sessions"
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), index=True)
+    pilot_id: Mapped[str] = mapped_column(ForeignKey("pilots.id"), index=True)
+    cohort_id: Mapped[str] = mapped_column(ForeignKey("cohorts.id"), index=True)
+    planned_date: Mapped[date] = mapped_column(Date)
+    duration_minutes: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(20), default="planned")
+    rescheduled_to_id: Mapped[str | None] = mapped_column(ForeignKey("pilot_sessions.id"), nullable=True, unique=True)
+    source: Mapped[str] = mapped_column(String(20), default="generated")
+    note: Mapped[str] = mapped_column(String(300), default="")
+    created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    __table_args__ = (UniqueConstraint("pilot_id", "cohort_id", "planned_date", name="uq_pilot_sessions_cohort_date"),
+                      CheckConstraint("duration_minutes > 0", name="ck_pilot_sessions_duration"),
+                      CheckConstraint(_in("status", ("planned", "completed", "cancelled", "rescheduled")), name="ck_pilot_sessions_status"),
+                      CheckConstraint(_in("source", ("generated", "manual", "reschedule")), name="ck_pilot_sessions_source"),
+                      CheckConstraint("status <> 'rescheduled' OR rescheduled_to_id IS NOT NULL", name="ck_pilot_sessions_rescheduled_link"))
+
+
+class PilotSessionEvent(IdMixin, TimestampMixin, Base):
+    """Append-only audit trail of the session calendar."""
+
+    __tablename__ = "pilot_session_events"
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), index=True)
+    pilot_id: Mapped[str] = mapped_column(ForeignKey("pilots.id"), index=True)
+    session_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)  # kept after a pre-activation delete
+    action: Mapped[str] = mapped_column(String(20))  # generated|added|edited|status|rescheduled|deleted
+    from_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    to_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    from_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    to_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    source: Mapped[str] = mapped_column(String(20), default="user")  # user | fidelity_log

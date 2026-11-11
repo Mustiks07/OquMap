@@ -117,7 +117,7 @@ export function FidelityPage() {
           <>
             <Card title={t2("fid.overall")} actions={<FidelityBadge code={d.overall.classification.code} />}>
               <MetricsRow m={d.overall} />
-              <p className="xs muted" style={{ marginTop: 8 }}>{t2("fid.rules")} · {d.method_version} · {t2("common.as_of", { date: d.as_of })} ·{" "}
+              <p className="xs muted" style={{ marginTop: 8 }}>{t2("fid.rules")} · {d.method_version} · {t2("common.as_of", { date: d.as_of })} · {t2("fid.expected_from")}: {t2(`fid.expected_source.${d.expected_source}`)} ·{" "}
                 {d.overall.reasons.map((c, i) => <span key={c}>{i > 0 && ", "}<CodeLabel prefix="fid.reason." code={c} /></span>)}</p>
               <div className="row">{Object.entries(d.distribution).map(([k, v]) => <span key={k}><FidelityBadge code={k} /> {v}</span>)}</div>
             </Card>
