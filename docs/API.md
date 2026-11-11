@@ -62,6 +62,8 @@
 | `POST /plans/solve` | CP-SAT по сценариям, статус решателя, проверка валидатором, конфликт |
 | `POST /sandbox/intent {dataset_id, text}` | Песочница: текст → типизированные операции (`add/remove/set/min/max/fix/max_change/priority/budget`) и diff ограничений; нераспознанное перечисляется; неизвестная тема → 422 |
 | `POST /sandbox/run {dataset_id, scenarios[1..3]}` | Решение сценариев CP-SAT + валидатор, сравнение с «было»: часы, покрытие целей, часы на трудные темы, риски, риски пререквизитов; сохраняется как анализ `sandbox` (повтор по отпечатку); `plan_analysis_id` сценария можно передать в решение |
+| `GET /calendar/context?dataset_id=` | Календарь по неделям: параметры по умолчанию (начало, недели, часы в неделю, условные каникулы), пререквизиты тем, действующий календарь |
+| `POST /calendar/solve` (`CalendarRequest`: `start_date`, `n_weeks`, `weekly_hours`, `week_hours`, `unavailable_weeks`, `topic_hours`, `plan_analysis_id`+`plan_preset`, `fixed[{topic, from_week, to_week}]`, `keep_order`) | Предлагаемый календарь vs действующий, недельная нагрузка, причины каждого переноса или проверенный минимальный конфликт с арифметикой; сохраняется как анализ `calendar` |
 | `POST /decisions`, `GET /decisions`, `GET /decisions/{id}` | Карточки решений (снимок оснований) |
 | `POST /decisions/{id}/approve {note}` | Утверждение → новая версия, прежняя `superseded` |
 | `POST /decisions/{id}/follow-up {assessment_id?}` | Наблюдаемая динамика на общих заданиях; `design = paired` (те же ID учеников, изменение внутри ученика) или `cohort` (стандартизация по входному уровню), `paired.reason` объясняет выбор |
@@ -69,7 +71,8 @@
 | `GET /ai/status?probe=` | Фактический провайдер, model ID, режим `live_model/recorded_demo/template`, ошибка конфигурации, причина блокировки live, возможности (заявленные или проверенные `probe`), политика данных, цепочка резервных провайдеров, OCR |
 | `POST /ai/explain-comparison`, `/ai/interpret-misconception`, `/ai/recommend` | Объяснения и рекомендации (режим виден) |
 | `POST /ai/council {dataset_id, topic_id, edition_a_id?, edition_b_id?, lang}` | Консилиум: журнал (план, вызовы инструментов с analysis_id/версией данных, факты, утверждения ролей, вердикты критика), согласия/разногласия, итоговая карточка `{claim, evidence_ids, limitations, recommended_action, verification_plan}` — ID и числа проверены сервером |
-| `POST /quizzes/generate {dataset_id, topic_id, n_items 3..7}` | Черновик диагностической работы по наблюдаемым гипотезам ошибок + автоматические проверки |
+| `GET /quizzes/families` | Точные семейства заданий и правила ошибок, которые применяют их дистракторы |
+| `POST /quizzes/generate {dataset_id, topic_id, n_items 3..7, families?, objective_id?}` | Черновик диагностической работы: семейства по наблюдаемым гипотезам темы или выбранные учителем (например, для неизмеренной темы) + автоматические проверки |
 | `POST /quizzes/preview` | То же без сохранения (режим презентации) |
 | `GET /quizzes?dataset_id=`, `GET /quizzes/{id}` | Работы, текущая версия, версии, проверки, наборы ответов |
 | `PUT /quizzes/{id} {items, note}` | Правка учителя → новая версия (`edited`); проверки перезапускаются |

@@ -125,7 +125,7 @@ def solve(session: Session, org_id: str, req: PlanSolveRequest, user_id: str | N
                 "input": {"topics": [t.model_dump() for t in req.topics], "change_penalty": req.change_penalty,
                           "diminishing_rate": req.diminishing_rate},
                 "source_analysis_id": req.source_analysis_id,
-                "note_ru": "План часов по темам, не календарное расписание по неделям. Целевая функция распределяет "
+                "note_ru": "План часов по темам; распределение по неделям — в «Календаре по неделям». Целевая функция распределяет "
                            "педагогический приоритет и не является прогнозом роста баллов."}
 
     params = req.model_dump(exclude={"filters", "dataset_id"})
