@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1200" height="420" viewBox="0 0 1200 420"
+     role="img" aria-labelledby="title desc">
+  <title id="title">OquMap — от результатов тестирования к проверяемому решению</title>
+  <desc id="desc">Редакционный заголовок OquMap и физический атлас из семи уровней, соединённых синим маршрутом доказательств.</desc>
+
+  <defs>
+    <clipPath id="canvas-clip">
+      <rect width="1200" height="420" rx="24"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#canvas-clip)">
+    <rect width="1200" height="420" fill="#F7F6F2"/>
+    <path d="M612 0V420" stroke="#17181A" stroke-opacity="0.10"/>
+    <path d="M0 348H1200" stroke="#17181A" stroke-opacity="0.10"/>
+
+    <image id="hybrid-subject"
+           href="evidence-atlas-subject-v2.png"
+           xlink:href="evidence-atlas-subject-v2.png"
+           x="480" y="-12" width="760" height="507"
+           preserveAspectRatio="xMidYMid meet"/>
+
+    <g id="title-block" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+      <text x="64" y="52" fill="#3157D5" font-size="18" font-weight="700" letter-spacing="1.8">DATA-DRIVEN CURRICULUM · RU / KZ</text>
+      <text x="64" y="126" fill="#17181A" font-size="64" font-weight="760" letter-spacing="-2.4">OquMap</text>
+      <text x="64" y="178" fill="#17181A" font-size="30" font-weight="650" letter-spacing="-0.6">От результатов тестирования —</text>
+      <text x="64" y="214" fill="#17181A" font-size="30" font-weight="650" letter-spacing="-0.6">к проверяемому решению.</text>
+      <text x="64" y="258" fill="#686C73" font-size="19" font-weight="460">Каждый вывод открывается до источника, расчёта и следующего измерения.</text>
+
+      <g transform="translate(64 286)" font-size="18" font-weight="650">
+        <rect width="158" height="42" rx="10" fill="#3157D5"/>
+        <text x="22" y="27" fill="#FFFFFF">Evidence Atlas</text>
+        <rect x="170" width="168" height="42" rx="10" fill="#FCFBF8" stroke="#17181A" stroke-opacity="0.16"/>
+        <text x="191" y="27" fill="#17181A">AI Council + Critic</text>
+        <rect x="350" width="160" height="42" rx="10" fill="#FCFBF8" stroke="#17181A" stroke-opacity="0.16"/>
+        <text x="373" y="27" fill="#17181A">Human in the loop</text>
+      </g>
+
+      <g transform="translate(64 383)" fill="#686C73" font-size="18" font-weight="560">
+        <text x="0" y="0">сигнал</text>
+        <text x="78" y="0" fill="#3157D5">→</text>
+        <text x="110" y="0">цель</text>
+        <text x="172" y="0" fill="#3157D5">→</text>
+        <text x="204" y="0">задание</text>
+        <text x="300" y="0" fill="#3157D5">→</text>
+        <text x="332" y="0">ошибка</text>
+        <text x="417" y="0" fill="#3157D5">→</text>
+        <text x="449" y="0">источник</text>
+      </g>
+    </g>
+
+    <g id="right-caption" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+      <rect x="890" y="348" width="254" height="56" rx="10" fill="#FCFBF8" stroke="#17181A" stroke-opacity="0.12"/>
+      <text x="910" y="371" fill="#3157D5" font-size="18" font-weight="700">план → решение</text>
+      <circle cx="914" cy="389" r="4" fill="#80500F"/>
+      <text x="926" y="395" fill="#17181A" font-size="17" font-weight="620">причинность проверяется</text>
+    </g>
+  </g>
+  <rect x="0.5" y="0.5" width="1199" height="419" rx="23.5" fill="none" stroke="#17181A" stroke-opacity="0.12"/>
+</svg>
