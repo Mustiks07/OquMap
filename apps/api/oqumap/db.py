@@ -8,6 +8,7 @@ from sqlalchemy import DateTime, String, create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 from sqlalchemy.types import TypeDecorator
+from starlette.requests import Request
 
 from .config import get_settings
 
@@ -83,6 +84,10 @@ def configure(url: str | None = None) -> None:
     _SessionLocal = sessionmaker(bind=_engine, autoflush=False, expire_on_commit=False)
 
 
+def make_sessionmaker(url: str) -> sessionmaker[Session]:
+    return sessionmaker(bind=_make_engine(url), autoflush=False, expire_on_commit=False)
+
+
 def engine() -> Engine:
     if _engine is None:
         configure()
@@ -97,8 +102,9 @@ def session_factory() -> sessionmaker[Session]:
     return _SessionLocal
 
 
-def get_session() -> Iterator[Session]:
-    session = session_factory()()
+def get_session(request: Request) -> Iterator[Session]:
+    factory = getattr(request.app.state, "sessionmaker", None) or session_factory()
+    session = factory()
     try:
         yield session
     finally:

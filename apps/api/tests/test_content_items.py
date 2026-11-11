@@ -5,7 +5,7 @@ from math import gcd
 
 import pytest
 
-from oqumap.demo.content import ITEMS, MISCONCEPTIONS, OBJECTIVES, TOPICS, FORMS, is_reduced, parse_value
+from oqumap.demo.content import FORMS, ITEMS, MISCONCEPTIONS, OBJECTIVES, TOPICS, is_reduced, parse_value
 
 
 def _ratio(text):

@@ -180,7 +180,7 @@ def _i(code, topic, objectives, stem_ru, stem_kz, options, key, expr=None, mode=
     return ItemSpec(code, topic, objectives, stem_ru, stem_kz, options, key, expr, mode, difficulty)
 
 
-O = "DEMO-M6-"
+O = "DEMO-M6-"  # noqa: E741
 
 ITEMS: list[ItemSpec] = [
     # ---- T1 -----------------------------------------------------------------------------------
@@ -381,6 +381,8 @@ SCALES = [
      "только по общим заданиям."),
     ("S-LOCAL-X", "Локальная школьная форма без выравнивания", "none",
      "Отдельная форма, составленная школой. Связывание со шкалой S-POST не проводилось."),
+    ("S-ILLUS", "Учебная иллюстрация (одно задание)", "identical_form",
+     "Одно и то же задание для всех; используется только для арифметической иллюстрации стандартизации."),
 ]
 
 FORMS = {
@@ -409,6 +411,8 @@ FORMS = {
         "stage": "post",
         "items": ["I14", "I24", "I27", "I19", "I21", "I13", "I29", "I35", "I43", "I47"],
     },
+    "F-ILLUS-PRE": {"name": "Иллюстрация: входной уровень", "scale": "S-ILLUS", "stage": "pre", "items": ["I24"]},
+    "F-ILLUS-POST": {"name": "Иллюстрация: диагностическая проверка", "scale": "S-ILLUS", "stage": "post", "items": ["I14"]},
     "F-FU": {
         "name": "Повторная проверка по теме T3",
         "scale": "S-POST",

@@ -28,8 +28,8 @@ class Settings(BaseSettings):
     max_import_rows: int = 200_000
 
     # Model provider. "none" keeps the app fully functional via template / recorded_demo modes.
-    llm_provider: str = "none"  # none | anthropic | openai_compatible
-    llm_model: str = "claude-sonnet-5-5"
+    llm_provider: str = "none"  # none | anthropic
+    llm_model: str = "claude-opus-5-5"
     llm_base_url: str | None = None
     llm_api_key: SecretStr | None = Field(default=None)
     llm_timeout_seconds: float = 30.0

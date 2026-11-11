@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from oqumap.analytics.comparison import compare_arms, cluster_unit_for, standardized_mean
+from oqumap.analytics.comparison import cluster_unit_for, compare_arms, standardized_mean
 from oqumap.analytics.fixtures import fixture_learners, load_fixture
 
 

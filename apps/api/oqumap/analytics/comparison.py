@@ -200,7 +200,8 @@ def compare_arms(
     few_clusters = any(v < MIN_CLUSTERS_PER_ARM for v in clusters_per_arm.values())
     if few_clusters:
         reasons.append(
-            Reason("few_clusters", "warn", {"min": MIN_CLUSTERS_PER_ARM, "unit": cluster_unit, **clusters_per_arm})
+            Reason("few_clusters", "warn", {"min": MIN_CLUSTERS_PER_ARM, "unit": cluster_unit,
+                                            "a": clusters_per_arm[arm_a], "b": clusters_per_arm[arm_b]})
         )
 
     analysable = with_outcome[with_outcome["baseline"].notna()].copy()
@@ -249,6 +250,10 @@ def compare_arms(
 
     hard_fail = any(r.severity == "fail" and r.code != "empty_stratum" for r in reasons)
     status = "not_comparable" if hard_fail else ("limited" if any(r.severity in ("warn", "fail") for r in reasons) else "comparable")
+    if status == "not_comparable" and adjusted_reason is None:
+        # Never present an adjusted figure as if it were a fair comparison; strata table stays descriptive.
+        adjusted = {arm_a: None, arm_b: None}
+        adjusted_reason = "not_comparable"
 
     # --- uncertainty -----------------------------------------------------------------------------
     diff_raw = None

@@ -5,6 +5,8 @@ planning device, not a forecast of score gains (docs/METHODOLOGY.md §6).
 
     maximize  sum_t p_t * U(h_t)  -  lambda * sum_t |h_t - h0_t|
     U(h) = (1 - r^h) / (1 - r)                         (concave, r in (0,1))
+    default r = 0.5^(1/mean(h0)): the marginal value of an hour halves at the average topic size, so the
+    objective is scale-free with respect to the size of the plan.
 
 Constraints: integer hours, sum(h) = budget, min/max per topic, fixed topics, elapsed hours cannot be
 removed (h_t >= elapsed_t), optional max change per topic. The plan is a per-topic hours plan, not a
@@ -40,8 +42,8 @@ class TopicConstraint:
 class PlanProblem:
     topics: list[TopicConstraint]
     budget: int
-    change_penalty: float = 0.3  # lambda, in priority-utility units per hour moved
-    diminishing_rate: float = 0.85  # r
+    change_penalty: float = 0.05  # lambda, in priority-utility units per hour moved
+    diminishing_rate: float | None = None  # r; None => 0.5 ** (1 / mean current hours)
     time_limit_seconds: float = 5.0
     weights_version: str = "priority-weights-v1"
     meta: dict = field(default_factory=dict)
@@ -55,6 +57,14 @@ class Violation:
 
     def as_dict(self) -> dict:
         return asdict(self)
+
+
+def effective_rate(problem: PlanProblem) -> float:
+    if problem.diminishing_rate is not None:
+        return problem.diminishing_rate
+    hs = [t.current_hours for t in problem.topics if t.current_hours > 0]
+    mean_h = sum(hs) / len(hs) if hs else 1.0
+    return 0.5 ** (1.0 / max(mean_h, 1.0))
 
 
 def utility(h: int, r: float) -> float:
@@ -95,7 +105,7 @@ def validate_plan(problem: PlanProblem, hours: dict[str, int]) -> list[Violation
 
 
 def objective_value(problem: PlanProblem, hours: dict[str, int]) -> float:
-    r = problem.diminishing_rate
+    r = effective_rate(problem)
     v = 0.0
     for t in problem.topics:
         h = hours[t.topic_id]
@@ -155,7 +165,7 @@ def _build(problem: PlanProblem, with_objective: bool) -> _Built:
             m.Add(t.current_hours - h[t.topic_id] <= t.max_change).OnlyEnforceIf(k)
 
     if with_objective:
-        r = problem.diminishing_rate
+        r = effective_rate(problem)
         terms = []
         for t in problem.topics:
             table = [int(round(OBJECTIVE_SCALE * t.priority * utility(k, r))) for k in range(ub + 1)]
@@ -272,7 +282,8 @@ def solve(problem: PlanProblem) -> dict:
         "objective": {
             "formula": "maximize Σ p_t·(1−r^h_t)/(1−r) − λ·Σ|h_t − h0_t|",
             "change_penalty": problem.change_penalty,
-            "diminishing_rate": problem.diminishing_rate,
+            "diminishing_rate": round(effective_rate(problem), 6),
+            "diminishing_rate_rule": "explicit" if problem.diminishing_rate is not None else "0.5^(1/mean(h0))",
             "is_forecast": False,
         },
         "solver": {"name": "OR-Tools CP-SAT", "wall_time_seconds": round(solver.WallTime(), 4),
@@ -315,7 +326,7 @@ def _input_errors(problem: PlanProblem) -> list[dict]:
     errs = []
     if problem.budget < 0:
         errs.append({"code": "negative_budget"})
-    if not (0 < problem.diminishing_rate < 1):
+    if problem.diminishing_rate is not None and not (0 < problem.diminishing_rate < 1):
         errs.append({"code": "bad_diminishing_rate"})
     if problem.change_penalty < 0 or not math.isfinite(problem.change_penalty):
         errs.append({"code": "bad_change_penalty"})
@@ -337,9 +348,9 @@ def preset(problem: PlanProblem, name: str) -> PlanProblem:
 
     p = copy.deepcopy(problem)
     if name == "minimal_changes":
-        p.change_penalty = max(problem.change_penalty, 0.8)
+        p.change_penalty = max(problem.change_penalty * 3, 0.15)
     elif name == "focus_problem_topics":
-        p.change_penalty = min(problem.change_penalty, 0.1)
+        p.change_penalty = min(problem.change_penalty / 3, 0.015)
     elif name == "balanced":
         pass
     else:

@@ -1,0 +1,111 @@
+{
+  "generated_on": "2026-11-11",
+  "is_synthetic": true,
+  "generator": "apps/api/oqumap/demo/generator.py",
+  "datasets": {
+    "base": {
+      "id": "39c874fa-4244-52a9-a4d6-38e71646ba62",
+      "name": "Основной демо-корпус: математика 6 класс, 2025–2026",
+      "version": 1,
+      "manifest": {
+        "generator": "oqumap.demo.generator",
+        "scenario": "base",
+        "seed": 20260901,
+        "expected_behaviour": [
+          "composition_changes_ranking",
+          "unverified_topic",
+          "unmeasured_topic",
+          "missing_and_retakes"
+        ],
+        "edition_effects": {
+          "EDB:T3": 0.45
+        },
+        "academic_year": "2025-2026"
+      }
+    },
+    "no_difference": {
+      "id": "6060065c-00ed-5d59-9bf2-a57380a2537f",
+      "name": "Сценарий: нет различий между пособиями",
+      "version": 1,
+      "manifest": {
+        "generator": "oqumap.demo.generator",
+        "scenario": "no_difference",
+        "seed": 20260902,
+        "expected_behaviour": [
+          "no_difference"
+        ],
+        "edition_effects": {},
+        "academic_year": "2025-2026"
+      }
+    },
+    "few_clusters": {
+      "id": "ac60c044-a979-5b1c-9894-863c69b96ec9",
+      "name": "Сценарий: мало классов при большом числе ответов",
+      "version": 1,
+      "manifest": {
+        "generator": "oqumap.demo.generator",
+        "scenario": "few_clusters",
+        "seed": 20260903,
+        "expected_behaviour": [
+          "few_clusters"
+        ],
+        "edition_effects": {
+          "EDB:T3": 0.45
+        },
+        "academic_year": "2025-2026"
+      }
+    },
+    "unlinked_forms": {
+      "id": "a7497622-76ad-514d-97ed-4b2b1ab951f8",
+      "name": "Сценарий: разные итоговые тесты без выравнивания шкал",
+      "version": 1,
+      "manifest": {
+        "generator": "oqumap.demo.generator",
+        "scenario": "unlinked_forms",
+        "seed": 20260904,
+        "expected_behaviour": [
+          "forms_not_linked"
+        ],
+        "edition_effects": {},
+        "academic_year": "2025-2026"
+      }
+    },
+    "confounded": {
+      "id": "9837d640-e6c5-5591-b57f-6200b7b67026",
+      "name": "Сценарий: пособие совпадает с единственным учителем",
+      "version": 1,
+      "manifest": {
+        "generator": "oqumap.demo.generator",
+        "scenario": "confounded",
+        "seed": 20260906,
+        "expected_behaviour": [
+          "edition_confounded_with_teacher"
+        ],
+        "edition_effects": {
+          "EDA:T3": 0.3
+        },
+        "academic_year": "2025-2026"
+      }
+    },
+    "illustration": {
+      "id": "a83a32a1-2a92-5bff-856a-9f71d03c0cff",
+      "name": "Учебная иллюстрация: стандартизация состава групп (76/63 → 60/75)",
+      "version": 1,
+      "manifest": {
+        "fixture": "composition-illustration-v1",
+        "strata_scheme": "pre_two_level",
+        "weights": "equal",
+        "expected_behaviour": [
+          "raw_76_63",
+          "standardized_60_75",
+          "no_intervals"
+        ]
+      }
+    }
+  },
+  "upload_files": [
+    "followup_2026_2027.csv",
+    "grades_only_sample.csv",
+    "upload_sample_with_errors.csv"
+  ]
+}
