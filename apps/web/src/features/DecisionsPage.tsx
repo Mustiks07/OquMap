@@ -102,6 +102,7 @@ function NewDecision() {
       });
       await qc.invalidateQueries({ queryKey: ["decisions"] });
       st.resetDraft();
+      st.markStep("decision");
       nav(`/decisions/${res.id}`);
     } catch (e) {
       setError(e);
@@ -150,7 +151,7 @@ function NewDecision() {
 function DecisionDetail({ id }: { id: string }) {
   const { t, lang } = useI18n();
   const q = useDecision(id);
-  const { user } = useAppState();
+  const { user, markStep } = useAppState();
   const { dataset } = useCurrentDataset();
   const qc = useQueryClient();
   const nav = useNavigate();
@@ -165,6 +166,7 @@ function DecisionDetail({ id }: { id: string }) {
     setError(null);
     try {
       const r = await api.post<DecisionOut>(`/api/v1/decisions/${id}/approve`, { note });
+      markStep("approve");
       await qc.invalidateQueries({ queryKey: ["decisions"] });
       nav(`/decisions/${r.id}`);
     } catch (e) {
@@ -179,6 +181,7 @@ function DecisionDetail({ id }: { id: string }) {
     try {
       const r = await api.post<FollowUpResponse>(`/api/v1/decisions/${id}/follow-up`, {});
       setFu(r);
+      markStep("followup");
       await qc.invalidateQueries({ queryKey: ["decision", id] });
       await qc.invalidateQueries({ queryKey: ["decisions"] });
     } catch (e) {

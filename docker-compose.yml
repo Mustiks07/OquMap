@@ -1,8 +1,11 @@
-# OquMap local stack: PostgreSQL + API (migrations + synthetic demo seed on start) + worker + web.
+# OquMap stack: PostgreSQL + API (migrations + demo seed on start) + worker + web (nginx, the only public entry point).
 # Usage: docker compose up --build   → http://localhost:8080
+# Deployment mode: OQUMAP_DEPLOYMENT_MODE=public_demo (default here: disposable demo tenant per visitor),
+# production (no demo login) or dev (QA personas). The API port is not published; see docker-compose.dev.yml.
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: oqumap
       POSTGRES_USER: oqumap
@@ -13,48 +16,66 @@ services:
       test: ["CMD-SHELL", "pg_isready -U oqumap -d oqumap"]
       interval: 3s
       timeout: 3s
-      retries: 20
+      retries: 30
 
   api:
     build: { context: ., dockerfile: apps/api/Dockerfile }
+    restart: unless-stopped
     env_file:
       - path: .env
         required: false
     environment:
       OQUMAP_DATABASE_URL: postgresql+psycopg://oqumap:${POSTGRES_PASSWORD:-oqumap-local-only}@db:5432/oqumap
+      OQUMAP_DEPLOYMENT_MODE: ${OQUMAP_DEPLOYMENT_MODE:-public_demo}
       OQUMAP_JOB_MODE: worker
       OQUMAP_STORAGE_DIR: /app/storage
       OQUMAP_CORS_ORIGINS: '["http://localhost:8080"]'
+      OQUMAP_ALLOWED_HOSTS: '["localhost", "127.0.0.1", "api", "web"]'
+      OQUMAP_TRUSTED_PROXIES: '["172.16.0.0/12", "10.0.0.0/8", "192.168.0.0/16"]'
+      OQUMAP_FORWARDED_ALLOW_IPS: "*"
+      OQUMAP_DEMO_TENANTS_PER_IP_PER_HOUR: ${OQUMAP_DEMO_TENANTS_PER_IP_PER_HOUR:-6}
+      OQUMAP_RATE_LOGIN: ${OQUMAP_RATE_LOGIN:-20/600}
     volumes:
       - storage:/app/storage
     depends_on:
       db: { condition: service_healthy }
-    ports:
-      - "8000:8000"
     command: ["api"]
 
   worker:
     build: { context: ., dockerfile: apps/api/Dockerfile }
+    restart: unless-stopped
     env_file:
       - path: .env
         required: false
     environment:
       OQUMAP_DATABASE_URL: postgresql+psycopg://oqumap:${POSTGRES_PASSWORD:-oqumap-local-only}@db:5432/oqumap
+      OQUMAP_DEPLOYMENT_MODE: ${OQUMAP_DEPLOYMENT_MODE:-public_demo}
       OQUMAP_JOB_MODE: worker
       OQUMAP_STORAGE_DIR: /app/storage
       OQUMAP_SEED_DEMO: "false"
     volumes:
       - storage:/app/storage
+    healthcheck:
+      test: ["CMD", "python", "-c", "import oqumap.worker"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
-      api: { condition: service_started }
+      api: { condition: service_healthy }
     command: ["worker"]
 
   web:
     build: { context: apps/web }
+    restart: unless-stopped
     depends_on:
-      - api
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health/live"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
     ports:
-      - "8080:80"
+      - "${OQUMAP_WEB_PORT:-8080}:80"
 
 volumes:
   db-data:

@@ -1,0 +1,11 @@
+# Development override: publish the API port and enable QA personas.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  api:
+    environment:
+      OQUMAP_DEPLOYMENT_MODE: dev
+    ports:
+      - "8000:8000"
+  worker:
+    environment:
+      OQUMAP_DEPLOYMENT_MODE: dev

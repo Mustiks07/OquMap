@@ -1,48 +1,121 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDatasets, useQuality } from "../api/hooks";
-import type { QualityReport } from "../api/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "../api/client";
+import { useConfig, useDatasets, useQuality } from "../api/hooks";
+import type { DatasetSummary, QualityReport } from "../api/types";
 import { useI18n } from "../i18n/I18n";
 import type { DictKey } from "../i18n/dict";
 import { useAppState } from "../state/AppState";
-import { Alert, Badge, Button, Card, EmptyState, QueryView, SyntheticBadge } from "../ui";
+import { Alert, Badge, Button, Card, Disclosure, EmptyState, ErrorState, QueryView, SyntheticBadge } from "../ui";
 import { dateTime, num } from "../ui/format";
 
 export function DatasetsPage() {
   const { t, lang } = useI18n();
   const q = useDatasets();
-  const { datasetId, setDatasetId } = useAppState();
+  const cfg = useConfig();
+  const { user, datasetId, setDatasetId } = useAppState();
   const nav = useNavigate();
+  const qc = useQueryClient();
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const recommendedCode = cfg.data?.recommended_dataset_code ?? "base";
+
+  async function loadLab(code: string) {
+    setLoading(code);
+    setError(null);
+    try {
+      const d = await api.post<DatasetSummary>(`/api/v1/demo/scenarios/${code}`);
+      await qc.invalidateQueries({ queryKey: ["datasets"] });
+      setDatasetId(d.id);
+      nav("/compare");
+    } catch (e) {
+      setError(e);
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  const card = (d: DatasetSummary, primary: boolean) => (
+    <Card key={d.id} title={lang === "kz" ? d.name_kz : d.name_ru}
+      actions={d.id === datasetId ? <Badge tone="ok">{t("datasets.selected")}</Badge> : null}>
+      <p className="small">{lang === "kz" ? d.description_kz : d.description_ru}</p>
+      <div className="row" style={{ marginBottom: 12 }}>
+        {d.is_synthetic && <SyntheticBadge />}
+        <Badge tone="info">{t(`level.${d.data_level}` as DictKey)}</Badge>
+        <Badge>v{d.version}</Badge>
+      </div>
+      <Button variant={primary ? "primary" : "default"} data-testid={`choose-${d.code}`}
+        onClick={() => { setDatasetId(d.id); nav(d.data_level === "setup" ? "/import" : "/overview"); }}>
+        {d.data_level === "setup" ? t("datasets.own_data") : t("datasets.open_overview")}
+      </Button>
+    </Card>
+  );
+
   return (
-    <div className="page">
+    <div className="page stack">
       <div className="page-header">
         <div>
           <h1>{t("datasets.title")}</h1>
           <p className="muted">{t("datasets.lead")}</p>
         </div>
+        <Button onClick={() => nav("/import")} data-testid="own-data">{t("datasets.own_data")}</Button>
       </div>
-      <QueryView q={q} empty={(d) => d.length === 0}>
-        {(ds) => (
-          <div className="grid grid-2">
-            {ds.map((d) => (
-              <Card key={d.id} title={lang === "kz" ? d.name_kz : d.name_ru}
-                actions={d.id === datasetId ? <Badge tone="ok">{t("datasets.selected")}</Badge> : null}>
-                <p className="small">{lang === "kz" ? d.description_kz : d.description_ru}</p>
-                <div className="row" style={{ marginBottom: 12 }}>
-                  {d.is_synthetic && <SyntheticBadge />}
-                  <Badge tone="info">{t(`level.${d.data_level}` as DictKey)}</Badge>
-                  <Badge>v{d.version}</Badge>
-                  {d.scenario && <Badge>{t("datasets.scenario")}: {d.scenario}</Badge>}
-                </div>
-                <Button variant={d.id === datasetId ? "default" : "primary"} data-testid={`choose-${d.code}`}
-                  onClick={() => { setDatasetId(d.id); nav("/import"); }}>
-                  {t("datasets.choose")}
-                </Button>
-              </Card>
-            ))}
-          </div>
-        )}
+      {error ? <ErrorState error={error} /> : null}
+      <QueryView q={q}>
+        {(ds) => {
+          const rec = ds.find((d) => d.code === recommendedCode && d.is_synthetic);
+          const lab = ds.filter((d) => d !== rec && d.is_synthetic && !!d.scenario);
+          const projects = ds.filter((d) => d !== rec && !lab.includes(d));
+          const labCodes = new Set(lab.map((d) => d.code));
+          const missingLab = (cfg.data?.lab_scenarios ?? []).filter((c) => !labCodes.has(c));
+          return (
+            <>
+              {rec && (
+                <section aria-labelledby="rec-title" className="stack">
+                  <h2 id="rec-title">{t("datasets.recommended")}</h2>
+                  {card(rec, true)}
+                </section>
+              )}
+              {projects.length > 0 && (
+                <section className="stack">
+                  <h2>{t("datasets.projects")}</h2>
+                  <div className="grid grid-2">{projects.map((d) => card(d, !rec))}</div>
+                </section>
+              )}
+              {ds.length === 0 && <EmptyState><Button variant="primary" onClick={() => nav("/import")}>{t("datasets.own_data")}</Button></EmptyState>}
+              {user?.org_is_demo && (lab.length > 0 || missingLab.length > 0) && (
+                <section className="stack">
+                  <Disclosure summary={t("datasets.lab")}>
+                    <p className="small muted">{t("datasets.lab_note")}</p>
+                    <div className="grid grid-2">
+                      {lab.map((d) => card(d, false))}
+                      {missingLab.map((c) => (
+                        <Card key={c} title={t(`lab.${c}` as DictKey)}>
+                          <Button onClick={() => loadLab(c)} disabled={loading !== null} data-testid={`load-${c}`}>
+                            {loading === c ? t("common.loading") : t("datasets.load")}
+                          </Button>
+                        </Card>
+                      ))}
+                    </div>
+                  </Disclosure>
+                </section>
+              )}
+            </>
+          );
+        }}
       </QueryView>
-      {q.data && q.data.length === 0 && <EmptyState />}
+    </div>
+  );
+}
+
+export function QualityPage() {
+  const { t } = useI18n();
+  const { datasetId } = useAppState();
+  return (
+    <div className="page stack">
+      <div className="page-header"><h1>{t("quality.title")}</h1></div>
+      {datasetId ? <QualityPanel /> : <EmptyState>{t("datasets.lead")}</EmptyState>}
     </div>
   );
 }

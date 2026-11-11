@@ -155,6 +155,9 @@ def build_pdf(font_path: str, bold_path: str) -> bytes:
         if idx > 0:
             canvas.drawRightString(A5[0] - 30, 20, labels[idx])
 
+    from reportlab import rl_config
+
+    rl_config.invariant = 1  # no creation date / random document id → reproducible bytes
     doc = SimpleDocTemplate(buf, pagesize=A5, leftMargin=36, rightMargin=36, topMargin=40, bottomMargin=40,
                             title="Демонстрационное пособие А", author="OquMap demo")
     story = []
@@ -173,7 +176,8 @@ def build_pdf(font_path: str, bold_path: str) -> bytes:
         writer.add_page(page)
     writer.set_page_label(0, 0, prefix="обл.")
     writer.set_page_label(1, len(reader.pages) - 1, style="/D", start=int(labels[1]))
-    writer.add_metadata({"/Title": "Демонстрационное пособие А", "/Author": "OquMap demo"})
+    writer.add_metadata({"/Title": "Демонстрационное пособие А", "/Author": "OquMap demo",
+                         "/CreationDate": "D:20260101000000Z", "/ModDate": "D:20260101000000Z"})
     out = io.BytesIO()
     writer.write(out)
     return out.getvalue()
@@ -201,14 +205,19 @@ def build_docx() -> bytes:
     d.core_properties.revision = 1
     buf = io.BytesIO()
     d.save(buf)
-    # Normalise zip entry timestamps so the demo file is byte-identical on every seed.
+    # Byte-identical on every OS: fixed timestamps, fixed create_system/attributes (ZipInfo defaults to 0 on
+    # Windows and 3 elsewhere) and no compression (deflate output depends on the zlib build).
     import zipfile
 
     src = zipfile.ZipFile(io.BytesIO(buf.getvalue()))
     out = io.BytesIO()
-    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_STORED) as z:
         for info in sorted(src.infolist(), key=lambda i: i.filename):
             zi = zipfile.ZipInfo(info.filename, date_time=(2026, 1, 1, 0, 0, 0))
-            zi.compress_type = zipfile.ZIP_DEFLATED
+            zi.compress_type = zipfile.ZIP_STORED
+            zi.create_system = 3
+            zi.create_version = 20
+            zi.extract_version = 20
+            zi.external_attr = 0o644 << 16
             z.writestr(zi, src.read(info.filename))
     return out.getvalue()

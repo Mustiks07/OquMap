@@ -41,7 +41,14 @@ export interface AppStateValue {
   resetDraft: () => void;
   assistantOpen: boolean;
   setAssistantOpen: (v: boolean) => void;
+  /** guided demo progress (per browser, survives reloads) */
+  progress: Record<string, boolean>;
+  markStep: (id: GuideStep) => void;
+  resetProgress: () => void;
 }
+
+export const GUIDE_STEPS = ["overview", "topic", "compare", "plan", "decision", "approve", "followup"] as const;
+export type GuideStep = (typeof GUIDE_STEPS)[number];
 
 const Ctx = createContext<AppStateValue | null>(null);
 const KEY = "oqumap.state.v1";
@@ -53,6 +60,7 @@ interface Persisted {
   editionA: string | null;
   editionB: string | null;
   draft: DecisionDraftRefs;
+  progress: Record<string, boolean>;
 }
 
 function load(): Partial<Persisted> {
@@ -74,14 +82,15 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [editionB, setB] = useState<string | null>(saved.editionB ?? null);
   const [draft, setDraft] = useState<DecisionDraftRefs>(saved.draft ?? { sourceIds: [] });
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [progress, setProgress] = useState<Record<string, boolean>>(saved.progress ?? {});
 
   useEffect(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ datasetId, filters, topicId, editionA, editionB, draft }));
+      localStorage.setItem(KEY, JSON.stringify({ datasetId, filters, topicId, editionA, editionB, draft, progress }));
     } catch {
       /* ignore */
     }
-  }, [datasetId, filters, topicId, editionA, editionB, draft]);
+  }, [datasetId, filters, topicId, editionA, editionB, draft, progress]);
 
   const setDatasetId = useCallback((id: string | null) => {
     setDatasetIdState((prev) => {
@@ -115,6 +124,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     resetDraft: () => setDraft({ sourceIds: [] }),
     assistantOpen,
     setAssistantOpen,
+    progress,
+    markStep: (id) => setProgress((p) => (p[id] ? p : { ...p, [id]: true })),
+    resetProgress: () => setProgress({}),
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

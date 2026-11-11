@@ -13,7 +13,7 @@ import { SourceDialog } from "./SourceDialog";
 export function TopicPage() {
   const { t, lang, pick } = useI18n();
   const params = useParams();
-  const { datasetId, topicId, setTopicId, updateDraft, draft } = useAppState();
+  const { datasetId, topicId, setTopicId, updateDraft, draft, markStep } = useAppState();
   const id = params.topicId ?? topicId;
   useEffect(() => {
     if (params.topicId && params.topicId !== topicId) setTopicId(params.topicId);
@@ -22,7 +22,10 @@ export function TopicPage() {
   const nav = useNavigate();
   const [source, setSource] = useState<string | null>(null);
   useEffect(() => {
-    if (q.data && !q.data.context.is_stale) updateDraft({ topicAnalysisId: q.data.context.analysis_id });
+    if (q.data && !q.data.context.is_stale) {
+      updateDraft({ topicAnalysisId: q.data.context.analysis_id });
+      markStep("topic");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q.data?.context.analysis_id]);
   if (!datasetId) return <NeedDataset />;

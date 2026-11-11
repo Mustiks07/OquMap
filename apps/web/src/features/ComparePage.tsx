@@ -28,7 +28,8 @@ export function ComparePage() {
 
   const run = () => {
     if (!st.datasetId || !topic || !a || !b) return;
-    cmp.mutate({ dataset_id: st.datasetId, topic_id: topic, edition_a_id: a, edition_b_id: b, filters: st.filters, strata_scheme: scheme, weight_mode: weights, include_topic_table: table });
+    cmp.mutate({ dataset_id: st.datasetId, topic_id: topic, edition_a_id: a, edition_b_id: b, filters: st.filters, strata_scheme: scheme, weight_mode: weights, include_topic_table: table },
+      { onSuccess: () => st.markStep("compare") });
   };
   useEffect(() => {
     if (dataset?.code === "illustration") {

@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { setToken } from "../api/client";
+import { api, setToken } from "../api/client";
 import { useCurrentDataset } from "../api/hooks";
 import { useI18n } from "../i18n/I18n";
 import type { DictKey } from "../i18n/dict";
@@ -8,10 +8,10 @@ import { useAppState } from "../state/AppState";
 import { Badge, Button, SyntheticBadge } from "../ui";
 import { dateTime } from "../ui/format";
 import { Assistant } from "./Assistant";
+import { GuidedDemo } from "./GuidedDemo";
 
 const STEPS: { to: string; key: DictKey }[] = [
   { to: "/datasets", key: "nav.datasets" },
-  { to: "/import", key: "nav.import" },
   { to: "/overview", key: "nav.overview" },
   { to: "/topic", key: "nav.topic" },
   { to: "/compare", key: "nav.compare" },
@@ -44,6 +44,9 @@ export function Layout() {
             {dataset.is_synthetic && <SyntheticBadge />}
           </span>
         ) : null}
+        {user?.org_is_ephemeral && user.org_expires_at && (
+          <Badge tone="synthetic" title={user.org_name}>{t("header.demo_until", { time: dateTime(user.org_expires_at, lang) })}</Badge>
+        )}
         <span className="header-spacer" />
         <div className="row" role="group" aria-label={t("header.lang")} style={{ gap: 4 }}>
           {(["ru", "kz"] as const).map((l) => (
@@ -60,7 +63,7 @@ export function Layout() {
             {user.display_name}
           </span>
         )}
-        <Button size="sm" variant="ghost" onClick={() => { setToken(null); setUser(null); qc.clear(); nav("/login"); }}>
+        <Button size="sm" variant="ghost" onClick={() => { api.post("/api/v1/auth/logout").catch(() => undefined); setToken(null); setUser(null); qc.clear(); nav("/login"); }}>
           {t("header.logout")}
         </Button>
       </header>
@@ -74,7 +77,28 @@ export function Layout() {
               </NavLink>
             </li>
           ))}
+          <li style={{ marginTop: 8, borderTop: "1px solid var(--color-border)", paddingTop: 8 }}>
+            <NavLink to="/quality" className={({ isActive }) => (isActive ? "active" : "")}>
+              <span className="nav-step" aria-hidden="true">i</span>
+              {t("quality.title")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/import" className={({ isActive }) => (isActive ? "active" : "")} data-testid="nav-import">
+              <span className="nav-step" aria-hidden="true">↑</span>
+              {t("datasets.own_data")}
+            </NavLink>
+          </li>
+          {user?.roles.includes("admin") && !user.org_is_demo && (
+            <li>
+              <NavLink to="/users" className={({ isActive }) => (isActive ? "active" : "")}>
+                <span className="nav-step" aria-hidden="true">⚙</span>
+                {t("nav.users")}
+              </NavLink>
+            </li>
+          )}
         </ol>
+        {user?.org_is_demo && <GuidedDemo />}
         {dataset?.is_synthetic && <p className="xs muted" style={{ marginTop: 16 }}>{t("synthetic.note")}</p>}
       </nav>
       <main className="app-main" id="main">

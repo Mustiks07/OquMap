@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
-import { pollJob, useCurrentDataset } from "../api/hooks";
-import type { ImportBatchOut, JobOut } from "../api/types";
+import { pollJob, useDatasets, useProject } from "../api/hooks";
+import type { DatasetSummary, ImportBatchOut, JobOut } from "../api/types";
 import { useI18n } from "../i18n/I18n";
+import type { DictKey } from "../i18n/dict";
 import { useAppState } from "../state/AppState";
-import { Alert, Badge, Button, Card, ErrorState, Field, Loading, Select } from "../ui";
+import { Alert, Badge, Button, Card, ErrorState, Field, Loading, QueryView, Select } from "../ui";
 import { num } from "../ui/format";
-import { QualityPanel } from "./DatasetsPage";
 
 interface Report {
   rows_total: number;
@@ -24,17 +24,23 @@ interface Report {
   duplicate_of_batch: string | null;
   available_analysis?: { level: string; possible: string[]; not_possible: string[]; missing_fields: string[] };
   mapping_error?: { missing: string[] };
+  commit_allowed?: boolean;
+  strict?: boolean;
+  blocking?: { code: string; message?: string; dependency?: string }[];
   status_counts?: Record<string, number>;
   new_learners?: number;
   new_classes?: number;
 }
 
-export function ImportWizard({ fixedTarget, onCommitted }: { fixedTarget?: "current"; onCommitted?: (j: JobOut) => void }) {
+const KINDS = ["program", "editions", "item_bank", "roster", "responses", "grades"];
+
+export function ImportWizard({ fixedTarget, onCommitted, kindProp }: { fixedTarget?: "current"; onCommitted?: (j: JobOut) => void; kindProp?: string }) {
   const { t } = useI18n();
   const { datasetId, setDatasetId } = useAppState();
   const qc = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
-  const [kind, setKind] = useState("responses");
+  const [kindState, setKind] = useState("responses");
+  const kind = kindProp ?? kindState;
   const [target, setTarget] = useState<"current" | "new">(fixedTarget ?? (datasetId ? "current" : "new"));
   const [newName, setNewName] = useState("Мой импорт (синтетический)");
   const [batch, setBatch] = useState<ImportBatchOut | null>(null);
@@ -102,9 +108,9 @@ export function ImportWizard({ fixedTarget, onCommitted }: { fixedTarget?: "curr
             {(id) => <input id={id} className="input" type="file" accept=".csv,.xlsx,.txt" data-testid="import-file"
               onChange={(e) => { setFile(e.target.files?.[0] ?? null); setBatch(null); setSheet(""); setMapping({}); }} />}
           </Field>
-          {!fixedTarget && (
+          {!fixedTarget && !kindProp && (
             <Field label={t("import.kind")}>
-              {(id) => <Select id={id} value={kind} onChange={setKind} options={[{ value: "responses", label: t("import.kind.responses") }, { value: "grades", label: t("import.kind.grades") }]} />}
+              {(id) => <Select id={id} value={kind} onChange={setKind} options={KINDS.map((k) => ({ value: k, label: t(`kind.${k}` as DictKey) }))} />}
             </Field>
           )}
           {!fixedTarget && (
@@ -132,6 +138,12 @@ export function ImportWizard({ fixedTarget, onCommitted }: { fixedTarget?: "curr
         <>
           {rep.duplicate_of_batch && <Alert tone="danger" title={t("import.duplicate", { id: rep.duplicate_of_batch.slice(0, 8) })} />}
           {rep.mapping_error && <Alert tone="danger">{t("import.mapping_error", { fields: rep.mapping_error.missing.join(", ") })}</Alert>}
+          {rep.blocking && rep.blocking.length > 0 && (
+            <Alert tone="danger" title={t("import.blocking")}>
+              <ul style={{ margin: 0 }}>{rep.blocking.map((b, i) => <li key={i}>{b.message ?? b.code}</li>)}</ul>
+            </Alert>
+          )}
+          {rep.strict && <Alert tone="info">{t("import.strict")}</Alert>}
           <Card title={t("import.report")} id="import-report">
             <div className="grid grid-3" style={{ marginBottom: 12 }}>
               <div className="metric"><span className="metric-label">{t("import.total")}</span><span className="metric-value">{num(batch.rows_total)}</span></div>
@@ -173,7 +185,7 @@ export function ImportWizard({ fixedTarget, onCommitted }: { fixedTarget?: "curr
               </div>
             )}
             <div className="row" style={{ marginTop: 16 }}>
-              <Button variant="primary" onClick={commit} disabled={busy !== "" || !!rep.duplicate_of_batch || !!rep.mapping_error || batch.rows_accepted === 0 || job?.status === "succeeded"} data-testid="import-commit">
+              <Button variant="primary" onClick={commit} disabled={busy !== "" || !!rep.duplicate_of_batch || !!rep.mapping_error || rep.commit_allowed === false || batch.rows_accepted === 0 || job?.status === "succeeded"} data-testid="import-commit">
                 {busy === "commit" ? t("import.committing") : t("import.commit")}
               </Button>
               {job && <Badge tone={job.status === "succeeded" ? "ok" : job.status === "failed" ? "danger" : "info"}>{job.status}</Badge>}
@@ -220,19 +232,91 @@ export function ImportWizard({ fixedTarget, onCommitted }: { fixedTarget?: "curr
   );
 }
 
+interface TemplateInfo {
+  order: string[];
+  rules: string[];
+  kinds: { kind: string; strict: boolean; template_csv: string; template_xlsx: string; example_csv: string; fields: { name: string; required: boolean; description: string }[] }[];
+}
+
 export function ImportPage() {
-  const { t } = useI18n();
-  const { dataset } = useCurrentDataset();
+  const { t, lang } = useI18n();
+  const { datasetId, setDatasetId, user } = useAppState();
+  const datasets = useDatasets();
+  const project = useProject(datasetId);
+  const qc = useQueryClient();
+  const templates = useQuery({ queryKey: ["templates"], queryFn: () => api.get<TemplateInfo>("/api/v1/imports/templates"), staleTime: 600_000 });
+  const [stage, setStage] = useState<string>("program");
+  const [name, setName] = useState("");
+  const [synthetic, setSynthetic] = useState(true);
+  const [error, setError] = useState<unknown>(null);
+
+  async function createProject() {
+    setError(null);
+    try {
+      const d = await api.post<DatasetSummary>("/api/v1/datasets", { name_ru: name, is_synthetic: synthetic || !!user?.org_is_demo });
+      await qc.invalidateQueries({ queryKey: ["datasets"] });
+      setDatasetId(d.id);
+      setStage("program");
+      setName("");
+    } catch (e) {
+      setError(e);
+    }
+  }
   return (
     <div className="page stack">
       <div className="page-header">
         <div>
-          <h1>{t("import.title")}</h1>
-          <p className="muted">{t("import.lead")}</p>
+          <h1>{t("project.title")}</h1>
+          <p className="muted">{t("project.lead")}</p>
         </div>
       </div>
-      {dataset && <QualityPanel />}
-      <ImportWizard />
+      <Card>
+        <div className="filters">
+          <Field label={t("project.select")}>
+            {(id) => (
+              <Select id={id} value={datasetId ?? ""} onChange={(v) => setDatasetId(v || null)}
+                options={[{ value: "", label: "—" }, ...(datasets.data ?? []).map((d) => ({ value: d.id, label: lang === "kz" ? d.name_kz : d.name_ru }))]} />
+            )}
+          </Field>
+          <Field label={t("project.name")}>{(id) => <input id={id} className="input" value={name} onChange={(e) => setName(e.target.value)} data-testid="project-name" />}</Field>
+          <label className="checkbox"><input type="checkbox" checked={synthetic || !!user?.org_is_demo} disabled={!!user?.org_is_demo} onChange={(e) => setSynthetic(e.target.checked)} /> {t("project.synthetic")}</label>
+          <Button variant="primary" onClick={createProject} disabled={!name.trim()} data-testid="create-project">{t("project.create")}</Button>
+        </div>
+        {error ? <ErrorState error={error} /> : null}
+      </Card>
+      {datasetId && (
+        <Card title={t("project.stage")}>
+          <QueryView q={templates}>
+            {(tp) => (
+              <div className="stack">
+                <ul className="xs muted" style={{ margin: 0 }}>{tp.rules.map((r, i) => <li key={i}>{r}</li>)}</ul>
+                <div className="table-wrap">
+                  <table className="table" data-testid="stages">
+                    <thead><tr><th>{t("project.stage")}</th><th>{t("common.status")}</th><th>Шаблоны</th><th /></tr></thead>
+                    <tbody>
+                      {tp.kinds.map((k) => {
+                        const ps = project.data?.stages.find((x) => x.kind === k.kind);
+                        return (
+                          <tr key={k.kind} aria-current={stage === k.kind ? "step" : undefined}>
+                            <td><strong>{t(`kind.${k.kind}` as DictKey)}</strong>{k.strict && <div className="xs muted">{t("import.strict")}</div>}</td>
+                            <td>{ps?.done ? <Badge tone="ok">{t("project.done")}</Badge> : ps?.blocked_message ? <span className="xs" style={{ color: "var(--color-warn)" }}>{ps.blocked_message}</span> : <Badge>{t("project.blocked")}</Badge>}</td>
+                            <td className="small">
+                              <a href={k.template_xlsx}>{t("project.template_xlsx")}</a> · <a href={k.template_csv}>{t("project.template_csv")}</a> · <a href={k.example_csv}>{t("project.example")}</a>
+                            </td>
+                            <td><Button size="sm" variant={stage === k.kind ? "primary" : "default"} onClick={() => setStage(k.kind)} data-testid={`stage-${k.kind}`}>{t("project.choose_stage")}</Button></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </QueryView>
+        </Card>
+      )}
+      {datasetId && <ImportWizard key={`${datasetId}-${stage}`} fixedTarget="current" kindProp={stage} onCommitted={() => qc.invalidateQueries({ queryKey: ["project", datasetId] })} />}
+      {!datasetId && <ImportWizard />}
     </div>
   );
 }

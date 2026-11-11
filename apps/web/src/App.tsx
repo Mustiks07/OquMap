@@ -5,7 +5,8 @@ import type { UserOut } from "./api/types";
 import { useAppState } from "./state/AppState";
 import { Loading } from "./ui";
 import { ComparePage } from "./features/ComparePage";
-import { DatasetsPage } from "./features/DatasetsPage";
+import { DatasetsPage, QualityPage } from "./features/DatasetsPage";
+import { UsersPage } from "./features/UsersPage";
 import { DecisionsPage } from "./features/DecisionsPage";
 import { ImportPage } from "./features/ImportPage";
 import { Layout } from "./features/Layout";
@@ -43,6 +44,8 @@ export function App() {
         <Route path="/" element={<Navigate to="/datasets" replace />} />
         <Route path="/datasets" element={<DatasetsPage />} />
         <Route path="/import" element={<ImportPage />} />
+        <Route path="/quality" element={<QualityPage />} />
+        <Route path="/users" element={<UsersPage />} />
         <Route path="/overview" element={<OverviewPage />} />
         <Route path="/topic" element={<TopicPage />} />
         <Route path="/topic/:topicId" element={<TopicPage />} />

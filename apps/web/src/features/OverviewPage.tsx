@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentDataset, useOverview } from "../api/hooks";
 import type { OverviewResult, TopicOverviewRow } from "../api/types";
@@ -21,10 +22,13 @@ export function NeedDataset() {
 
 export function OverviewPage() {
   const { t, lang, pick } = useI18n();
-  const { datasetId, setTopicId } = useAppState();
+  const { datasetId, setTopicId, markStep } = useAppState();
   const { dataset } = useCurrentDataset();
   const q = useOverview();
   const nav = useNavigate();
+  useEffect(() => {
+    if (q.data) markStep("overview");
+  }, [q.data, markStep]);
   if (!datasetId) return <NeedDataset />;
   const open = (id: string) => {
     setTopicId(id);

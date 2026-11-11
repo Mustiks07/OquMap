@@ -1,5 +1,5 @@
 {
-  "generated_on": "2026-11-11",
+  "generator_version": "seed-v2",
   "is_synthetic": true,
   "generator": "apps/api/oqumap/demo/generator.py",
   "datasets": {

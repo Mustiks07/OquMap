@@ -49,7 +49,7 @@ export function PlannerPage() {
       dataset_id: st.datasetId!, plan_id: mode === "current" ? ctx.data?.plan?.id ?? null : null, filters: st.filters,
       topics: rows.map(({ status: _s, score: _sc, basis: _b, diag: _d, ...r }) => r), budget, change_penalty: penalty,
       presets, time_limit_seconds: 5, source_analysis_id: ctx.data?.source_analysis_id ?? null,
-    });
+    }, { onSuccess: () => { if (mode === "current") st.markStep("plan"); } });
   const env = solve.data as Envelope<PlanResult> | undefined;
   const sum = rows.reduce((a, r) => a + r.current_hours, 0);
   return (

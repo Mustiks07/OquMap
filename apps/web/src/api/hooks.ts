@@ -24,6 +24,32 @@ import type {
   TopicEvidenceResult,
 } from "./types";
 
+export interface PublicConfig {
+  deployment_mode: "dev" | "public_demo" | "production";
+  demo_login_enabled: boolean;
+  qa_personas_enabled: boolean;
+  password_login_enabled: boolean;
+  demo_tenant_ttl_hours: number | null;
+  live_ai_configured: boolean;
+  llm_config_error: string | null;
+  lab_scenarios: string[];
+  recommended_dataset_code: string;
+}
+
+export function useConfig() {
+  return useQuery({ queryKey: ["config"], queryFn: () => api.get<PublicConfig>("/api/v1/config"), staleTime: 300_000 });
+}
+
+export interface ProjectStatus {
+  dataset_id: string;
+  stages: { kind: string; done: boolean; blocked_by: string[]; blocked_message: string | null }[];
+  counts: Record<string, number>;
+}
+
+export function useProject(id: string | null) {
+  return useQuery({ queryKey: ["project", id], enabled: !!id, queryFn: () => api.get<ProjectStatus>(`/api/v1/datasets/${id}/project`) });
+}
+
 export function useDatasets() {
   return useQuery({ queryKey: ["datasets"], queryFn: () => api.get<DatasetSummary[]>("/api/v1/datasets") });
 }

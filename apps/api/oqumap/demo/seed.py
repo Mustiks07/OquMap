@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-from datetime import date
 from pathlib import Path
 
 from sqlalchemy import select
@@ -320,7 +319,7 @@ def _seed_plan(session: Session, ds: m.Dataset) -> None:
 
 def _write_manifest(datasets: dict[str, m.Dataset]) -> None:
     out = {
-        "generated_on": date.today().isoformat(),
+        "generator_version": "seed-v2",  # no wall-clock date: the file is byte-identical on every seed
         "is_synthetic": True,
         "generator": "apps/api/oqumap/demo/generator.py",
         "datasets": {code: {"id": ds.id, "name": ds.name_ru, "version": ds.version, "manifest": ds.manifest}
