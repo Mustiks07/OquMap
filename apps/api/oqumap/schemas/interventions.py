@@ -870,3 +870,56 @@ class PortfolioOut(Model):
     best_intervention_reason: str
     pilots: list[PilotListItem]
     limitations: list[Message]
+
+
+# ---------------------------------------------------------------------------
+# Experiment Design Studio
+# ---------------------------------------------------------------------------
+
+
+class DesignStudioRequest(BaseModel):
+    dataset_id: str | None = None
+    cohort_ids: list[str] = Field(default_factory=list, max_length=500)
+    assignment_unit: Literal["cohort", "school"] = "cohort"
+    cluster_sizes: list[int] = Field(default_factory=list, max_length=500)
+    classes_share_schools: bool = False
+    icc_low: float = Field(default=0.05, ge=0, le=0.5)
+    icc_high: float = Field(default=0.20, ge=0, le=0.5)
+    baseline_r: float = Field(default=0.5, ge=0, le=0.95)
+    attrition: float = Field(default=0.1, ge=0, le=0.6)
+    effect_low: float = Field(default=0.1, gt=0, le=2)
+    effect_high: float = Field(default=0.3, gt=0, le=2)
+    mde_target: float | None = Field(default=None, gt=0, le=2)
+    comparison_available: bool = True
+    n_pre_measurements: int = Field(default=1, ge=0, le=20)
+    n_post_measurements: int = Field(default=1, ge=0, le=20)
+    calendar_weeks: int = Field(default=12, ge=1, le=52)
+    intervention_weeks: int = Field(default=6, ge=1, le=52)
+    alpha: float = Field(default=0.05, gt=0, lt=0.5)
+    target_power: float = Field(default=0.8, ge=0.5, lt=1)
+
+
+class DesignOption(Model):
+    design: str
+    admissible: bool
+    analysis_mode: str
+    causal_ceiling: str
+    clusters: dict[str, Any]
+    mde_range: dict[str, Any] | None
+    power_range: dict[str, Any] | None
+    meets_mde_target: bool | None
+    precision_unavailable_reason: str | None
+    sensitivity: list[dict[str, Any]]
+    risks: dict[str, str]
+    reasons: list[str]
+    messages: list[Message]
+
+
+class DesignStudioOut(Model):
+    method_version: str
+    assumptions: dict[str, Any]
+    formula: str
+    designs: list[DesignOption]
+    auto_approval: bool
+    warnings: list[str]
+    warning_messages: list[Message]

@@ -243,3 +243,27 @@ test("pager moves the offset and keeps it in the URL", async () => {
   await waitFor(() => expect(calls.some((c) => c.url.includes("offset=25"))).toBe(true));
   expect(screen.getByText(/Страница 2 из 3/)).toBeInTheDocument();
 });
+
+test("design studio sends the selected classes and never approves a design itself", async () => {
+  const { DesignStudio } = await import("../features/interventions/DesignStudio");
+  const used: string[] = [];
+  const design = (code: string, admissible: boolean, mde: { low: number; high: number } | null) => ({
+    design: code, admissible, analysis_mode: "built_in", causal_ceiling: code === "cluster_randomized" ? "causal_estimate" : "descriptive_change",
+    clusters: { intervention: 3, comparison: 3, total: 6, mean_size: 25 }, mde_range: mde, power_range: mde ? { low: 0.3, high: 0.6 } : null,
+    meets_mde_target: null, precision_unavailable_reason: mde ? null : "too_few_clusters", sensitivity: [], risks: { contamination: "high" },
+    reasons: [], messages: [] });
+  routes = [[/POST .*\/design-studio\/evaluate/, () => ({ body: { method_version: "eds-v1", assumptions: {}, formula: "f", auto_approval: false,
+    warnings: [], warning_messages: [], designs: [design("single_group", true, { low: 0.2, high: 0.3 }), design("cluster_randomized", false, null)] } })]];
+  localStorage.clear();
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={qc}><I18nProvider initial="ru"><MemoryRouter>
+    <DesignStudio datasetId="d" cohortIds={["c1", "c2"]} assignmentUnit="cohort" onUseDesign={(d) => used.push(d)} /></MemoryRouter></I18nProvider></QueryClientProvider>);
+  fireEvent.click(screen.getByRole("button", { name: "Рассчитать варианты" }));
+  expect(await screen.findByTestId("design-studio-result")).toBeInTheDocument();
+  expect((calls.find((c) => c.method === "POST")?.body as { cohort_ids: string[] }).cohort_ids).toEqual(["c1", "c2"]);
+  expect(screen.getByText("мало кластеров — точность не показывается")).toBeInTheDocument();
+  expect(screen.getAllByRole("button", { name: "Выбрать дизайн" })).toHaveLength(1); // only admissible designs
+  fireEvent.click(screen.getByRole("button", { name: "Выбрать дизайн" }));
+  expect(used).toEqual(["single_group"]);
+  expect(screen.getByText(/Расчёт не утверждает дизайн/)).toBeInTheDocument();
+});

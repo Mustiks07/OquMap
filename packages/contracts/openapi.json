@@ -1855,6 +1855,327 @@
         "title": "DemoLogin",
         "type": "object"
       },
+      "DesignOption": {
+        "additionalProperties": true,
+        "properties": {
+          "admissible": {
+            "title": "Admissible",
+            "type": "boolean"
+          },
+          "analysis_mode": {
+            "title": "Analysis Mode",
+            "type": "string"
+          },
+          "causal_ceiling": {
+            "title": "Causal Ceiling",
+            "type": "string"
+          },
+          "clusters": {
+            "additionalProperties": true,
+            "title": "Clusters",
+            "type": "object"
+          },
+          "design": {
+            "title": "Design",
+            "type": "string"
+          },
+          "mde_range": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mde Range"
+          },
+          "meets_mde_target": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meets Mde Target"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "power_range": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power Range"
+          },
+          "precision_unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precision Unavailable Reason"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "risks": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Risks",
+            "type": "object"
+          },
+          "sensitivity": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Sensitivity",
+            "type": "array"
+          }
+        },
+        "required": [
+          "design",
+          "admissible",
+          "analysis_mode",
+          "causal_ceiling",
+          "clusters",
+          "mde_range",
+          "power_range",
+          "meets_mde_target",
+          "precision_unavailable_reason",
+          "sensitivity",
+          "risks",
+          "reasons",
+          "messages"
+        ],
+        "title": "DesignOption",
+        "type": "object"
+      },
+      "DesignStudioOut": {
+        "additionalProperties": true,
+        "properties": {
+          "assumptions": {
+            "additionalProperties": true,
+            "title": "Assumptions",
+            "type": "object"
+          },
+          "auto_approval": {
+            "title": "Auto Approval",
+            "type": "boolean"
+          },
+          "designs": {
+            "items": {
+              "$ref": "#/components/schemas/DesignOption"
+            },
+            "title": "Designs",
+            "type": "array"
+          },
+          "formula": {
+            "title": "Formula",
+            "type": "string"
+          },
+          "method_version": {
+            "title": "Method Version",
+            "type": "string"
+          },
+          "warning_messages": {
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "title": "Warning Messages",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "method_version",
+          "assumptions",
+          "formula",
+          "designs",
+          "auto_approval",
+          "warnings",
+          "warning_messages"
+        ],
+        "title": "DesignStudioOut",
+        "type": "object"
+      },
+      "DesignStudioRequest": {
+        "properties": {
+          "alpha": {
+            "default": 0.05,
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": 0.0,
+            "title": "Alpha",
+            "type": "number"
+          },
+          "assignment_unit": {
+            "default": "cohort",
+            "enum": [
+              "cohort",
+              "school"
+            ],
+            "title": "Assignment Unit",
+            "type": "string"
+          },
+          "attrition": {
+            "default": 0.1,
+            "maximum": 0.6,
+            "minimum": 0.0,
+            "title": "Attrition",
+            "type": "number"
+          },
+          "baseline_r": {
+            "default": 0.5,
+            "maximum": 0.95,
+            "minimum": 0.0,
+            "title": "Baseline R",
+            "type": "number"
+          },
+          "calendar_weeks": {
+            "default": 12,
+            "maximum": 52.0,
+            "minimum": 1.0,
+            "title": "Calendar Weeks",
+            "type": "integer"
+          },
+          "classes_share_schools": {
+            "default": false,
+            "title": "Classes Share Schools",
+            "type": "boolean"
+          },
+          "cluster_sizes": {
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 500,
+            "title": "Cluster Sizes",
+            "type": "array"
+          },
+          "cohort_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "title": "Cohort Ids",
+            "type": "array"
+          },
+          "comparison_available": {
+            "default": true,
+            "title": "Comparison Available",
+            "type": "boolean"
+          },
+          "dataset_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataset Id"
+          },
+          "effect_high": {
+            "default": 0.3,
+            "exclusiveMinimum": 0.0,
+            "maximum": 2.0,
+            "title": "Effect High",
+            "type": "number"
+          },
+          "effect_low": {
+            "default": 0.1,
+            "exclusiveMinimum": 0.0,
+            "maximum": 2.0,
+            "title": "Effect Low",
+            "type": "number"
+          },
+          "icc_high": {
+            "default": 0.2,
+            "maximum": 0.5,
+            "minimum": 0.0,
+            "title": "Icc High",
+            "type": "number"
+          },
+          "icc_low": {
+            "default": 0.05,
+            "maximum": 0.5,
+            "minimum": 0.0,
+            "title": "Icc Low",
+            "type": "number"
+          },
+          "intervention_weeks": {
+            "default": 6,
+            "maximum": 52.0,
+            "minimum": 1.0,
+            "title": "Intervention Weeks",
+            "type": "integer"
+          },
+          "mde_target": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 2.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mde Target"
+          },
+          "n_post_measurements": {
+            "default": 1,
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "N Post Measurements",
+            "type": "integer"
+          },
+          "n_pre_measurements": {
+            "default": 1,
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "N Pre Measurements",
+            "type": "integer"
+          },
+          "target_power": {
+            "default": 0.8,
+            "exclusiveMaximum": 1.0,
+            "minimum": 0.5,
+            "title": "Target Power",
+            "type": "number"
+          }
+        },
+        "title": "DesignStudioRequest",
+        "type": "object"
+      },
       "Envelope_ComparisonResult_": {
         "additionalProperties": true,
         "properties": {
@@ -10958,6 +11279,116 @@
         "summary": "Decision Report",
         "tags": [
           "decisions"
+        ]
+      }
+    },
+    "/api/v1/design-studio/evaluate": {
+      "post": {
+        "description": "Deterministic design comparison for planning; never approves or changes a pilot.",
+        "operationId": "design_studio_api_v1_design_studio_evaluate_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DesignStudioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DesignStudioOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Design Studio",
+        "tags": [
+          "design-studio"
         ]
       }
     },

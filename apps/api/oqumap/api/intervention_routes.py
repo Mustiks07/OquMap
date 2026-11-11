@@ -15,6 +15,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Query
 
 from ..schemas import interventions as S
+from ..services import design_studio as eds
 from ..services import fidelity as fid
 from ..services import interventions as ivs
 from ..services import learning_loop as loop
@@ -185,3 +186,14 @@ def learning_summary(p: P, session: DB, dataset_id: str | None = None):
 @router.get("/portfolio/interventions", response_model=S.PortfolioOut, tags=["portfolio"])
 def intervention_portfolio(p: P, session: DB, dataset_id: str | None = None, as_of: date | None = None):
     return pf.portfolio(session, p, dataset_id, as_of)
+
+
+# ---------------------------------------------------------------------------
+# Experiment Design Studio
+# ---------------------------------------------------------------------------
+
+
+@router.post("/design-studio/evaluate", response_model=S.DesignStudioOut, tags=["design-studio"])
+def design_studio(body: S.DesignStudioRequest, p: P, session: DB):
+    """Deterministic design comparison for planning; never approves or changes a pilot."""
+    return eds.evaluate(session, p.org_id, body)

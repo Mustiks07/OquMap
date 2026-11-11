@@ -8,6 +8,7 @@ import { NeedDataset } from "../OverviewPage";
 import { useIntervention, useInterventions, useMAction, usePilot, type PilotCreate, type PilotOut } from "../measurement/api";
 import { ActionError, FidelityBadge, KV, LabelText, MQuery, Messages, OutcomeBadge, PilotStatusBadge, useRoles } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
+import { DesignStudio } from "./DesignStudio";
 
 const DESIGNS = ["single_group", "matched_comparison", "cluster_randomized", "interrupted_time_series", "stepped_wedge"] as const;
 type Arm = "intervention" | "comparison" | "";
@@ -121,6 +122,8 @@ export function PilotNewPage() {
             </table>
           </div>
         </Card>
+        <DesignStudio datasetId={datasetId} assignmentUnit={f.assignment_unit}
+          cohortIds={Object.entries(arms).filter(([, a]) => a).map(([c]) => c)} onUseDesign={(d) => set("design", d)} />
         <Card title={t2("pilot.baseline")}>
           <div className="grid grid-2">
             <Field label={t2("pilot.baseline")}>{(id) => <Select id={id} value={f.baseline_assessment_id} onChange={(v) => set("baseline_assessment_id", v)} options={assessOpts} />}</Field>

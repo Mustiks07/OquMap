@@ -345,6 +345,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/design-studio/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Design Studio
+         * @description Deterministic design comparison for planning; never approves or changes a pilot.
+         */
+        post: operations["design_studio_api_v1_design_studio_evaluate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/documents": {
         parameters: {
             query?: never;
@@ -1842,6 +1862,155 @@ export interface components {
              * @default methodist
              */
             persona: string;
+        };
+        /** DesignOption */
+        DesignOption: {
+            /** Admissible */
+            admissible: boolean;
+            /** Analysis Mode */
+            analysis_mode: string;
+            /** Causal Ceiling */
+            causal_ceiling: string;
+            /** Clusters */
+            clusters: {
+                [key: string]: unknown;
+            };
+            /** Design */
+            design: string;
+            /** Mde Range */
+            mde_range: {
+                [key: string]: unknown;
+            } | null;
+            /** Meets Mde Target */
+            meets_mde_target: boolean | null;
+            /** Messages */
+            messages: components["schemas"]["Message"][];
+            /** Power Range */
+            power_range: {
+                [key: string]: unknown;
+            } | null;
+            /** Precision Unavailable Reason */
+            precision_unavailable_reason: string | null;
+            /** Reasons */
+            reasons: string[];
+            /** Risks */
+            risks: {
+                [key: string]: string;
+            };
+            /** Sensitivity */
+            sensitivity: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** DesignStudioOut */
+        DesignStudioOut: {
+            /** Assumptions */
+            assumptions: {
+                [key: string]: unknown;
+            };
+            /** Auto Approval */
+            auto_approval: boolean;
+            /** Designs */
+            designs: components["schemas"]["DesignOption"][];
+            /** Formula */
+            formula: string;
+            /** Method Version */
+            method_version: string;
+            /** Warning Messages */
+            warning_messages: components["schemas"]["Message"][];
+            /** Warnings */
+            warnings: string[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** DesignStudioRequest */
+        DesignStudioRequest: {
+            /**
+             * Alpha
+             * @default 0.05
+             */
+            alpha: number;
+            /**
+             * Assignment Unit
+             * @default cohort
+             * @enum {string}
+             */
+            assignment_unit: "cohort" | "school";
+            /**
+             * Attrition
+             * @default 0.1
+             */
+            attrition: number;
+            /**
+             * Baseline R
+             * @default 0.5
+             */
+            baseline_r: number;
+            /**
+             * Calendar Weeks
+             * @default 12
+             */
+            calendar_weeks: number;
+            /**
+             * Classes Share Schools
+             * @default false
+             */
+            classes_share_schools: boolean;
+            /** Cluster Sizes */
+            cluster_sizes?: number[];
+            /** Cohort Ids */
+            cohort_ids?: string[];
+            /**
+             * Comparison Available
+             * @default true
+             */
+            comparison_available: boolean;
+            /** Dataset Id */
+            dataset_id?: string | null;
+            /**
+             * Effect High
+             * @default 0.3
+             */
+            effect_high: number;
+            /**
+             * Effect Low
+             * @default 0.1
+             */
+            effect_low: number;
+            /**
+             * Icc High
+             * @default 0.2
+             */
+            icc_high: number;
+            /**
+             * Icc Low
+             * @default 0.05
+             */
+            icc_low: number;
+            /**
+             * Intervention Weeks
+             * @default 6
+             */
+            intervention_weeks: number;
+            /** Mde Target */
+            mde_target?: number | null;
+            /**
+             * N Post Measurements
+             * @default 1
+             */
+            n_post_measurements: number;
+            /**
+             * N Pre Measurements
+             * @default 1
+             */
+            n_pre_measurements: number;
+            /**
+             * Target Power
+             * @default 0.8
+             */
+            target_power: number;
         };
         /** Envelope[ComparisonResult] */
         Envelope_ComparisonResult_: {
@@ -5733,6 +5902,86 @@ export interface operations {
                     "application/pdf": unknown;
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": unknown;
                     "text/csv": unknown;
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    design_studio_api_v1_design_studio_evaluate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DesignStudioRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DesignStudioOut"];
                 };
             };
             /** @description Bad Request */
