@@ -1,0 +1,16 @@
+# Normalise line endings in the repository; Linux entrypoints must stay LF on every checkout (incl. Windows
+# with core.autocrlf=true), otherwise "exec ...: no such file or directory" inside containers.
+* text=auto
+*.sh text eol=lf
+scripts/docker-entrypoint.sh text eol=lf
+Dockerfile text eol=lf
+*.conf text eol=lf
+*.py text eol=lf
+alembic.ini text eol=lf
+*.ps1 text eol=crlf
+# binary demo artefacts
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.ttf binary
+*.png binary
