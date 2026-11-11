@@ -11,6 +11,7 @@ from sqlalchemy import text
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import db
+from .api.quality_routes import router as quality_router
 from .api.routes import router
 from .config import CODE_VERSION, get_settings
 from .errors import ApiError
@@ -80,6 +81,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
         return {"status": status, "version": CODE_VERSION, "job_mode": settings.job_mode, "llm_provider": settings.llm_provider}
 
     app.include_router(router)
+    app.include_router(quality_router)
     return app
 
 
