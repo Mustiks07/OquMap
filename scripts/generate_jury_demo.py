@@ -19,6 +19,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data/jury_demo"
+SYSTEM_FONT = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+REPO_FONT = ROOT / "apps/api/oqumap/assets/fonts/DejaVuSans.ttf"
+DEFAULT_FONT = SYSTEM_FONT if SYSTEM_FONT.is_file() else REPO_FONT
 SEED = 20261111
 LABEL = "Синтетический материал для демонстрации OquMap"
 KZ_NOTE = "KZ: перевод не проверен носителем языка"
@@ -997,7 +1000,8 @@ def main():
     p.add_argument(
         "--font",
         type=Path,
-        default=Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+        default=DEFAULT_FONT,
+        help="DejaVu Sans TTF (defaults to the Linux system font, then the checked-in application font)",
     )
     args = p.parse_args()
     files = build(args.font)

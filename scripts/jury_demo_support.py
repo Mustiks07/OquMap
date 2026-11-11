@@ -14,10 +14,11 @@ from fractions import Fraction
 
 import pandas as pd
 from generate_jury_demo import MC, OUT, SEED, truth
+from pypdf import PdfReader
+
 from oqumap.analytics import scoring
 from oqumap.analytics.comparison import compare_arms
 from oqumap.analytics.paired import paired_change
-from pypdf import PdfReader
 
 
 def rows(root, name):
@@ -522,9 +523,10 @@ def connect_material_links(session, dataset_id, root=OUT):
     Documents must already be uploaded/extracted through the normal document path.
     Refuses non-synthetic projects, wrong file hashes and unrelated editions. Idempotent.
     """
+    from sqlalchemy import select
+
     from oqumap import models as m
     from oqumap.services.common import audit, bump_dataset_version
-    from sqlalchemy import select
 
     ds = session.get(m.Dataset, dataset_id)
     assert ds and ds.is_synthetic and ds.program_version_id, (

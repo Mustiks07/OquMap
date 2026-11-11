@@ -11,11 +11,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "scripts"))
-from generate_jury_demo import OUT, build  # noqa: E402
+from generate_jury_demo import DEFAULT_FONT, OUT, build  # noqa: E402
 from jury_demo_support import evaluate, validate_files  # noqa: E402
 from verify_jury_demo import api_checks  # noqa: E402
-
-FONT = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
 
 
 def test_two_clean_generations_identical_including_pdfs_and_docs(tmp_path):
@@ -26,11 +24,16 @@ def test_two_clean_generations_identical_including_pdfs_and_docs(tmp_path):
             check=True,
             capture_output=True,
         )
-    files = build(FONT)
+    files = build(DEFAULT_FONT)
+    canonical = json.loads((OUT / "manifest.json").read_text())
+    same_font = hashlib.sha256(DEFAULT_FONT.read_bytes()).hexdigest() == canonical["font_sha256"]
     for name, data in files.items():
-        assert (
-            (first / name).read_bytes() == (second / name).read_bytes() == data == (OUT / name).read_bytes()
-        ), name
+        assert (first / name).read_bytes() == (second / name).read_bytes() == data, name
+        # PDFs and their manifest hashes depend on the exact DejaVu build. The canonical checked-in
+        # artefacts remain checksum-verified below; on platforms without that font, still prove a
+        # clean generation is deterministic and compare every font-independent byte to the corpus.
+        if same_font or name not in {"materials/textbook_A.pdf", "materials/textbook_B.pdf", "manifest.json"}:
+            assert data == (OUT / name).read_bytes(), name
     # In-place regeneration does not retain a creation timestamp or introduce non-deterministic IDs.
     subprocess.run(
         [sys.executable, str(ROOT / "scripts/generate_jury_demo.py"), "--out", str(first)],

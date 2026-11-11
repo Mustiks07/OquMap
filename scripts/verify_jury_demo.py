@@ -31,6 +31,7 @@ def configure_local(storage):
 def api_checks(client, headers, root=OUT):
     """Reusable against a fresh, authorized tenant; five files use the actual HTTP import path."""
     from jury_demo_support import connect_material_links, evaluate, in_range
+
     from oqumap import db
     from oqumap import models as m
 
@@ -269,6 +270,7 @@ def main():
         configure_local(Path(temp) / "storage")
         from fastapi.testclient import TestClient
         from jury_demo_support import validate_files
+
         from oqumap import db
         from oqumap.main import create_app
         from oqumap.services.admin import create_organization

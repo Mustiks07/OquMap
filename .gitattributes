@@ -10,6 +10,8 @@ alembic.ini text eol=lf
 # These files are byte-compared with their deterministic generator in the test suite.
 # Keep LF in the working tree even when core.autocrlf=true on Windows.
 data/templates/example_project/* text eol=lf
+# Jury fixtures are checksum-verified byte-for-byte and must not be rewritten by autocrlf.
+data/jury_demo/** text eol=lf
 # Generated API contracts are regenerated and diff-checked on both Linux and Windows.
 packages/contracts/openapi.json text eol=lf
 apps/web/src/api/schema.d.ts text eol=lf
