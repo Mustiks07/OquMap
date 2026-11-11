@@ -2,13 +2,13 @@
 permissions and tenant isolation."""
 
 from conftest import login
-from mhelpers import curriculum, dataset, intervention_body, objective, topic, user_headers
+from mhelpers import curriculum, dataset, intervention_body, items, objective, topic, user_headers
 
 
 def test_seeded_library_has_levels_statuses_and_versions(fresh_client):
     c = fresh_client
     H = login(c)
-    rows = {r["code"]: r for r in c.get("/api/v1/interventions", headers=H).json()}
+    rows = {r["code"]: r for r in items(c.get("/api/v1/interventions", headers=H).json())}
     assert {"INT-STRIPS", "INT-PEER", "INT-NUMLINE", "INT-ERRDIAG", "INT-WORKED", "INT-OLDDRILL"} <= set(rows)
     assert {r["evidence_level"] for r in rows.values()} == {"practice_based", "observational", "experimental"}
     assert rows["INT-OLDDRILL"]["status"] == "archived"
@@ -18,9 +18,9 @@ def test_seeded_library_has_levels_statuses_and_versions(fresh_client):
     # the seeded pilot is synthetic: its accepted entry is demo evidence, not real evidence
     assert strips["evidence_summary"]["accepted_entries"] == 0 and strips["evidence_summary"]["accepted_synthetic_entries"] == 1
     # filters
-    assert {r["code"] for r in c.get("/api/v1/interventions", params={"evidence_level": "experimental"}, headers=H).json()} == {"INT-NUMLINE"}
-    assert "INT-STRIPS" in {r["code"] for r in c.get("/api/v1/interventions", params={"misconception": "add_across"}, headers=H).json()}
-    assert {r["code"] for r in c.get("/api/v1/interventions", params={"status": "archived"}, headers=H).json()} == {"INT-OLDDRILL"}
+    assert {r["code"] for r in items(c.get("/api/v1/interventions", params={"evidence_level": "experimental"}, headers=H).json())} == {"INT-NUMLINE"}
+    assert "INT-STRIPS" in {r["code"] for r in items(c.get("/api/v1/interventions", params={"misconception": "add_across"}, headers=H).json())}
+    assert {r["code"] for r in items(c.get("/api/v1/interventions", params={"status": "archived"}, headers=H).json())} == {"INT-OLDDRILL"}
 
 
 def test_crud_versioning_and_immutability(fresh_client):
@@ -133,7 +133,7 @@ def test_intervention_tenant_isolation(fresh_client):
     ds = dataset(c, H, "base")
     cur = curriculum(c, H, ds["id"])
     iv = c.post("/api/v1/interventions", json=intervention_body("T-ISO", cur), headers=H).json()
-    assert c.get("/api/v1/interventions", headers=O).json() == []
+    assert items(c.get("/api/v1/interventions", headers=O).json()) == []
     for r in (c.get(f"/api/v1/interventions/{iv['id']}", headers=O),
               c.patch(f"/api/v1/interventions/{iv['id']}", json={"title_ru": "x"}, headers=O),
               c.post(f"/api/v1/interventions/{iv['id']}/versions", json={}, headers=O),

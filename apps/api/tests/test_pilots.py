@@ -9,6 +9,7 @@ from mhelpers import (
     curriculum,
     dataset,
     intervention_body,
+    items,
     pilot_by_code,
     topic,
     user_headers,
@@ -37,7 +38,7 @@ def ctx(fresh_client):
     H = login(c)
     ds = dataset(c, H, "measurement_loop")
     cur = curriculum(c, H, ds["id"])
-    ivs = {r["code"]: r for r in c.get("/api/v1/interventions", headers=H).json()}
+    ivs = {r["code"]: r for r in items(c.get("/api/v1/interventions", headers=H).json())}
     return {"c": c, "H": H, "ds": ds, "cur": cur, "ivs": ivs}
 
 
@@ -167,7 +168,7 @@ def test_pilot_tenant_isolation(ctx):
     c, H, cur = ctx["c"], ctx["H"], ctx["cur"]
     O = login(c, "other_org")
     p1 = pilot_by_code(c, H, "PIL-M01")
-    assert c.get("/api/v1/pilots", headers=O).json() == []
+    assert items(c.get("/api/v1/pilots", headers=O).json()) == []
     for r in (c.get(f"/api/v1/pilots/{p1['id']}", headers=O),
               c.patch(f"/api/v1/pilots/{p1['id']}", json={"title": "чужой"}, headers=O),
               c.post(f"/api/v1/pilots/{p1['id']}/transition", json={"to_status": "stopped", "note": "чужой"}, headers=O),

@@ -10,9 +10,9 @@ Permissions (adapted to the existing role model, see docs/INTERVENTION_AND_PILOT
 from __future__ import annotations
 
 from datetime import date
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from ..schemas import interventions as S
 from ..services import fidelity as fid
@@ -29,13 +29,23 @@ router = APIRouter(prefix="/api/v1")
 # ---------------------------------------------------------------------------
 
 
-@router.get("/interventions", response_model=list[S.InterventionListItem], tags=["interventions"])
+Limit = Annotated[int, Query(ge=1, le=200)]
+Offset = Annotated[int, Query(ge=0)]
+
+
+def page(rows: list, limit: int, offset: int) -> dict:
+    """Stable page of an already ordered list (order: code, then id)."""
+    return {"items": rows[offset:offset + limit], "total": len(rows), "limit": limit, "offset": offset}
+
+
+@router.get("/interventions", response_model=S.InterventionPage, tags=["interventions"])
 def list_interventions(p: P, session: DB, dataset_id: str | None = None, status: str | None = None,
                        evidence_level: str | None = None, topic_id: str | None = None, objective_id: str | None = None,
                        misconception: str | None = None, grade: int | None = None, language: str | None = None,
-                       q: str | None = None):
-    return ivs.list_interventions(session, p.org_id, dataset_id, status, evidence_level, topic_id, objective_id, misconception,
+                       q: str | None = None, limit: Limit = 50, offset: Offset = 0):
+    rows = ivs.list_interventions(session, p.org_id, dataset_id, status, evidence_level, topic_id, objective_id, misconception,
                                   grade, language, q)
+    return page(sorted(rows, key=lambda r: (r["code"], r["id"])), limit, offset)
 
 
 @router.post("/interventions", response_model=S.InterventionOut, tags=["interventions"])
@@ -100,9 +110,11 @@ def review_evidence_entry(entry_id: str, body: S.EvidenceReview, p: P, session: 
 # ---------------------------------------------------------------------------
 
 
-@router.get("/pilots", response_model=list[S.PilotListItem], tags=["pilots"])
-def list_pilots(p: P, session: DB, dataset_id: str | None = None, status: str | None = None, intervention_id: str | None = None):
-    return pls.list_pilots(session, p.org_id, dataset_id, status, intervention_id)
+@router.get("/pilots", response_model=S.PilotPage, tags=["pilots"])
+def list_pilots(p: P, session: DB, dataset_id: str | None = None, status: str | None = None, intervention_id: str | None = None,
+                limit: Limit = 50, offset: Offset = 0):
+    rows = pls.list_pilots(session, p.org_id, dataset_id, status, intervention_id)
+    return page(sorted(rows, key=lambda r: (r["code"], r["id"])), limit, offset)
 
 
 @router.post("/pilots", response_model=S.PilotOut, tags=["pilots"])

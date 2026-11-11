@@ -17,6 +17,7 @@ from datetime import date
 
 import numpy as np
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .. import measurement_models as mm
@@ -154,17 +155,35 @@ def _check_refs(session: Session, org_id: str, ds: m.Dataset, data: dict) -> Non
         seen.add(cid)
 
 
-def _next_code(session: Session, org_id: str) -> str:
+def _next_code(session: Session, org_id: str, skip: set[str] | None = None) -> str:
     n = int(session.scalar(select(func.count()).select_from(mm.Pilot).where(mm.Pilot.org_id == org_id)) or 0)
     while True:
         n += 1
         code = f"PIL-{n:03d}"
+        if code in (skip or set()):
+            continue
         if not session.scalar(select(mm.Pilot.id).where(mm.Pilot.org_id == org_id, mm.Pilot.code == code)):
             return code
 
 
 def create(session: Session, p: Principal, body: S.PilotCreate, code: str | None = None) -> dict:
+    """Create a draft pilot. An auto-generated code that another request took in the meantime is retried with the
+    next free code (unique constraint + full rollback); an explicit code collision is a 409."""
     p.require("methodist")
+    skip: set[str] = set()
+    for attempt in range(5):
+        chosen = code or _next_code(session, p.org_id, skip)
+        try:
+            return _create(session, p, body, chosen)
+        except IntegrityError:
+            session.rollback()
+            if code is not None or attempt == 4:
+                raise ApiError("concurrent_modification", "Код пилота уже занят; повторите", 409, {"code": chosen}) from None
+            skip.add(chosen)
+    raise AssertionError("unreachable")
+
+
+def _create(session: Session, p: Principal, body: S.PilotCreate, code: str) -> dict:
     ds = get_dataset(session, p.org_id, body.dataset_id)
     iv = ivs.get_intervention(session, p.org_id, body.intervention_id)
     if iv.status == "archived":
@@ -177,7 +196,7 @@ def create(session: Session, p: Principal, body: S.PilotCreate, code: str | None
     snap = _snapshot(session, v)
     plan = body.analysis_plan.model_dump()
     pl = mm.Pilot(
-        org_id=p.org_id, dataset_id=ds.id, code=code or _next_code(session, p.org_id), title=ivs.clean_text(body.title, 300),
+        org_id=p.org_id, dataset_id=ds.id, code=code, title=ivs.clean_text(body.title, 300),
         status="draft", design=body.design, assignment_unit=body.assignment_unit,
         causal_ceiling=causal_ceiling(body.design, plan), intervention_id=iv.id, intervention_version_id=v.id,
         intervention_snapshot=snap, snapshot_sha256=_sha(snap), decision_id=body.decision_id, topic_id=body.topic_id,

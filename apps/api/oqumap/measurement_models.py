@@ -17,6 +17,7 @@ from sqlalchemy import (
     CheckConstraint,
     Date,
     ForeignKey,
+    ForeignKeyConstraint,
     Index,
     Integer,
     String,
@@ -89,6 +90,9 @@ class InterventionVersion(IdMixin, TimestampMixin, Base):
     reviewed_at: Mapped[datetime | None] = mapped_column(TZDateTime(), nullable=True)
     review_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     __table_args__ = (UniqueConstraint("intervention_id", "version", name="uq_intervention_versions_version"),
+                      UniqueConstraint("id", "intervention_id", name="uq_intervention_versions_id_intervention"),
+                      CheckConstraint("minutes_per_session > 0 AND sessions_per_week > 0 AND duration_weeks > 0",
+                                      name="ck_intervention_versions_dosage"),
                       CheckConstraint(_in("status", VERSION_STATUSES), name="ck_intervention_versions_status"),
                       CheckConstraint(_in("evidence_level", EVIDENCE_LEVELS), name="ck_intervention_versions_evidence"))
 
@@ -103,7 +107,12 @@ class InterventionTarget(IdMixin, Base):
     topic_id: Mapped[str | None] = mapped_column(ForeignKey("topics.id"), nullable=True, index=True)
     objective_id: Mapped[str | None] = mapped_column(ForeignKey("objectives.id"), nullable=True, index=True)
     misconception_code: Mapped[str | None] = mapped_column(String(60), nullable=True, index=True)
-    __table_args__ = (CheckConstraint(_in("target_type", ("topic", "objective", "misconception")),
+    __table_args__ = (CheckConstraint(
+        "(target_type = 'topic' AND topic_id IS NOT NULL AND objective_id IS NULL AND misconception_code IS NULL) OR "
+        "(target_type = 'objective' AND objective_id IS NOT NULL AND topic_id IS NULL AND misconception_code IS NULL) OR "
+        "(target_type = 'misconception' AND misconception_code IS NOT NULL AND topic_id IS NULL AND objective_id IS NULL)",
+        name="ck_intervention_targets_one_field"),
+        CheckConstraint(_in("target_type", ("topic", "objective", "misconception")),
                                       name="ck_intervention_targets_type"),)
 
 
@@ -145,6 +154,11 @@ class Pilot(IdMixin, TimestampMixin, Base):
     activated_at: Mapped[datetime | None] = mapped_column(TZDateTime(), nullable=True)
     is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
     __table_args__ = (UniqueConstraint("org_id", "code", name="uq_pilots_org_code"),
+                      ForeignKeyConstraint(["intervention_version_id", "intervention_id"],
+                                           ["intervention_versions.id", "intervention_versions.intervention_id"],
+                                           name="fk_pilots_version_of_intervention"),
+                      CheckConstraint("minutes_per_session > 0 AND sessions_per_week > 0 AND duration_weeks > 0",
+                                      name="ck_pilots_dosage"),
                       CheckConstraint(_in("status", PILOT_STATUSES), name="ck_pilots_status"),
                       CheckConstraint(_in("design", DESIGNS), name="ck_pilots_design"),
                       CheckConstraint(_in("assignment_unit", ("cohort", "school")), name="ck_pilots_unit"))
@@ -196,6 +210,10 @@ class FidelityLog(IdMixin, TimestampMixin, Base):
     recorder_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     corrects_log_id: Mapped[str | None] = mapped_column(ForeignKey("fidelity_logs.id"), nullable=True)
     __table_args__ = (Index("ix_fidelity_logs_pilot_cohort_date", "pilot_id", "cohort_id", "session_date"),
+                      UniqueConstraint("corrects_log_id", name="uq_fidelity_logs_single_correction"),
+                      CheckConstraint("activities_planned >= 0 AND activities_completed >= 0 AND "
+                                      "(learners_present IS NULL OR learners_present >= 0) AND "
+                                      "(learners_assigned IS NULL OR learners_assigned >= 0)", name="ck_fidelity_logs_counts"),
                       CheckConstraint("delivered_minutes >= 0 AND planned_minutes >= 0", name="ck_fidelity_logs_minutes"),
                       CheckConstraint(_in("disruption", ("none", "cancelled", "shortened", "teacher_absent", "holiday", "other")),
                                       name="ck_fidelity_logs_disruption"))
@@ -218,6 +236,7 @@ class PilotOutcome(IdMixin, TimestampMixin, Base):
     result: Mapped[dict] = mapped_column(JSON, default=dict)
     created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
     __table_args__ = (UniqueConstraint("org_id", "input_fingerprint", name="uq_pilot_outcomes_fingerprint"),
+                      UniqueConstraint("id", "pilot_id", "org_id", name="uq_pilot_outcomes_id_pilot_org"),
                       CheckConstraint(_in("status", OUTCOME_STATUSES), name="ck_pilot_outcomes_status"))
 
 
@@ -239,7 +258,10 @@ class PilotConclusion(IdMixin, TimestampMixin, Base):
     decision_basis: Mapped[str] = mapped_column(String(30), default="insufficient_evidence", server_default="insufficient_evidence")
     stop_reason_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
     acknowledged_limitation_codes: Mapped[list] = mapped_column(JSON, default=list, server_default=text("'[]'"))
-    __table_args__ = (CheckConstraint(_in("decision", ("continue", "modify", "stop", "extend_data_collection")),
+    __table_args__ = (ForeignKeyConstraint(["outcome_id", "pilot_id", "org_id"],
+                                           ["pilot_outcomes.id", "pilot_outcomes.pilot_id", "pilot_outcomes.org_id"],
+                                           name="fk_pilot_conclusions_outcome_same_pilot"),
+                      CheckConstraint(_in("decision", ("continue", "modify", "stop", "extend_data_collection")),
                                       name="ck_pilot_conclusions_decision"),
                       CheckConstraint(_in("decision_basis", ("evidence_supports", "operational", "insufficient_evidence",
                                                              "external_factors")), name="ck_pilot_conclusions_basis"),
@@ -266,7 +288,10 @@ class InterventionEvidenceEntry(IdMixin, TimestampMixin, Base):
     reviewed_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
     reviewed_at: Mapped[datetime | None] = mapped_column(TZDateTime(), nullable=True)
     review_note: Mapped[str | None] = mapped_column(Text, nullable=True)
-    __table_args__ = (CheckConstraint(_in("review_status", ("proposed", "accepted", "rejected")),
+    __table_args__ = (ForeignKeyConstraint(["intervention_version_id", "intervention_id"],
+                                           ["intervention_versions.id", "intervention_versions.intervention_id"],
+                                           name="fk_intervention_evidence_version_of_intervention"),
+                      CheckConstraint(_in("review_status", ("proposed", "accepted", "rejected")),
                                       name="ck_intervention_evidence_review"),)
 
 
@@ -285,3 +310,9 @@ class AssessmentCohort(IdMixin, TimestampMixin, Base):
     created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
     __table_args__ = (UniqueConstraint("assessment_id", "cohort_id", name="uq_assessment_cohorts_assessment_cohort"),
                       CheckConstraint(_in("source", ("manual", "seed", "import")), name="ck_assessment_cohorts_source"))
+
+
+# Decision versions created by the learning loop must not collide under concurrency (shared table, index only).
+from .models import Decision  # noqa: E402
+
+Index("uq_decisions_group_version", Decision.decision_group_id, Decision.version, unique=True)

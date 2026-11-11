@@ -15,6 +15,7 @@ from mhelpers import (
     curriculum,
     dataset,
     intervention_body,
+    items,
     objective,
     pilot_by_code,
     topic,
@@ -234,7 +235,7 @@ def test_end_to_end_from_quality_signal_to_next_decision_version(flow):
 
 def test_comparability_and_small_samples_are_honest(flow):
     c, H, ds, cur = flow
-    iv = next(r for r in c.get("/api/v1/interventions", headers=H).json() if r["code"] == "INT-PEER")
+    iv = next(r for r in items(c.get("/api/v1/interventions", headers=H).json()) if r["code"] == "INT-PEER")
     # baseline on F-PRE (scale S-PRE) vs outcome on F-T3-DIAG: unlinked scales → no change computed
     body = _pilot_body(ds, cur, iv["id"], design="single_group", objective_id=None, baseline_assessment_id=assessment(cur, "PRE-2026M"),
                        cohorts=[{"cohort_id": x, "arm": "intervention"} for x in cohorts(cur, "В")], start_date="2026-09-08")

@@ -308,9 +308,17 @@
             "title": "Assessments",
             "type": "array"
           },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
           "method_version": {
             "title": "Method Version",
             "type": "string"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
           },
           "rules": {
             "additionalProperties": {
@@ -318,12 +326,19 @@
             },
             "title": "Rules",
             "type": "object"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
           }
         },
         "required": [
           "method_version",
           "rules",
-          "assessments"
+          "assessments",
+          "total",
+          "limit",
+          "offset"
         ],
         "title": "AssessmentQualityList",
         "type": "object"
@@ -3635,6 +3650,38 @@
         "title": "InterventionOut",
         "type": "object"
       },
+      "InterventionPage": {
+        "additionalProperties": true,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InterventionListItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "InterventionPage",
+        "type": "object"
+      },
       "InterventionPatch": {
         "description": "Partial update of a *draft* version (reviewed versions are immutable).",
         "properties": {
@@ -6343,6 +6390,38 @@
         "title": "PilotOutcomeOut",
         "type": "object"
       },
+      "PilotPage": {
+        "additionalProperties": true,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PilotListItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PilotPage",
+        "type": "object"
+      },
       "PilotPatch": {
         "properties": {
           "analysis_plan": {
@@ -7040,6 +7119,11 @@
             "title": "Interventions With Repeated Signals",
             "type": "array"
           },
+          "learners_by_outcome_status": {
+            "additionalProperties": true,
+            "title": "Learners By Outcome Status",
+            "type": "object"
+          },
           "limitations": {
             "items": {
               "$ref": "#/components/schemas/Message"
@@ -7080,6 +7164,7 @@
           "as_of",
           "dataset_id",
           "counts_by_status",
+          "learners_by_outcome_status",
           "follow_ups",
           "fidelity_distribution",
           "outcome_distribution",
@@ -12231,6 +12316,29 @@
             }
           },
           {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
             "in": "header",
             "name": "authorization",
             "required": false,
@@ -12252,11 +12360,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/InterventionListItem"
-                  },
-                  "title": "Response List Interventions Api V1 Interventions Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/InterventionPage"
                 }
               }
             },
@@ -14203,6 +14307,29 @@
             }
           },
           {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
             "in": "header",
             "name": "authorization",
             "required": false,
@@ -14224,11 +14351,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/PilotListItem"
-                  },
-                  "title": "Response List Pilots Api V1 Pilots Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/PilotPage"
                 }
               }
             },
@@ -15974,6 +16097,29 @@
               "default": "as_incorrect",
               "title": "Omitted Policy",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
             }
           },
           {

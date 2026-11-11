@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import db
@@ -64,6 +65,11 @@ def create_app(database_url: str | None = None) -> FastAPI:
     @app.exception_handler(StarletteHTTPException)
     async def http_error(_: Request, exc: StarletteHTTPException):
         return err(exc.status_code, "http_error", str(exc.detail))
+
+    @app.exception_handler(IntegrityError)
+    async def integrity_error(_: Request, exc: IntegrityError):
+        # a uniqueness/foreign-key race that no service mapped explicitly: a conflict, not an internal error
+        return err(409, "integrity_conflict", "Данные одновременно изменены другим запросом; повторите действие")
 
     @app.exception_handler(Exception)
     async def unhandled(_: Request, exc: Exception):

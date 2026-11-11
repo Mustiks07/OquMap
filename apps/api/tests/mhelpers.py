@@ -48,7 +48,7 @@ def cohorts(cur: dict, letter: str) -> list[str]:
 
 
 def pilot_by_code(client, H, code: str) -> dict:
-    row = next(p for p in client.get("/api/v1/pilots", headers=H).json() if p["code"] == code)
+    row = next(p for p in items(client.get("/api/v1/pilots", params={"limit": 200}, headers=H).json()) if p["code"] == code)
     return client.get(f"/api/v1/pilots/{row['id']}", headers=H).json()
 
 

@@ -27,6 +27,7 @@ from ..errors import ApiError, not_found
 from ..schemas import interventions as S
 from .auth import Principal
 from .common import audit, get_dataset
+from .concurrency import conflict_as
 from .measurement_messages import render
 
 CONTENT_FIELDS = ("title_ru", "title_kz", "description_ru", "description_kz", "grades", "languages", "minutes_per_session",
@@ -164,7 +165,8 @@ def create(session: Session, p: Principal, body: S.InterventionCreate) -> dict:
     content = _content_from(session, p.org_id, body)
     iv = mm.Intervention(org_id=p.org_id, dataset_id=body.dataset_id, code=code, created_by=p.user_id, is_synthetic=p.org.is_demo)
     session.add(iv)
-    session.flush()
+    with conflict_as(session, "duplicate_code", "Интервенция с таким кодом уже есть", {"code": code}):
+        session.flush()
     v = mm.InterventionVersion(org_id=p.org_id, intervention_id=iv.id, version=1, status="draft", author_id=p.user_id,
                                content_sha256=content_hash(content), change_note="", **content)
     session.add(v)
@@ -227,7 +229,9 @@ def new_version(session: Session, p: Principal, intervention_id: str, body: S.Ne
                                author_id=p.user_id, content_sha256=content_hash(content),
                                change_note=clean_text(body.change_note, 1000), **content)
     session.add(v)
-    session.flush()
+    with conflict_as(session, "concurrent_modification", "Версию одновременно создал другой пользователь; обновите страницу",
+                     {"version": latest.version + 1}):
+        session.flush()
     _index_targets(session, v)
     audit(session, p.org_id, p.user_id, "intervention.new_version", "intervention", iv.id, version=v.version)
     session.commit()

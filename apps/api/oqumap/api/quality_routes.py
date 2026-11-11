@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Query
 
 from ..schemas import interventions as S
 from ..services import quality as svc
@@ -17,8 +19,9 @@ def _params(attempt_rule: str, omitted_policy: str) -> svc.QualityParams:
 
 @router.get("/assessments", response_model=S.AssessmentQualityList)
 def list_quality(p: P, session: DB, dataset_id: str | None = None, attempt_rule: str = "first",
-                 omitted_policy: str = "as_incorrect"):
-    return svc.list_assessments(session, p.org_id, dataset_id, _params(attempt_rule, omitted_policy), p.user_id)
+                 omitted_policy: str = "as_incorrect", limit: Annotated[int, Query(ge=1, le=200)] = 50,
+                 offset: Annotated[int, Query(ge=0)] = 0):
+    return svc.list_assessments(session, p.org_id, dataset_id, _params(attempt_rule, omitted_policy), p.user_id, limit, offset)
 
 
 @router.get("/assessments/{assessment_id}", response_model=S.AssessmentQualityOut)

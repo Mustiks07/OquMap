@@ -254,6 +254,9 @@ class AssessmentQualityList(Model):
     method_version: str
     rules: dict[str, str]
     assessments: list[AssessmentQualitySummary]
+    total: int
+    limit: int
+    offset: int
 
 
 class AssessmentItemsOut(Model):
@@ -469,6 +472,13 @@ class InterventionListItem(Model):
     accepted_synthetic_evidence: int
 
 
+class InterventionPage(Model):
+    items: list[InterventionListItem]
+    total: int
+    limit: int
+    offset: int
+
+
 class SuggestionComponent(Model):
     code: str
     points: float
@@ -668,6 +678,13 @@ class PilotListItem(Model):
     outcome_status: str | None
 
 
+class PilotPage(Model):
+    items: list[PilotListItem]
+    total: int
+    limit: int
+    offset: int
+
+
 # ---------------------------------------------------------------------------
 # Fidelity
 # ---------------------------------------------------------------------------
@@ -840,6 +857,7 @@ class PortfolioOut(Model):
     as_of: str
     dataset_id: str | None
     counts_by_status: dict[str, int]
+    learners_by_outcome_status: dict[str, Any]
     follow_ups: dict[str, Any]
     fidelity_distribution: dict[str, int]
     outcome_distribution: dict[str, int]

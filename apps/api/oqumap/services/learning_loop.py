@@ -36,9 +36,11 @@ from . import clock
 from . import interventions as ivs
 from .auth import Principal
 from .common import audit, fingerprint
-from .fidelity import DETAIL_ROLES, fidelity_for, logs_fingerprint, resolve_as_of
+from .concurrency import conflict_as
+from .fidelity import fidelity_for, logs_fingerprint, resolve_as_of
 from .measurement_messages import CAUSAL_LEVELS, FIDELITY_LABELS, STATUS_LABELS, label, render
 from .pilots import PROTOCOL_ONLY_DESIGNS, get_pilot, pilot_cohorts
+from .privacy import MIN_CELL, can_see_detail, filter_outcome_result
 
 METHOD_VERSION_LOOP = "loop-v1"
 MIN_CLUSTERS_CI = 5
@@ -416,9 +418,10 @@ def outcome_payload(session: Session, o: mm.PilotOutcome, p: Principal | None = 
     pl = session.get(mm.Pilot, o.pilot_id)
     ds = session.get(m.Dataset, pl.dataset_id)
     result = dict(o.result)
-    if p is not None and not (set(p.user.roles or []) & DETAIL_ROLES):
-        result["cohorts"] = None
-        result["cohort_detail_visible"] = False
+    if p is not None and not can_see_detail(p.user.roles):
+        result = filter_outcome_result(result)
+    else:
+        result["suppression"] = {"min_cell": MIN_CELL, "suppressed_arms": {}, "applied": False}
     return {"id": o.id, "pilot_id": o.pilot_id, "status": o.status, "status_label": label(STATUS_LABELS, o.status),
             "causal_level": label(CAUSAL_LEVELS, o.causal_level), "causal_ceiling": label(CAUSAL_LEVELS, pl.causal_ceiling),
             "fidelity": label(FIDELITY_LABELS, o.fidelity_class), "method_version": o.method_version,
@@ -499,6 +502,11 @@ def _valid_evidence_ids(session: Session, pl: mm.Pilot, ids: list[str], outcome_
     return ok
 
 
+def latest_decision(session: Session, group: str, org_id: str) -> m.Decision:
+    return session.scalar(select(m.Decision).where(m.Decision.decision_group_id == group, m.Decision.org_id == org_id)
+                          .order_by(m.Decision.version.desc()))
+
+
 def _next_decision(session: Session, p: Principal, pl: mm.Pilot, o: mm.PilotOutcome, c: mm.PilotConclusion, next_action: str) -> m.Decision:
     """Create the next version of the decision (or a first version) carrying the learning-loop record. The new
     version is a draft; approval follows the existing decision workflow."""
@@ -507,15 +515,23 @@ def _next_decision(session: Session, p: Principal, pl: mm.Pilot, o: mm.PilotOutc
     loop = {"pilot_id": pl.id, "pilot_code": pl.code, "outcome_id": o.id, "outcome_status": o.status,
             "causal_level": o.causal_level, "fidelity_class": o.fidelity_class, "conclusion_id": c.id,
             "decision": c.decision, "summary_ru": c.summary_ru, "evidence_ids": c.evidence_ids,
-            "intervention_id": pl.intervention_id, "intervention_version_id": pl.intervention_version_id}
+            "intervention_id": pl.intervention_id, "intervention_version_id": pl.intervention_version_id,
+            "intervention_code": session.get(mm.Intervention, pl.intervention_id).code,
+            "intervention_version": session.get(mm.InterventionVersion, pl.intervention_version_id).version,
+            "intervention_title_ru": (pl.intervention_snapshot or {}).get("title_ru"),
+            "design": pl.design, "causal_ceiling": pl.causal_ceiling, "outcome_as_of": (o.result or {}).get("as_of"),
+            "primary": (o.result or {}).get("primary"), "decision_basis": c.decision_basis,
+            "acknowledged_limitation_codes": c.acknowledged_limitation_codes or [], "lessons_ru": c.lessons_ru,
+            "open_questions": c.open_questions or [], "is_synthetic": pl.is_synthetic,
+            "limitations": [{k: r.get(k) for k in ("code", "severity", "message_ru", "message_kz")}
+                            for r in (o.result or {}).get("reasons", []) if r.get("severity") in ("warn", "fail")]}
     prev = session.get(m.Decision, pl.decision_id) if pl.decision_id else None
     action = next_action or {"continue": "Продолжить интервенцию по протоколу и повторить измерение.",
                              "modify": "Изменить интервенцию (новая версия) и запустить повторный пилот.",
                              "stop": "Остановить интервенцию; искать другой способ решения проблемы.",
                              "extend_data_collection": "Продолжить сбор данных до достаточного объёма."}[c.decision]
     if prev is not None:
-        latest = session.scalar(select(m.Decision).where(m.Decision.decision_group_id == prev.decision_group_id,
-                                                         m.Decision.org_id == p.org_id).order_by(m.Decision.version.desc()))
+        latest = latest_decision(session, prev.decision_group_id, p.org_id)
         snap = dict(latest.snapshot or {})
         snap["learning_loop"] = loop
         snap.setdefault("limitations", [])
@@ -538,7 +554,8 @@ def _next_decision(session: Session, p: Principal, pl: mm.Pilot, o: mm.PilotOutc
                        action=action, responsible=pl.owner or "—", follow_up_criterion="", analysis_ids=[],
                        snapshot=snap, status="draft", created_by=p.user_id)
     session.add(d)
-    session.flush()
+    with conflict_as(session, "concurrent_modification", "Новую версию решения одновременно создал другой пользователь; повторите"):
+        session.flush()  # unique(decision_group_id, version)
     audit(session, p.org_id, p.user_id, "decision.from_learning_loop", "decision", d.id, pilot_id=pl.id, conclusion_id=c.id)
     return d
 

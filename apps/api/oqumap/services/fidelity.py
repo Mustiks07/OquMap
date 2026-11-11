@@ -29,6 +29,7 @@ from . import clock
 from . import interventions as ivs
 from .auth import Principal
 from .common import audit
+from .concurrency import conflict_as
 from .measurement_messages import FIDELITY_LABELS, label, render
 from .pilots import get_pilot, pilot_cohorts
 
@@ -166,6 +167,10 @@ def logs_fingerprint(session: Session, pl: mm.Pilot) -> list[str]:
     return [r.id for r in effective_logs(session, pl)]
 
 
+def correction_exists(session: Session, log_id: str) -> bool:
+    return session.scalar(select(mm.FidelityLog.id).where(mm.FidelityLog.corrects_log_id == log_id)) is not None
+
+
 def add_log(session: Session, p: Principal, pilot_id: str, body: S.FidelityLogCreate) -> dict:
     p.require("methodist", "teacher")
     pl = get_pilot(session, p.org_id, pilot_id)
@@ -188,7 +193,7 @@ def add_log(session: Session, p: Principal, pilot_id: str, body: S.FidelityLogCr
         old = session.scalar(select(mm.FidelityLog).where(mm.FidelityLog.id == body.corrects_log_id, mm.FidelityLog.pilot_id == pl.id))
         if old is None:
             raise not_found("fidelity_log", body.corrects_log_id)
-        if session.scalar(select(mm.FidelityLog.id).where(mm.FidelityLog.corrects_log_id == old.id)):
+        if correction_exists(session, old.id):
             raise ApiError("already_corrected", "Эта запись уже исправлена; исправляйте последнюю версию", 409)
     log = mm.FidelityLog(
         org_id=p.org_id, pilot_id=pl.id, cohort_id=body.cohort_id, session_date=body.session_date,
@@ -201,7 +206,8 @@ def add_log(session: Session, p: Principal, pilot_id: str, body: S.FidelityLogCr
         disruption_note=ivs.clean_text(body.disruption_note, 1000), source=body.source, recorder_id=p.user_id,
         corrects_log_id=body.corrects_log_id)
     session.add(log)
-    session.flush()
+    with conflict_as(session, "already_corrected", "Эта запись уже исправлена; исправляйте последнюю версию"):
+        session.flush()  # unique(corrects_log_id) closes the race between two simultaneous corrections
     # audit without free-text notes (may contain personal data)
     audit(session, p.org_id, p.user_id, "fidelity.log", "pilot", pl.id, log_id=log.id, corrects=body.corrects_log_id,
           disruption=body.disruption)

@@ -221,19 +221,24 @@ def _summary(full: dict) -> dict:
 
 
 def list_assessments(session: Session, org_id: str, dataset_id: str | None, params: QualityParams,
-                     user_id: str | None = None) -> dict:
+                     user_id: str | None = None, limit: int = 50, offset: int = 0) -> dict:
+    """Page of assessments in a stable order (dataset creation, dataset id, assessment code, id). Only the requested
+    page is computed."""
     params.validate_values()
     q = select(m.Dataset).where(m.Dataset.org_id == org_id)
     if dataset_id:
         an.get_dataset(session, org_id, dataset_id)  # 404 for foreign / missing
         q = q.where(m.Dataset.id == dataset_id)
-    rows = []
-    for ds in session.scalars(q.order_by(m.Dataset.created_at)):
+    pairs = []
+    for ds in session.scalars(q.order_by(m.Dataset.created_at, m.Dataset.id)):
         for a in session.scalars(select(m.Assessment).where(m.Assessment.dataset_id == ds.id, m.Assessment.org_id == org_id)
-                                 .order_by(m.Assessment.code)):
-            rows.append(_summary(assessment_quality(session, org_id, a.id, params, user_id)) | {
-                "dataset": {"id": ds.id, "code": ds.code, "name_ru": ds.name_ru, "name_kz": ds.name_kz}})
-    return {"method_version": aq.METHOD_VERSION_QUALITY, "rules": params.model_dump(), "assessments": rows}
+                                 .order_by(m.Assessment.code, m.Assessment.id)):
+            pairs.append((ds, a))
+    rows = [_summary(assessment_quality(session, org_id, a.id, params, user_id)) | {
+        "dataset": {"id": ds.id, "code": ds.code, "name_ru": ds.name_ru, "name_kz": ds.name_kz}}
+        for ds, a in pairs[offset:offset + limit]]
+    return {"method_version": aq.METHOD_VERSION_QUALITY, "rules": params.model_dump(), "assessments": rows,
+            "total": len(pairs), "limit": limit, "offset": offset}
 
 
 def item_items(session: Session, org_id: str, assessment_id: str, params: QualityParams, user_id: str | None,

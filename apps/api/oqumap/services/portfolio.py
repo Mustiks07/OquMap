@@ -20,6 +20,23 @@ from .auth import Principal
 from .fidelity import fidelity_for, resolve_as_of
 from .measurement_messages import STATUS_LABELS, render
 from .pilots import list_pilots, pilot_cohorts
+from .privacy import MIN_CELL, can_see_detail, suppress_cells
+
+
+def _assigned_learners(session: Session, pl: mm.Pilot) -> int:
+    ids = [c.cohort_id for c in pilot_cohorts(session, pl)]
+    return int(session.query(m.Learner).filter(m.Learner.cohort_id.in_(ids)).count()) if ids else 0
+
+
+def _learner_cells(cells: dict[str, int], detail: bool) -> dict:
+    """Learners covered by pilots per outcome status. Viewers get small-cell suppression (primary + complementary,
+    because the total is shown)."""
+    total = sum(cells.values())
+    if detail:
+        return {"total": total, "cells": {k: {"value": v, "suppressed": False, "reason": None} for k, v in cells.items()},
+                "suppression_applied": False, "min_cell": MIN_CELL}
+    sup = suppress_cells(cells, MIN_CELL, total_visible=True)
+    return {"total": total, "cells": sup, "suppression_applied": any(x["suppressed"] for x in sup.values()), "min_cell": MIN_CELL}
 
 
 def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_of: date | None = None) -> dict:
@@ -32,6 +49,7 @@ def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_
     counts = {s: 0 for s in mm.PILOT_STATUSES}
     fid_dist = {k: 0 for k in ("high", "moderate", "low", "unknown")}
     out_dist = {k: 0 for k in STATUS_LABELS}
+    learners_by_outcome: dict[str, int] = {}
     due, overdue, upcoming = [], [], []
     missing, queue = [], []
     topics_cov: dict[str, dict] = {}
@@ -41,6 +59,7 @@ def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_
                                 .order_by(mm.PilotOutcome.created_at.desc()))
         if latest is not None and not latest.interim:
             out_dist[latest.status] += 1
+            learners_by_outcome[latest.status] = learners_by_outcome.get(latest.status, 0) + _assigned_learners(session, pl)
         fid = None
         if pl.status in ("active", "completed", "stopped"):
             fid = fidelity_for(session, pl, as_of)["overall"]
@@ -130,6 +149,7 @@ def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_
     return {
         "generated_at": utcnow().isoformat(), "as_of": as_of.isoformat(), "dataset_id": dataset_id,
         "counts_by_status": counts,
+        "learners_by_outcome_status": _learner_cells(learners_by_outcome, can_see_detail(p.user.roles)),
         "follow_ups": {"overdue": overdue, "due_within_14_days": due, "upcoming": upcoming},
         "fidelity_distribution": fid_dist,
         "outcome_distribution": out_dist,
