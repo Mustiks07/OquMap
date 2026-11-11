@@ -7,7 +7,7 @@ Both sets were labelled by the developer, not by an independent methodist: the n
 that labelling on a tiny corpus and are not an external benchmark.
 
 Usage: cd apps/api && uv run python ../../scripts/eval_ai_mapping.py [--live]
---live additionally evaluates the configured model provider (requires OQUMAP_LLM_PROVIDER=anthropic and a key).
+--live additionally evaluates the configured live provider (OQUMAP_LLM_PROVIDER, OQUMAP_LLM_MODEL and that provider's key).
 """
 
 import json

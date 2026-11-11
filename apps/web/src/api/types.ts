@@ -112,9 +112,16 @@ export interface SearchResult {
   relevance: { matched_terms: string[]; query_terms: string[] };
 }
 
+export interface AiCapabilities {
+  structured_output: boolean; tool_calling: boolean; parallel_tools: boolean; vision_pdf: boolean; streaming: boolean;
+  max_context_tokens: number | null; max_output_tokens: number | null; probed: boolean; notes: string[];
+}
+
 export interface AiStatus {
-  provider: string; model: string | null; live_available: boolean; fallback_modes: string[]; ocr_engine: string; ocr_available: boolean;
-  note_ru: string | null;
+  provider: string; model: string | null; mode: "live_model" | "recorded_demo" | "template"; live_available: boolean;
+  config_error: string | null; live_blocked_reason: string | null; probe_error: string | null;
+  capabilities: AiCapabilities; data_policy: string; data_policy_note_ru: string | null; real_data_allowed: boolean;
+  fallback_chain: string[]; fallback_modes: string[]; ocr_engine: string; ocr_available: boolean; note_ru: string | null;
 }
 
 export type ComparisonRequest = S["ComparisonRequest"];

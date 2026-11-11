@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { useConfig, useDatasets, useQuality } from "../api/hooks";
 import type { DatasetSummary, QualityReport } from "../api/types";
+import { AiStatusCard } from "./AiStatusCard";
 import { useI18n } from "../i18n/I18n";
 import type { DictKey } from "../i18n/dict";
 import { useAppState } from "../state/AppState";
@@ -116,6 +117,7 @@ export function QualityPage() {
     <div className="page stack">
       <div className="page-header"><h1>{t("quality.title")}</h1></div>
       {datasetId ? <QualityPanel /> : <EmptyState>{t("datasets.lead")}</EmptyState>}
+      <Card title={t("aistatus.title")}><AiStatusCard /></Card>
     </div>
   );
 }

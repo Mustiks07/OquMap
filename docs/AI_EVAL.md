@@ -18,7 +18,7 @@
 | `live_model` | — | — | не измерено | | | | |
 
 `live_model` не оценивался: в среде разработки нет ключа API. Команда для измерения после настройки ключа:
-`cd apps/api && OQUMAP_LLM_PROVIDER=anthropic OQUMAP_LLM_API_KEY=... uv run python ../../scripts/eval_ai_mapping.py --live`.
+`cd apps/api && OQUMAP_LLM_PROVIDER=<provider> OQUMAP_LLM_MODEL=<model> OQUMAP_<PROVIDER>_API_KEY=... uv run python ../../scripts/eval_ai_mapping.py --live`.
 
 ## Типичные ошибки шаблона
 Полный список — `errors` в `results.json`. Наиболее частые: смешение «сравнения» и «приведения к общему

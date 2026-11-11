@@ -77,12 +77,26 @@ cd apps/api && uv run python ../../scripts/export_openapi.py && cd ../web && npm
 
 ## Модель и OCR
 Без ключа приложение полностью работает: объяснения строятся по шаблону (`template`) или берутся из явно
-помеченных записанных примеров (`recorded_demo`). Для живой модели:
+помеченных записанных примеров (`recorded_demo`). Аналитика (оценки, сравнение, план) от модели не зависит.
+
+Слой модели провайдер-независимый: `none | recorded | gemini | openrouter | openai | anthropic`
+(адаптеры поверх HTTP API, структурированный вывод всегда проверяется сервером по JSON Schema, инструменты
+типизированы и исполняются сервером). Пример для бесплатного Gemini и **только синтетических** данных:
 ```
-OQUMAP_LLM_PROVIDER=anthropic
-OQUMAP_LLM_API_KEY=<ключ>         # только на сервере
-OQUMAP_LLM_MODEL=claude-opus-5-5
+OQUMAP_LLM_PROVIDER=gemini
+OQUMAP_LLM_MODEL=gemini-2.5-flash
+OQUMAP_GEMINI_API_KEY=<ключ>      # только на сервере; не попадает во frontend, ответы API, логи, экспорт
 ```
+Бесплатный тариф Gemini может использовать запросы для улучшения продуктов Google, поэтому UI показывает
+предупреждение, а реальные данные учеников туда не отправляются (`OQUMAP_LLM_REAL_DATA_ALLOWED=false`;
+даже при `true` политика `may_train` блокирует отправку). Для реальных данных нужен платный/договорный профиль
+или режим шаблонов. Все переменные — в `.env.example`. Проверка конфигурации и возможностей модели:
+```bash
+cd apps/api && uv run python -m oqumap.maintenance check-config && uv run python -m oqumap.maintenance probe-llm
+```
+Сравнение моделей на одинаковом синтетическом наборе задач: `uv run python ../../scripts/eval_llm_provider.py`.
+Живая модель отключена для анонимного публичного демо; квоты на роль/организацию/пользователя, потолок токенов,
+circuit breaker и резервный провайдер только по явной настройке с audit-событием.
 OCR: `OQUMAP_OCR_ENGINE=tesseract` и бинарник `tesseract` с языками rus+kaz+eng; без него страницы без
 текстового слоя помечаются, текст не выдумывается.
 
@@ -95,7 +109,7 @@ data/demo/       фикстуры, файлы для загрузки, демо-
 data/ai_eval/    результаты оценки связывания
 docs/            METHODOLOGY, API, AI_EVAL, DEMO_SCENARIO, CLAUDE_HANDOFF, исходные задания (briefs/)
 tests/e2e/       Playwright: сквозной сценарий
-scripts/         dev, reset, check, export_openapi, eval_ai_mapping, docker-entrypoint
+scripts/         dev, reset, check, export_openapi, eval_ai_mapping, eval_llm_provider, docker-entrypoint, docker_cold_start
 ```
 
 Документация: [методика](docs/METHODOLOGY.md) · [API](docs/API.md) · [демо-сценарий](docs/DEMO_SCENARIO.md) ·

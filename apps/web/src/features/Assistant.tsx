@@ -5,6 +5,7 @@ import type { AssistantAnswer } from "../api/types";
 import { useI18n } from "../i18n/I18n";
 import { useAppState } from "../state/AppState";
 import { Button, Disclosure, ErrorState, Loading, ModeBadge } from "../ui";
+import { AiStatusCard } from "./AiStatusCard";
 
 interface Msg {
   role: "user" | "bot";
@@ -52,6 +53,7 @@ export function Assistant({ onClose }: { onClose: () => void }) {
       <p className="xs muted" style={{ padding: "8px 12px", margin: 0 }}>
         {t("assistant.context", { dataset: dataset ? (lang === "kz" ? dataset.name_kz : dataset.name_ru) : "—", topic: topic ? `${topic.code} ${pick(topic, "title")}` : "—" })}
       </p>
+      <div style={{ padding: "0 12px 8px" }}><AiStatusCard /></div>
       <div className="stack" style={{ flex: 1, overflowY: "auto", padding: 12 }} aria-live="polite">
         {msgs.length === 0 && (
           <div className="stack">
