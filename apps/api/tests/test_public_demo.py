@@ -141,7 +141,12 @@ def test_login_rate_limit(public, monkeypatch):
 def test_expired_tenant_is_rejected_and_fully_removed(public):
     h, b = demo(public)
     org_id = b["user"]["org_id"]
+    # user-created artefacts (quiz with versions, sandbox analysis) must also be removed
+    ds = next(d for d in public.get("/api/v1/datasets", headers=h).json() if d["code"] == "base")
+    t3 = next(t for t in public.get("/api/v1/curriculum", params={"dataset_id": ds["id"]}, headers=h).json()["topics"] if t["code"] == "T3")
+    assert public.post("/api/v1/quizzes/generate", json={"dataset_id": ds["id"], "topic_id": t3["id"]}, headers=h).status_code == 200
     with db.session_factory()() as s:
+        assert s.scalar(select(func.count()).select_from(m.QuizVersion)) >= 1
         before = s.scalar(select(func.count()).select_from(m.Response).where(m.Response.org_id == org_id))
         assert before > 1000
         s.get(m.Organization, org_id).expires_at = utcnow() - timedelta(minutes=1)
@@ -158,6 +163,8 @@ def test_expired_tenant_is_rejected_and_fully_removed(public):
                 n = s.scalar(select(func.count()).select_from(table).where(table.c.org_id == org_id))
                 assert n == 0, table.name
         assert s.get(m.Organization, org_id) is None
+        assert s.scalar(select(func.count()).select_from(m.QuizVersion).join(m.Quiz, m.Quiz.id == m.QuizVersion.quiz_id)
+                        .where(m.Quiz.org_id == org_id)) == 0
         assert s.scalar(select(func.count()).select_from(m.Response).where(m.Response.org_id == DEMO_ORG_ID)) > 1000
 
 

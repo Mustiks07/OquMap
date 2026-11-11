@@ -209,6 +209,10 @@ def delete_org_data(session: Session, org_id: str) -> int:
         nonlocal n
         n += session.execute(stmt).rowcount or 0
 
+    quiz_ids = list(session.scalars(select(m.Quiz.id).where(m.Quiz.org_id == org_id)))
+    run(delete(_t("quiz_response_sets")).where(T("quiz_response_sets").org_id == org_id))
+    run(delete(_t("quiz_versions")).where(T("quiz_versions").quiz_id.in_(quiz_ids)))
+    run(delete(_t("quizzes")).where(T("quizzes").org_id == org_id))
     for name in ("follow_ups", "decisions", "analysis_runs", "jobs", "fragment_objectives", "ai_generations"):
         run(delete(_t(name)).where(T(name).org_id == org_id))
     run(delete(_t("plan_topic_hours")).where(T("plan_topic_hours").plan_id.in_(plan_ids)))

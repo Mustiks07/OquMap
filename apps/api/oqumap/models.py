@@ -558,3 +558,49 @@ class Job(IdMixin, TimestampMixin, Base):
 __all__ = [name for name in dir() if name[0].isupper()]
 
 _ = relationship  # relationships are intentionally explicit queries; keeps tenant scoping visible
+
+
+# ---------------------------------------------------------------------------
+# Diagnostic quizzes (formative only: never part of a final grade)
+# ---------------------------------------------------------------------------
+
+
+class Quiz(IdMixin, TimestampMixin, Base):
+    __tablename__ = "quizzes"
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), index=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("datasets.id"), index=True)
+    topic_id: Mapped[str] = mapped_column(ForeignKey("topics.id"))
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(20), default="draft")  # draft|edited|approved|rejected
+    current_version: Mapped[int] = mapped_column(Integer, default=1)
+    use: Mapped[str] = mapped_column(String(30), default="diagnostic_only")
+    source_analysis_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    generation_mode: Mapped[str] = mapped_column(String(20), default="template")
+    created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    reviewed_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(TZDateTime(), nullable=True)
+    review_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class QuizVersion(IdMixin, TimestampMixin, Base):
+    __tablename__ = "quiz_versions"
+    quiz_id: Mapped[str] = mapped_column(ForeignKey("quizzes.id"), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    items: Mapped[list] = mapped_column(JSON, default=list)
+    checks: Mapped[dict] = mapped_column(JSON, default=dict)
+    author_kind: Mapped[str] = mapped_column(String(20))  # generator|teacher
+    created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    __table_args__ = (UniqueConstraint("quiz_id", "version", name="uq_quiz_versions_quiz_version"),)
+
+
+class QuizResponseSet(IdMixin, TimestampMixin, Base):
+    __tablename__ = "quiz_response_sets"
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), index=True)
+    quiz_id: Mapped[str] = mapped_column(ForeignKey("quizzes.id"), index=True)
+    quiz_version: Mapped[int] = mapped_column(Integer)
+    decision_id: Mapped[str | None] = mapped_column(ForeignKey("decisions.id"), nullable=True)
+    n_learners: Mapped[int] = mapped_column(Integer, default=0)
+    summary: Mapped[dict] = mapped_column(JSON, default=dict)
+    file_sha256: Mapped[str] = mapped_column(String(64))
+    created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)

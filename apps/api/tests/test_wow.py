@@ -131,3 +131,70 @@ def test_sandbox_compares_scenarios_and_converts_to_decision(client, H, datasets
         "plan_analysis_id": a["plan_analysis_id"], "plan_preset": "balanced"})
     assert d.status_code == 200, d.text
     assert d.json()["snapshot"]["plan"]["analysis_id"] == a["plan_analysis_id"]
+
+
+def test_quiz_families_are_exact_and_distractors_follow_rules():
+    from fractions import Fraction
+
+    from oqumap.services import quizzes as qz
+
+    r = qz.render_frac_add({"a": 1, "b": 2, "c": 1, "d": 3})
+    by = {o["misconception"]: o["text"] for o in r["options"]}
+    assert r["key_value"] == Fraction(5, 6) and by[None] == "5/6" and by["add_across"] == "2/5" and by["numerators_not_scaled"] == "2/6"
+    r = qz.render_mixed_sub({"w1": 3, "n1": 1, "w2": 1, "n2": 3, "d": 4})
+    by = {o["misconception"]: o["text"] for o in r["options"]}
+    assert by[None] == "1 1/2" and by["ignore_fraction"] == "2"
+
+
+def test_quiz_generate_review_export_and_responses(client, H, datasets, curriculum):
+    import io
+
+    from openpyxl import load_workbook
+
+    ds = datasets["base"]["id"]
+    t3 = _topic(curriculum, "T3")
+    q = client.post("/api/v1/quizzes/generate", json={"dataset_id": ds, "topic_id": t3["id"], "n_items": 5}, headers=H)
+    assert q.status_code == 200, q.text
+    q = q.json()
+    assert q["status"] == "draft" and q["counts_toward_grade"] is False and len(q["items"]) == 5
+    assert q["checks"]["approvable"], q["checks"]["blocking_failed"]
+    for it in q["items"]:
+        assert sum(o["correct"] for o in it["options"]) == 1
+        assert all(o["rationale_ru"] for o in it["options"]) and it["evidence_ids"][0].startswith("misconception:")
+    # teacher edits the stem of Q1 → recomputed key no longer applies → approval blocked until the teacher verifies the key
+    items = [dict(i) for i in q["items"]]
+    items[0]["stem_ru"] = items[0]["stem_ru"] + " Запишите решение."
+    e = client.put(f"/api/v1/quizzes/{q['id']}", json={"items": items, "note": "уточнил формулировку"}, headers=H).json()
+    assert e["status"] == "edited" and e["current_version"] == 2 and not e["checks"]["approvable"]
+    blocked = client.post(f"/api/v1/quizzes/{q['id']}/review", json={"action": "approve"}, headers=H)
+    assert blocked.status_code == 422 and blocked.json()["error"]["code"] == "quiz_checks_failed"
+    items[0]["teacher_key_verified"] = True
+    e = client.put(f"/api/v1/quizzes/{q['id']}", json={"items": items}, headers=H).json()
+    assert e["checks"]["approvable"] and [v["version"] for v in e["versions"]] == [1, 2, 3]
+    ok = client.post(f"/api/v1/quizzes/{q['id']}/review", json={"action": "approve", "note": "ok"}, headers=H).json()
+    assert ok["status"] == "approved"
+    locked = client.put(f"/api/v1/quizzes/{q['id']}", json={"items": items}, headers=H)
+    assert locked.status_code == 409
+    pdf = client.get(f"/api/v1/quizzes/{q['id']}/export", params={"format": "pdf", "teacher": True}, headers=H)
+    assert pdf.status_code == 200 and pdf.content[:5] == b"%PDF-"
+    assert client.get(f"/api/v1/quizzes/{q['id']}/export", params={"format": "pdf"}, headers=H).content == \
+        client.get(f"/api/v1/quizzes/{q['id']}/export", params={"format": "pdf"}, headers=H).content  # deterministic
+    x = client.get(f"/api/v1/quizzes/{q['id']}/export", params={"format": "xlsx"}, headers=H)
+    wb = load_workbook(io.BytesIO(x.content))
+    assert wb["items"].max_row == 1 + sum(len(i["options"]) for i in ok["items"])
+    csv_ = client.get(f"/api/v1/quizzes/{q['id']}/export", params={"format": "csv"}, headers=H).content.decode("utf-8-sig")
+    assert csv_.splitlines()[0].startswith("code,objective")
+    # responses: one learner chooses the misconception option on Q2 twice? (one row per item) + duplicate + unknown
+    q2 = ok["items"][1]
+    wrong = next(o for o in q2["options"] if not o["correct"])
+    right = next(o for o in q2["options"] if o["correct"])
+    rows = "learner_code,item_code,response\nL1,Q2,{w}\nL2,Q2,{r}\nL1,Q2,{r}\nL3,Q9,A\n".format(w=wrong["key"], r=right["key"])
+    rs = client.post(f"/api/v1/quizzes/{q['id']}/responses", files={"file": ("r.csv", rows.encode(), "text/csv")}, headers=H).json()
+    assert rs["n_learners"] == 2 and rs["summary"]["items"]["Q2"]["p_correct"] == 0.5
+    assert rs["summary"]["hypotheses"][wrong["misconception"]]["n_learners"] == 1 and rs["summary"]["n_rejected"] == 2
+
+
+def test_quiz_for_topic_without_family_is_honest(client, H, datasets, curriculum):
+    t8 = _topic(curriculum, "T8")  # not measured: no hypotheses → no template family
+    r = client.post("/api/v1/quizzes/generate", json={"dataset_id": datasets["base"]["id"], "topic_id": t8["id"]}, headers=H)
+    assert r.status_code == 422 and r.json()["error"]["code"] == "no_template_family"

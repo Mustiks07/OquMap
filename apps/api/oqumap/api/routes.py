@@ -30,11 +30,15 @@ from ..services import (
     jobs,
     mappings,
     planning,
+    quizzes,
     ratelimit,
     reports,
     search,
 )
 from ..services.auth import Principal
+from ..services.quizzes import EditReq as QuizEditReq
+from ..services.quizzes import GenerateReq as QuizGenerateReq
+from ..services.quizzes import ReviewReq as QuizReviewReq
 from ..services.ratelimit import client_ip_var
 from ..services.sandbox import IntentRequest as IntentRequestModel
 from ..services.sandbox import SandboxRequest as SandboxRequestModel
@@ -628,6 +632,57 @@ def sandbox_run(body: SandboxRequestModel, p: P, session: DB) -> dict[str, Any]:
 
     ratelimit.check(session, "compute", p.user_id, "rate_compute")
     return sandbox.run(session, p.org_id, body, p.user_id)
+
+
+@router.post("/quizzes/generate", tags=["quizzes"])
+def quiz_generate(body: QuizGenerateReq, p: P, session: DB) -> dict[str, Any]:
+    """Diagnostic quiz (3–7 items) from the misconception hypotheses observed in a topic; starts as a draft."""
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    return quizzes.generate(session, p, body)
+
+
+@router.get("/quizzes", tags=["quizzes"])
+def quiz_list(dataset_id: str, p: P, session: DB) -> list[dict[str, Any]]:
+    an.get_dataset(session, p.org_id, dataset_id)
+    return quizzes.list_quizzes(session, p.org_id, dataset_id)
+
+
+@router.get("/quizzes/{quiz_id}", tags=["quizzes"])
+def quiz_get(quiz_id: str, p: P, session: DB) -> dict[str, Any]:
+    return quizzes.payload(session, quizzes._get(session, p.org_id, quiz_id))
+
+
+@router.put("/quizzes/{quiz_id}", tags=["quizzes"])
+def quiz_edit(quiz_id: str, body: QuizEditReq, p: P, session: DB) -> dict[str, Any]:
+    """Teacher edit → new version (status edited); checks are re-run."""
+    return quizzes.edit(session, p, quiz_id, body)
+
+
+@router.post("/quizzes/{quiz_id}/review", tags=["quizzes"])
+def quiz_review(quiz_id: str, body: QuizReviewReq, p: P, session: DB) -> dict[str, Any]:
+    return quizzes.review(session, p, quiz_id, body)
+
+
+@router.get("/quizzes/{quiz_id}/export", tags=["quizzes"])
+def quiz_export(quiz_id: str, p: P, session: DB, format: str = "pdf", lang: str = "ru", teacher: bool = False):
+    qd = quizzes.payload(session, quizzes._get(session, p.org_id, quiz_id))
+    if format == "pdf":
+        body, media = quizzes.to_pdf(qd, lang, teacher), "application/pdf"
+    elif format == "csv":
+        body, media = quizzes.to_csv(qd, lang), "text/csv; charset=utf-8"
+    elif format == "xlsx":
+        body, media = quizzes.to_xlsx(qd, lang), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    else:
+        raise ApiError("invalid_parameter", "format: pdf | csv | xlsx", 422)
+    return Response(body, media_type=media, headers={"Content-Disposition": f'attachment; filename="oqumap-quiz-{quiz_id[:8]}.{format}"'})
+
+
+@router.post("/quizzes/{quiz_id}/responses", tags=["quizzes"])
+async def quiz_responses(quiz_id: str, p: P, session: DB, file: UploadFile = File(...), decision_id: str | None = Form(None)) -> dict[str, Any]:
+    """Import diagnostic answers (learner_code,item_code,response) as a follow-up signal; never into grades."""
+    ratelimit.check(session, "import", p.org_id, "rate_import")
+    data = await file.read(get_settings().max_upload_bytes + 1)
+    return quizzes.import_responses(session, p, quiz_id, data, decision_id)
 
 
 @router.post("/decisions", response_model=S.DecisionOut, tags=["decisions"])
