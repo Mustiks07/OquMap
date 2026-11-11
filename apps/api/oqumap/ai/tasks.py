@@ -338,8 +338,9 @@ def _recommend_template(tr: dict, comp: dict | None, sources: list[dict], lang: 
     top = tr["misconceptions"][0] if tr["misconceptions"] else None
     confirmed = [x for x in sources if x["status"] == "confirmed"] or sources
     cites = [x["source_id"] for x in confirmed[:3]]
-    ref = "; ".join(f"{x['edition_code']} " + (f"с. {x['page_printed']}" if x["page_printed"] else x["anchor"])
-                    + ("" if x["status"] == "confirmed" else " (связь не подтверждена)") for x in confirmed[:3])
+    ref = "; ".join(dict.fromkeys(
+        f"{x['edition_code']} " + (f"с. {x['page_printed']}" if x["page_printed"] else x["anchor"])
+        + ("" if x["status"] == "confirmed" else " (связь не подтверждена)") for x in confirmed[:3]))
     if lang == "ru":
         problem = (f"Тема {t['code']} «{title}»: средняя доля баллов {_pct(s.get('mean'))} "
                    f"({s.get('n_learners')} уч., {s.get('n_classes')} кл.)"

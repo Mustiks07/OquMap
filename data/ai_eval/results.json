@@ -1,0 +1,346 @@
+{
+  "date": "2026-11-11",
+  "labelled_by": "developer (not an independent methodist)",
+  "template": {
+    "fragments": {
+      "n": 25,
+      "precision": 0.667,
+      "recall": 0.759,
+      "top1_accuracy": 0.64,
+      "exact_match": 0.56,
+      "no_proposal_rate": 0.04,
+      "errors": [
+        {
+          "id": "EDA:Сокращение дробей",
+          "gold": [
+            "DEMO-M6-2.1"
+          ],
+          "predicted": []
+        },
+        {
+          "id": "EDA:3/4 = 9/12, 5/6 = 10/12",
+          "gold": [
+            "DEMO-M6-2.2",
+            "DEMO-M6-2.3"
+          ],
+          "predicted": [
+            "DEMO-M6-1.2",
+            "DEMO-M6-2.2"
+          ]
+        },
+        {
+          "id": "EDA:3 1/4 − 1 3/4 = 13/4",
+          "gold": [
+            "DEMO-M6-3.2"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1"
+          ]
+        },
+        {
+          "id": "EDA:Чтобы найти дробь от числа",
+          "gold": [
+            "DEMO-M6-4.3"
+          ],
+          "predicted": [
+            "DEMO-M6-4.1",
+            "DEMO-M6-4.3"
+          ]
+        },
+        {
+          "id": "EDA:Процент — это сотая часть",
+          "gold": [
+            "DEMO-M6-5.1",
+            "DEMO-M6-7.1"
+          ],
+          "predicted": [
+            "DEMO-M6-7.1"
+          ]
+        },
+        {
+          "id": "EDA:произведение крайних членов",
+          "gold": [
+            "DEMO-M6-6.2"
+          ],
+          "predicted": [
+            "DEMO-M6-4.1",
+            "DEMO-M6-4.2"
+          ]
+        },
+        {
+          "id": "EDB:Разделим полоску на 6 равных ч",
+          "gold": [
+            "DEMO-M6-3.1"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1",
+            "DEMO-M6-3.2"
+          ]
+        },
+        {
+          "id": "EDB:Почему 1/2 + 1/3 не может быть",
+          "gold": [
+            "DEMO-M6-3.1"
+          ],
+          "predicted": [
+            "DEMO-M6-2.2",
+            "DEMO-M6-2.3"
+          ]
+        },
+        {
+          "id": "EDB:Чтобы вычислить 3 1/4 − 1 3/4",
+          "gold": [
+            "DEMO-M6-3.2"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1",
+            "DEMO-M6-3.2"
+          ]
+        },
+        {
+          "id": "EDB:Ответ 2 1/2 появляется",
+          "gold": [
+            "DEMO-M6-3.2"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1"
+          ]
+        },
+        {
+          "id": "EDB:Квадрат 10 × 10",
+          "gold": [
+            "DEMO-M6-7.1"
+          ],
+          "predicted": [
+            "DEMO-M6-4.1",
+            "DEMO-M6-7.1"
+          ]
+        }
+      ]
+    },
+    "items": {
+      "n": 52,
+      "precision": 0.7,
+      "recall": 0.712,
+      "top1_accuracy": 0.712,
+      "exact_match": 0.577,
+      "no_proposal_rate": 0.0,
+      "errors": [
+        {
+          "id": "I09",
+          "gold": [
+            "DEMO-M6-2.2"
+          ],
+          "predicted": [
+            "DEMO-M6-2.2",
+            "DEMO-M6-2.3"
+          ]
+        },
+        {
+          "id": "I12",
+          "gold": [
+            "DEMO-M6-2.2",
+            "DEMO-M6-2.3"
+          ],
+          "predicted": [
+            "DEMO-M6-2.3"
+          ]
+        },
+        {
+          "id": "I19",
+          "gold": [
+            "DEMO-M6-3.2"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1"
+          ]
+        },
+        {
+          "id": "I20",
+          "gold": [
+            "DEMO-M6-3.2"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1"
+          ]
+        },
+        {
+          "id": "I21",
+          "gold": [
+            "DEMO-M6-3.2"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1"
+          ]
+        },
+        {
+          "id": "I22",
+          "gold": [
+            "DEMO-M6-3.1",
+            "DEMO-M6-3.3"
+          ],
+          "predicted": [
+            "DEMO-M6-3.3"
+          ]
+        },
+        {
+          "id": "I23",
+          "gold": [
+            "DEMO-M6-3.1",
+            "DEMO-M6-3.3"
+          ],
+          "predicted": [
+            "DEMO-M6-3.3"
+          ]
+        },
+        {
+          "id": "I26",
+          "gold": [
+            "DEMO-M6-3.2"
+          ],
+          "predicted": [
+            "DEMO-M6-3.1"
+          ]
+        },
+        {
+          "id": "I27",
+          "gold": [
+            "DEMO-M6-3.1",
+            "DEMO-M6-3.3"
+          ],
+          "predicted": [
+            "DEMO-M6-3.3"
+          ]
+        },
+        {
+          "id": "I34",
+          "gold": [
+            "DEMO-M6-4.1",
+            "DEMO-M6-4.3"
+          ],
+          "predicted": [
+            "DEMO-M6-4.1"
+          ]
+        },
+        {
+          "id": "I36",
+          "gold": [
+            "DEMO-M6-5.1"
+          ],
+          "predicted": [
+            "DEMO-M6-2.1"
+          ]
+        },
+        {
+          "id": "I37",
+          "gold": [
+            "DEMO-M6-5.2"
+          ],
+          "predicted": [
+            "DEMO-M6-5.1"
+          ]
+        },
+        {
+          "id": "I38",
+          "gold": [
+            "DEMO-M6-5.2"
+          ],
+          "predicted": [
+            "DEMO-M6-4.1",
+            "DEMO-M6-5.1"
+          ]
+        },
+        {
+          "id": "I39",
+          "gold": [
+            "DEMO-M6-5.1"
+          ],
+          "predicted": [
+            "DEMO-M6-2.3"
+          ]
+        },
+        {
+          "id": "I40",
+          "gold": [
+            "DEMO-M6-5.2"
+          ],
+          "predicted": [
+            "DEMO-M6-4.2",
+            "DEMO-M6-5.1"
+          ]
+        },
+        {
+          "id": "I42",
+          "gold": [
+            "DEMO-M6-6.2"
+          ],
+          "predicted": [
+            "DEMO-M6-4.2",
+            "DEMO-M6-6.2"
+          ]
+        },
+        {
+          "id": "I44",
+          "gold": [
+            "DEMO-M6-6.1"
+          ],
+          "predicted": [
+            "DEMO-M6-4.2",
+            "DEMO-M6-6.1"
+          ]
+        },
+        {
+          "id": "I45",
+          "gold": [
+            "DEMO-M6-6.1",
+            "DEMO-M6-6.2"
+          ],
+          "predicted": [
+            "DEMO-M6-4.2",
+            "DEMO-M6-6.2"
+          ]
+        },
+        {
+          "id": "I49",
+          "gold": [
+            "DEMO-M6-7.2"
+          ],
+          "predicted": [
+            "DEMO-M6-7.1",
+            "DEMO-M6-7.2"
+          ]
+        },
+        {
+          "id": "I50",
+          "gold": [
+            "DEMO-M6-7.2"
+          ],
+          "predicted": [
+            "DEMO-M6-7.1",
+            "DEMO-M6-7.2"
+          ]
+        },
+        {
+          "id": "I51",
+          "gold": [
+            "DEMO-M6-5.2",
+            "DEMO-M6-7.1"
+          ],
+          "predicted": [
+            "DEMO-M6-7.1"
+          ]
+        },
+        {
+          "id": "I52",
+          "gold": [
+            "DEMO-M6-7.2"
+          ],
+          "predicted": [
+            "DEMO-M6-7.1"
+          ]
+        }
+      ]
+    }
+  },
+  "live_model": null
+}

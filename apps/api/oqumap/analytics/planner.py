@@ -348,9 +348,9 @@ def preset(problem: PlanProblem, name: str) -> PlanProblem:
 
     p = copy.deepcopy(problem)
     if name == "minimal_changes":
-        p.change_penalty = max(problem.change_penalty * 3, 0.15)
+        p.change_penalty = round(max(problem.change_penalty * 3, 0.15), 4)
     elif name == "focus_problem_topics":
-        p.change_penalty = min(problem.change_penalty / 3, 0.015)
+        p.change_penalty = round(min(problem.change_penalty / 3, 0.015), 4)
     elif name == "balanced":
         pass
     else:
