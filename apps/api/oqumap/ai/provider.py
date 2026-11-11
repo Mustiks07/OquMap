@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 import re
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 from ..config import REPO_ROOT, get_settings
@@ -236,6 +237,17 @@ def get_provider() -> Provider:
         prov, _, model = fb.partition(":")
         chain.append(build_adapter(prov, model))
     return ChainProvider(chain)
+
+
+@contextmanager
+def use_provider(p: Provider):
+    """Temporarily route AI tasks through ``p`` (operator recording command, tests)."""
+    global _provider_override
+    prev, _provider_override = _provider_override, p
+    try:
+        yield
+    finally:
+        _provider_override = prev
 
 
 def set_provider_for_tests(p: Provider | None) -> None:

@@ -2,6 +2,8 @@
 
     python -m oqumap.maintenance cleanup        # expired demo tenants, API sessions, rate-limit counters
     python -m oqumap.maintenance check-config   # exit 1 when the live LLM configuration is unusable
+    python -m oqumap.maintenance probe-llm      # ask the configured provider about the model
+    python -m oqumap.maintenance record-live    # probe → eval → council → recorded demo (docs/LIVE_RECORDING.md)
 
 The worker also runs ``cleanup`` every OQUMAP_CLEANUP_INTERVAL seconds (default 600).
 """
@@ -57,9 +59,23 @@ def probe_llm() -> int:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("command", choices=["cleanup", "check-config", "probe-llm"])
+    ap.add_argument("command", choices=["cleanup", "check-config", "probe-llm", "record-live"])
+    ap.add_argument("--topics", default="T3", help="record-live: comma-separated topic codes")
+    ap.add_argument("--langs", default="ru,kz", help="record-live: comma-separated languages")
+    ap.add_argument("--no-eval", action="store_true", help="record-live: skip the provider eval")
     a = ap.parse_args()
-    if a.command == "cleanup":
+    if a.command == "record-live":
+        from .ai.record_live import RecordingRefused, record
+
+        with session_factory()() as session:
+            try:
+                man = record(session, topics=tuple(a.topics.split(",")), langs=tuple(a.langs.split(",")), run_eval=not a.no_eval)
+            except RecordingRefused as exc:
+                print(json.dumps({"recorded": False, "refused": str(exc)}, ensure_ascii=False))
+                sys.exit(2)
+        print(json.dumps({"recorded": True, "provider": man["provider"], "model": man["model"], "files": len(man["files"]),
+                          "eval": man.get("eval")}, ensure_ascii=False))
+    elif a.command == "cleanup":
         print(json.dumps(cleanup(), ensure_ascii=False))
     elif a.command == "probe-llm":
         sys.exit(probe_llm())

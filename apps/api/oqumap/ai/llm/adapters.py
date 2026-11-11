@@ -400,8 +400,9 @@ class AnthropicProvider(LLMProvider):
 
 
 class RecordedProvider(LLMProvider):
-    """Replays outputs recorded in data/demo/recorded/llm/<key>.json (key = task + input hash). Missing key →
-    LLMError('capability'), and the caller falls back to template mode. Results are labelled recorded_demo."""
+    """Replays real live-model outputs recorded by ``scripts/record_live_demo.py`` (data/demo/recorded/llm/). Key =
+    task + input hash with database IDs normalised. Missing key → LLMError('capability'), and the caller falls back
+    to template mode. Results are labelled recorded_demo, never live_model."""
 
     name = "recorded"
     data_policy = "none"
@@ -414,14 +415,13 @@ class RecordedProvider(LLMProvider):
         return Capabilities(structured_output=True, tool_calling=False, notes=["replay of recorded outputs"])
 
     def structured(self, system: str, user: str, schema: dict, name: str = "result") -> LLMResult:
-        import hashlib
+        from .recording import replay
 
-        key = hashlib.sha256((name + "\n" + user).encode()).hexdigest()[:24]
-        p = self.dir / f"{name}-{key}.json"
-        if not p.exists():
+        got = replay(self.dir, name, user)  # key = task + input with database IDs normalised (see recording.py)
+        if got is None:
             raise LLMError("capability", "no_recording")
-        data = json.loads(p.read_text(encoding="utf-8"))
-        return LLMResult(self.name, data.get("recorded_model", "recorded"), 0, Usage(), "", self._validated(data["output"], schema))
+        data, model = got
+        return LLMResult(self.name, model, 0, Usage(), "", self._validated(data, schema))
 
     def tool_loop(self, system, user, tools, execute, max_steps=4):
         raise LLMError("capability", "recorded_provider_has_no_tool_loop")
