@@ -741,6 +741,7 @@ class PilotOutcomeOut(Model):
     current_dataset_version: int
     is_stale: bool
     interim: bool
+    as_of: str | None
     created_at: str
     result: dict[str, Any]
 

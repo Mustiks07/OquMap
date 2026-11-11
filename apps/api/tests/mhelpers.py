@@ -60,3 +60,8 @@ def intervention_body(code: str, cur: dict, **kw) -> dict:
                         {"target_type": "misconception", "misconception_code": "add_across"}]}
     body.update(kw)
     return body
+
+
+def items(payload) -> list:
+    """List endpoints return either a list (legacy) or a page {items, total, limit, offset}."""
+    return payload if isinstance(payload, list) else payload["items"]

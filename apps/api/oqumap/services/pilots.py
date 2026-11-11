@@ -24,6 +24,7 @@ from .. import models as m
 from ..db import utcnow
 from ..errors import ApiError, forbidden, not_found
 from ..schemas import interventions as S
+from . import clock
 from . import interventions as ivs
 from .auth import Principal
 from .common import audit, get_dataset
@@ -441,7 +442,7 @@ def payload(session: Session, pl: mm.Pilot, p: Principal | None = None) -> dict:
 
 
 def list_pilots(session: Session, org_id: str, dataset_id: str | None = None, status: str | None = None,
-                intervention_id: str | None = None) -> list[dict]:
+                intervention_id: str | None = None, as_of: date | None = None) -> list[dict]:
     from .fidelity import fidelity_for
 
     q = select(mm.Pilot).where(mm.Pilot.org_id == org_id)
@@ -459,7 +460,7 @@ def list_pilots(session: Session, org_id: str, dataset_id: str | None = None, st
         topic = session.get(m.Topic, pl.topic_id)
         latest = session.scalar(select(mm.PilotOutcome).where(mm.PilotOutcome.pilot_id == pl.id)
                                 .order_by(mm.PilotOutcome.created_at.desc()))
-        fid = fidelity_for(session, pl)["overall"]["classification"]["code"] if pl.status in ("active", "completed", "stopped") else None
+        fid = fidelity_for(session, pl, as_of)["overall"]["classification"]["code"] if pl.status in ("active", "completed", "stopped") else None
         out.append({"id": pl.id, "code": pl.code, "title": pl.title, "dataset_id": pl.dataset_id, "status": pl.status,
                     "design": pl.design, "intervention_id": iv.id, "intervention_code": iv.code, "intervention_version": v.version,
                     "topic_code": topic.code if topic else None,
@@ -472,4 +473,5 @@ def list_pilots(session: Session, org_id: str, dataset_id: str | None = None, st
 
 
 def today() -> date:
-    return date.today()
+    """Backward-compatible alias; use ``clock.today()``."""
+    return clock.today()

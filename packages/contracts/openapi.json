@@ -6012,6 +6012,17 @@
       "PilotOutcomeOut": {
         "additionalProperties": true,
         "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
           "causal_ceiling": {
             "$ref": "#/components/schemas/Label"
           },
@@ -6079,6 +6090,7 @@
           "current_dataset_version",
           "is_stale",
           "interim",
+          "as_of",
           "created_at",
           "result"
         ],

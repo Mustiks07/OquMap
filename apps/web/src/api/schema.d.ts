@@ -3202,6 +3202,8 @@ export interface components {
         };
         /** PilotOutcomeOut */
         PilotOutcomeOut: {
+            /** As Of */
+            as_of: string | null;
             causal_ceiling: components["schemas"]["Label"];
             causal_level: components["schemas"]["Label"];
             /** Created At */

@@ -17,13 +17,13 @@ from ..db import utcnow
 from . import analysis as an
 from . import interventions as ivs
 from .auth import Principal
-from .fidelity import fidelity_for
+from .fidelity import fidelity_for, resolve_as_of
 from .measurement_messages import STATUS_LABELS, render
-from .pilots import list_pilots, pilot_cohorts, today
+from .pilots import list_pilots, pilot_cohorts
 
 
 def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_of: date | None = None) -> dict:
-    as_of = as_of or today()
+    as_of = resolve_as_of(None, as_of)  # one date for deadlines, fidelity and the pilot list
     q = select(mm.Pilot).where(mm.Pilot.org_id == p.org_id)
     if dataset_id:
         an.get_dataset(session, p.org_id, dataset_id)
@@ -43,7 +43,7 @@ def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_
             out_dist[latest.status] += 1
         fid = None
         if pl.status in ("active", "completed", "stopped"):
-            fid = fidelity_for(session, pl)["overall"]
+            fid = fidelity_for(session, pl, as_of)["overall"]
             fid_dist[fid["classification"]["code"]] += 1
         topic = session.get(m.Topic, pl.topic_id)
         tc = topics_cov.setdefault(topic.id, {"topic_id": topic.id, "code": topic.code, "title_ru": topic.title_ru,
@@ -136,7 +136,7 @@ def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_
         "action_queue": queue,
         "best_intervention": None,
         "best_intervention_reason": "not_shown_without_comparability_and_repetition",
-        "pilots": list_pilots(session, p.org_id, dataset_id),
+        "pilots": list_pilots(session, p.org_id, dataset_id, as_of=as_of),
         "limitations": [
             {"code": "no_league_tables", "severity": "info", "params": {},
              "message_ru": "Портфель не ранжирует школы, учителей или интервенции; показываются только агрегаты по статусам.",

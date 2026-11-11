@@ -32,10 +32,11 @@ from ..db import new_id, utcnow
 from ..errors import ApiError, forbidden, not_found
 from ..schemas import interventions as S
 from . import analysis as an
+from . import clock
 from . import interventions as ivs
 from .auth import Principal
 from .common import audit, fingerprint
-from .fidelity import DETAIL_ROLES, fidelity_for, logs_fingerprint
+from .fidelity import DETAIL_ROLES, fidelity_for, logs_fingerprint, resolve_as_of
 from .measurement_messages import CAUSAL_LEVELS, FIDELITY_LABELS, STATUS_LABELS, label, render
 from .pilots import get_pilot, pilot_cohorts
 
@@ -422,7 +423,7 @@ def outcome_payload(session: Session, o: mm.PilotOutcome, p: Principal | None = 
             "causal_level": label(CAUSAL_LEVELS, o.causal_level), "causal_ceiling": label(CAUSAL_LEVELS, pl.causal_ceiling),
             "fidelity": label(FIDELITY_LABELS, o.fidelity_class), "method_version": o.method_version,
             "dataset_version": o.dataset_version, "current_dataset_version": ds.version, "is_stale": ds.version != o.dataset_version,
-            "interim": o.interim, "created_at": o.created_at.isoformat(), "result": result}
+            "interim": o.interim, "as_of": result.get("as_of"), "created_at": o.created_at.isoformat(), "result": result}
 
 
 def run_follow_up(session: Session, p: Principal, pilot_id: str, body: S.FollowUpRun) -> dict:
@@ -445,13 +446,24 @@ def run_follow_up(session: Session, p: Principal, pilot_id: str, body: S.FollowU
         audit(session, p.org_id, p.user_id, "pilot.set_outcome_assessment", "pilot", pl.id, previous=previous, new=a.id)
         session.commit()
     detail = True  # stored result keeps cohort rows; payload hides them from roles without access
-    as_of = body.as_of
+    # one effective date drives fingerprint, fidelity and the stored result (no silent reuse across dates)
+    effective_as_of = resolve_as_of(pl, body.as_of)
+    out_a = session.get(m.Assessment, pl.outcome_assessment_id) if pl.outcome_assessment_id else None
+    if body.as_of is None and out_a is not None and out_a.administered_on \
+            and out_a.administered_on > effective_as_of and out_a.administered_on <= clock.today():
+        # a pilot past its end date is usually measured after the end: the default date is the outcome measurement date
+        # (fidelity is unchanged after the end date: no sessions are expected or logged later)
+        effective_as_of = out_a.administered_on
+    if out_a is not None and out_a.administered_on and out_a.administered_on > effective_as_of:
+        raise ApiError("outcome_after_as_of", "Итоговое измерение проведено после даты расчёта", 422,
+                       {"administered_on": out_a.administered_on.isoformat(), "as_of": effective_as_of.isoformat()})
     fp = fingerprint(pl.id, pl.snapshot_sha256, pl.design, pl.analysis_plan, pl.outcome_assessment_id, ds.version,
-                     logs_fingerprint(session, pl), str(as_of or ""), pl.status == "active", METHOD_VERSION_LOOP, CODE_VERSION,
-                     sorted((c.cohort_id, c.arm) for c in pilot_cohorts(session, pl)))
+                     logs_fingerprint(session, pl), effective_as_of.isoformat(), pl.status == "active", METHOD_VERSION_LOOP,
+                     CODE_VERSION, sorted((c.cohort_id, c.arm) for c in pilot_cohorts(session, pl)))
     o = session.scalar(select(mm.PilotOutcome).where(mm.PilotOutcome.org_id == p.org_id, mm.PilotOutcome.input_fingerprint == fp))
     if o is None:
-        res = an._clean(compute_outcome(session, pl, pl.outcome_assessment_id, as_of, detail))
+        res = an._clean(compute_outcome(session, pl, pl.outcome_assessment_id, effective_as_of, detail))
+        res["as_of"] = effective_as_of.isoformat()
         o = mm.PilotOutcome(org_id=p.org_id, pilot_id=pl.id, dataset_version=ds.version, outcome_assessment_id=pl.outcome_assessment_id,
                             method_version=METHOD_VERSION_LOOP, input_fingerprint=fp, status=res["status"],
                             causal_level=res["causal_level"], fidelity_class=res["fidelity"]["classification"]["code"],

@@ -272,7 +272,12 @@ def test_stop_after_low_fidelity_requires_explaining_implementation(flow):
     assert rv.status_code == 422
 
 
-def test_portfolio_aggregates_without_league_tables(flow):
+def test_portfolio_aggregates_without_league_tables(flow, monkeypatch):
+    from datetime import date
+
+    from oqumap.services import clock
+
+    monkeypatch.setattr(clock, "today", lambda: date(2027, 1, 5))  # a date after PIL-M03's follow-up deadline
     c, H, ds, cur = flow
     r = c.get("/api/v1/portfolio/interventions", params={"dataset_id": ds["id"], "as_of": "2027-01-05"}, headers=H)
     assert r.status_code == 200

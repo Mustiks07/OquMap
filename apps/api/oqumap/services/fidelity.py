@@ -25,11 +25,12 @@ from .. import measurement_models as mm
 from .. import models as m
 from ..errors import ApiError, not_found
 from ..schemas import interventions as S
+from . import clock
 from . import interventions as ivs
 from .auth import Principal
 from .common import audit
 from .measurement_messages import FIDELITY_LABELS, label, render
-from .pilots import get_pilot, pilot_cohorts, today
+from .pilots import get_pilot, pilot_cohorts
 
 METHOD_VERSION_FIDELITY = "fidelity-v1"
 RULES = {"min_log_coverage": 0.5, "low_below": 0.5, "high_at_least": 0.8, "overall_downgrade_share": 1 / 3}
@@ -133,10 +134,21 @@ def effective_logs(session: Session, pl: mm.Pilot) -> list[mm.FidelityLog]:
 
 
 def default_as_of(pl: mm.Pilot) -> date:
-    t = today()
+    t = clock.today()
     if pl.end_date and (pl.status in ("completed",) or t > pl.end_date):
         return pl.end_date
     return t
+
+
+def resolve_as_of(pl: mm.Pilot | None, as_of: date | None) -> date:
+    """Effective analysis date: explicit ``as_of`` (never in the future — a future date would present unobserved
+    sessions/measurements as if they had happened) or the pilot default (end of a completed pilot, else today)."""
+    if as_of is not None and as_of > clock.today():
+        raise ApiError("as_of_in_future", "Дата расчёта не может быть в будущем", 422,
+                       {"as_of": as_of.isoformat(), "today": clock.today().isoformat()})
+    if as_of is not None:
+        return as_of
+    return default_as_of(pl) if pl is not None else clock.today()
 
 
 def fidelity_for(session: Session, pl: mm.Pilot, as_of: date | None = None) -> dict:
@@ -164,7 +176,7 @@ def add_log(session: Session, p: Principal, pilot_id: str, body: S.FidelityLogCr
         raise ApiError("cohort_not_in_pilot", "Класс не получает интервенцию в этом пилоте", 422, {"cohort_id": body.cohort_id})
     if (pl.start_date and body.session_date < pl.start_date) or (pl.end_date and body.session_date > pl.end_date):
         raise ApiError("date_outside_pilot", "Дата вне периода пилота", 422)
-    if body.session_date > today():
+    if body.session_date > clock.today():
         raise ApiError("date_in_future", "Нельзя записать занятие, которое ещё не прошло", 422)
     if body.learners_present is not None and body.learners_assigned is not None and body.learners_present > body.learners_assigned:
         raise ApiError("validation_error", "Присутствовало больше, чем назначено", 422, {"field": "learners_present"})
@@ -212,7 +224,7 @@ def log_payload(session: Session, r: mm.FidelityLog, users: dict | None = None, 
 
 def fidelity_payload(session: Session, p: Principal, pilot_id: str, as_of: date | None = None) -> dict:
     pl = get_pilot(session, p.org_id, pilot_id)
-    res = fidelity_for(session, pl, as_of)
+    res = fidelity_for(session, pl, resolve_as_of(pl, as_of))
     detail = bool(set(p.user.roles or []) & DETAIL_ROLES)
     cohorts = None
     logs = None
