@@ -1,0 +1,121 @@
+# CI: backend lint/tests (SQLite + PostgreSQL), OpenAPI drift, frontend typecheck/tests/build, dependency audits,
+# script line endings, Docker image build + entrypoint selfcheck + cold start + Playwright.
+# Actions are pinned to commit SHAs; caches hold only dependency downloads (no secrets, no .env).
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Shell scripts use LF and a valid shebang
+        run: |
+          bad=0
+          for f in $(git ls-files '*.sh'); do
+            if grep -q $'\r' "$f"; then echo "CRLF: $f"; bad=1; fi
+            head -n 1 "$f" | grep -Eq '^#!/(usr/bin/env (ba)?sh|bin/(ba)?sh)$' || { echo "bad shebang: $f"; bad=1; }
+          done
+          exit $bad
+      - name: No tracked build artefacts or local secrets
+        run: |
+          ! git ls-files | grep -E '(\.tsbuildinfo$|(^|/)\.env$|\.ca-tmp\.pem$|node_modules/)'
+
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: ci-only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check oqumap tests ../../scripts
+      - name: Tests (SQLite)
+        run: uv run pytest -q
+      - name: Tests (PostgreSQL)
+        env:
+          OQUMAP_TEST_DATABASE_URL: postgresql+psycopg://postgres:ci-only@localhost:5432/postgres
+        run: uv run pytest -q -p no:cacheprovider
+      - name: OpenAPI contract has no drift
+        run: uv run python ../../scripts/export_openapi.py --check
+      - name: Config diagnostics (no provider)
+        run: uv run python -m oqumap.maintenance check-config
+      - name: pip-audit (locked runtime dependencies)
+        run: uvx --from pip-audit==2.10.1 pip-audit -r requirements.lock.txt --strict
+      - name: Working tree is clean after tests
+        run: git status --porcelain && test -z "$(git status --porcelain)"
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-fund
+      - name: Generated API types match the contract
+        run: npm run gen:types && git diff --exit-code -- src/api/schema.d.ts
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=low
+      - run: npm audit --audit-level=low
+      - name: Working tree is clean
+        run: test -z "$(git status --porcelain)"
+
+  docker:
+    runs-on: ubuntu-24.04
+    needs: [hygiene, backend, frontend]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/e2e/package-lock.json
+      - name: Entrypoint selfcheck inside the built image
+        run: |
+          docker build -t oqumap-api-ci -f apps/api/Dockerfile .
+          docker run --rm --entrypoint oqumap-entrypoint oqumap-api-ci selfcheck
+      - name: Install Playwright browser
+        working-directory: tests/e2e
+        run: npm ci --no-fund && npx playwright install --with-deps chromium
+      - name: Cold start from empty volumes (x2) + Playwright
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+          OQUMAP_ADMIN_PASSWORD: ci-admin-password-123
+        run: scripts/docker_cold_start.sh 2 --e2e
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --tail 200
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: playwright-report
+          path: tests/e2e/test-results
+          retention-days: 7

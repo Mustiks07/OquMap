@@ -115,3 +115,52 @@ def test_corrupted_xlsx_is_reported(fresh_client):
     r = c.post("/api/v1/imports/validate", files={"file": ("bad.xlsx", b"PK\x03\x04garbage", "application/octet-stream")},
                data={"new_dataset_name": "bad"}, headers=H)
     assert r.status_code == 422 and r.json()["error"]["code"] == "file_unreadable"
+
+
+def test_xlsx_container_checks_reject_bombs_macros_traversal_and_fake_csv():
+    import zipfile
+
+    import pytest
+
+    from oqumap.errors import ApiError
+    from oqumap.services import imports
+
+    def zipped(members: dict[str, bytes]) -> bytes:
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+            for n, b in members.items():
+                z.writestr(n, b)
+        return buf.getvalue()
+
+    base = {"[Content_Types].xml": b"<Types/>", "xl/workbook.xml": b"<w/>"}
+    bomb = zipped({**base, "xl/worksheets/sheet1.xml": b"\0" * (5 * 1024 * 1024)})
+    macro = zipped({**base, "xl/worksheets/sheet1.xml": b"<x/>", "xl/vbaProject.bin": b"x"})
+    trav = zipped({**base, "xl/worksheets/sheet1.xml": b"<x/>", "../evil.txt": b"x"})
+    cases = [(bomb, "file_too_large"), (macro, "macros_not_allowed"), (trav, "file_unreadable"),
+             (b"not a zip at all", "unsupported_file_type"), (zipped({"a.txt": b"x"}), "unsupported_file_type")]
+    for data, code in cases:
+        with pytest.raises(ApiError) as e:
+            imports.read_table(data, "upload.xlsx")
+        assert e.value.code == code
+    with pytest.raises(ApiError) as e:
+        imports.read_table(bomb, "renamed.csv")  # binary content behind a .csv name
+    assert e.value.code == "unsupported_file_type"
+
+
+def test_xlsx_row_limit_stops_streaming(monkeypatch):
+    import pytest
+
+    from oqumap.config import get_settings
+    from oqumap.errors import ApiError
+    from oqumap.services import imports
+
+    monkeypatch.setattr(get_settings(), "max_import_rows", 10)
+    wb = Workbook()
+    ws = wb.active
+    for i in range(2000):
+        ws.append([f"L{i}", i])
+    buf = io.BytesIO()
+    wb.save(buf)
+    with pytest.raises(ApiError) as e:
+        imports.read_table(buf.getvalue(), "big.xlsx")
+    assert e.value.code == "too_many_rows"

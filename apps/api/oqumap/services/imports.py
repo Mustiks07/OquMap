@@ -13,6 +13,7 @@ import csv
 import io
 import math
 import re
+import zipfile
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date
@@ -100,6 +101,8 @@ def read_table(data: bytes, filename: str, sheet: str | None = None) -> Table:
 
 
 def _read_csv(data: bytes) -> Table:
+    if b"\x00" in data[:8192] or data[:4] == b"PK\x03\x04" or data[:5] == b"%PDF-":
+        raise ApiError("unsupported_file_type", "Файл не похож на текстовый CSV", 415)
     for enc in ("utf-8-sig", "cp1251"):
         try:
             text = data.decode(enc)
@@ -124,9 +127,39 @@ def _read_csv(data: bytes) -> Table:
     return Table(headers, body)
 
 
+MAX_XLSX_UNCOMPRESSED = 80 * 1024 * 1024
+MAX_XLSX_RATIO = 150  # uncompressed/compressed per member; real sheets stay far below this
+MAX_XLSX_MEMBERS = 2000
+MAX_COLUMNS = 200
+
+
+def _preflight_xlsx(data: bytes) -> None:
+    """Zip-bomb and container checks before openpyxl touches the file."""
+    if data[:4] != b"PK\x03\x04":
+        raise ApiError("unsupported_file_type", "Файл не является XLSX (неверная сигнатура)", 415)
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            infos = z.infolist()
+    except zipfile.BadZipFile:
+        raise ApiError("file_unreadable", "Файл XLSX повреждён", 422) from None
+    names = [i.filename for i in infos]
+    if "[Content_Types].xml" not in names or not any(n.startswith("xl/worksheets/") for n in names):
+        raise ApiError("unsupported_file_type", "Это не книга XLSX", 415)
+    if any(n.lower().endswith("vbaproject.bin") for n in names):
+        raise ApiError("macros_not_allowed", "Книги с макросами не принимаются", 415)
+    if len(infos) > MAX_XLSX_MEMBERS or any(n.startswith("/") or ".." in n.split("/") for n in names):
+        raise ApiError("file_unreadable", "Недопустимая структура архива XLSX", 422)
+    total = sum(i.file_size for i in infos)
+    if total > MAX_XLSX_UNCOMPRESSED or any(i.compress_size and i.file_size / i.compress_size > MAX_XLSX_RATIO
+                                            and i.file_size > 1024 * 1024 for i in infos):
+        raise ApiError("file_too_large", "Распакованная книга слишком велика (возможна zip-бомба)", 413,
+                       {"max_uncompressed_bytes": MAX_XLSX_UNCOMPRESSED})
+
+
 def _read_xlsx(data: bytes, sheet: str | None) -> Table:
     from openpyxl import load_workbook
 
+    _preflight_xlsx(data)
     try:
         # data_only=False: a formula cell is read as its formula text (e.g. "=1+1") and then rejected by
         # validation; formulas are never evaluated and cached results are not trusted. Macros never run.
@@ -140,8 +173,12 @@ def _read_xlsx(data: bytes, sheet: str | None) -> Table:
         raise ApiError("unknown_sheet", "Лист не найден", 422, {"sheet": target, "sheets": sheets})
     ws = wb[target]
     rows = []
-    for row in ws.iter_rows(values_only=True):
+    limit = get_settings().max_import_rows + 1
+    for row in ws.iter_rows(values_only=True, max_col=MAX_COLUMNS):
         rows.append(["" if v is None else _cell_str(v) for v in row])
+        if len(rows) > limit + 1000:  # stop streaming early (margin for trailing blank rows)
+            wb.close()
+            _check_rows(len(rows))
     wb.close()
     while rows and not any(c.strip() for c in rows[-1]):
         rows.pop()
@@ -466,7 +503,8 @@ def _available_analysis(kind: str, accepted: list[RowResult], dataset: m.Dataset
 
 def store_upload(org_id: str, data: bytes, filename: str) -> tuple[str, str]:
     digest = sha256_bytes(data)
-    ext = Path(filename).suffix.lower()[:6] or ".bin"
+    ext = Path(filename).suffix.lower()
+    ext = ext if ext in (".csv", ".txt", ".xlsx") else ".bin"
     root = get_settings().storage_dir / "imports" / org_id
     root.mkdir(parents=True, exist_ok=True)
     path = root / f"{digest}{ext}"  # never use the user-provided name in the path
