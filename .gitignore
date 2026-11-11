@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Node
+node_modules/
+dist/
+apps/web/test-results/
+apps/web/playwright-report/
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+# Runtime data
+storage/
+*.sqlite
+*.db
+.env
+# Generated bulk demo data (regenerated deterministically by the seed)
+data/demo/generated/
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

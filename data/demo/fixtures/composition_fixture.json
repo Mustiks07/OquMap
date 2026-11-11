@@ -1,0 +1,15 @@
+{
+  "fixture_id": "composition-illustration-v1",
+  "is_synthetic": true,
+  "purpose": "Учебная иллюстрация стандартизации по составу групп. Не доказательство причинности и не корпус для доверительных интервалов.",
+  "outcome": "Прохождение одной и той же диагностической проверки (1 = прошёл, 0 = не прошёл).",
+  "strata_definition": "Уровень до обучения определён по входной проверке до изучения материала.",
+  "strata_scheme": "pre_two_level",
+  "cells": [
+    {"arm": "A", "stratum": "high", "passed": 144, "total": 180},
+    {"arm": "A", "stratum": "low",  "passed": 8,   "total": 20},
+    {"arm": "B", "stratum": "high", "passed": 18,  "total": 20},
+    {"arm": "B", "stratum": "low",  "passed": 108, "total": 180}
+  ],
+  "standard_weights": {"high": 0.5, "low": 0.5}
+}
