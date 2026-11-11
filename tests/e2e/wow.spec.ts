@@ -45,7 +45,7 @@ test("demo in 3 minutes: preflight and seven read-only screens", async ({ page }
   const before = await page.evaluate(() => localStorage.getItem("oqumap.token"));
   await page.getByTestId("tour-reset").click();
   await expect(page.getByTestId("tour-step-1")).toHaveAttribute("aria-current", "step");
-  expect(await page.evaluate(() => localStorage.getItem("oqumap.token"))).not.toBe(before);
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("oqumap.token")), { timeout: 60_000 }).not.toBe(before);
   expect(errors).toEqual([]);
 });
 

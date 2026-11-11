@@ -45,12 +45,22 @@ export function TourPage() {
     try { sessionStorage.setItem(KEY, String(step)); } catch { /* ignore */ }
   }, [step]);
   useEffect(() => {
+    // A reset replaces the disposable organisation without leaving this route.
+    // Reconcile the local step with the value reset before that identity change.
+    setStep(readStep());
+  }, [st.user?.org_id]);
+  useEffect(() => {
     if (pf.data?.topic_id && pf.data.topic_id !== st.topicId) st.setTopicId(pf.data.topic_id);
   }, [pf.data, st]);
 
   async function reset() {
     setResetting(true);
     try {
+      // Reset persisted presentation state before replacing the disposable user.
+      // setUser can remount this page, and the new instance must not read the old
+      // final step from sessionStorage during that remount.
+      try { sessionStorage.setItem(KEY, "0"); } catch { /* ignore */ }
+      setStep(0);
       if (st.user?.org_is_ephemeral) {
         // a fresh disposable tenant: identical starting data, nothing left from the previous run
         const r = await api.post<LoginResponse>("/api/v1/auth/demo-login", { persona: "methodist" });
