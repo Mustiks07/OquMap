@@ -1,0 +1,4 @@
+pilot_id,intervention_id,class_codes,start_date,end_date,baseline_assessment,followup_assessment,design,is_synthetic
+JURY-PILOT-A,JURY-INT-M2,JURY-S01-61;JURY-S02-62,2026-10-13,2026-11-02,JURY-POST-2026,JURY-FOLLOWUP-2026,nonrandomized_within_group,true
+JURY-PILOT-B,JURY-INT-M2,JURY-S03-61;JURY-S04-62,2026-10-13,2026-11-02,JURY-POST-2026,JURY-FOLLOWUP-2026,nonrandomized_within_group,true
+JURY-PILOT-C,JURY-INT-M2,JURY-S05-61;JURY-S06-62,2026-10-13,2026-11-02,JURY-POST-2026,JURY-FOLLOWUP-2026,nonrandomized_within_group,true

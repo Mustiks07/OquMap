@@ -1,0 +1,96 @@
+{
+  "algorithm": "Python random MT19937; independent roster and response streams; see generator source",
+  "base_commit": "9cac9a267b23a704dab514b40a662dc68fec0769",
+  "counts": {
+    "absence_rows": 55,
+    "assessments": 3,
+    "classes": 16,
+    "forms": 3,
+    "import_response_file_rows": 46129,
+    "items": 42,
+    "learners": 384,
+    "objectives": 18,
+    "response_rows": 46074,
+    "schools": 8,
+    "topics": 6
+  },
+  "dataset_name": "OquMap Jury - Математика 6 (synthetic)",
+  "files": {
+    "1_program.csv": {
+      "bytes": 6240,
+      "sha256": "42787aeda00d441bfa97ae6eb331616c587541ba7bdf498335161ac905a0fbc0"
+    },
+    "2_editions.csv": {
+      "bytes": 422,
+      "sha256": "43c42ac91283141747d2ea9dcbdad1b5c899c13764694504b6bcaebd35e33d5d"
+    },
+    "3_item_bank.csv": {
+      "bytes": 36603,
+      "sha256": "d1371031a4d025abbfcb6662d95ef9ad7906428e5b4060d548be225a3f205605"
+    },
+    "4_roster.csv": {
+      "bytes": 46207,
+      "sha256": "248017dee12749469886dfcb168c105905581c7703adb8e478656d55fb27933a"
+    },
+    "5_responses.csv": {
+      "bytes": 3240155,
+      "sha256": "07a35ab762e96bf0bdc68721d57f0b9cddb39688561854d2cfcac52bf3426633"
+    },
+    "6_interventions.csv": {
+      "bytes": 232,
+      "sha256": "78230dc70fcad4e00bb53c6771585ff9faa6da45c3ac62c60af11ab5bbf4a3b0"
+    },
+    "7_pilots.csv": {
+      "bytes": 528,
+      "sha256": "5ae7e3bd6ba09d639bd27932d3a62870555592ad3d5b262f10a3d2fc9fde57d6"
+    },
+    "8_fidelity_logs.csv": {
+      "bytes": 1199,
+      "sha256": "6fe69358e9939889896e1daa7e419199db1218ece9e2111d6f224839cc05baa7"
+    },
+    "9_followups.csv": {
+      "bytes": 12188,
+      "sha256": "5f9961ea359de6967cba6b8ea5f22ea90f3f766fd7968cfac4d014e3ed9b3252"
+    },
+    "DATA_DICTIONARY.md": {
+      "bytes": 14024,
+      "sha256": "ccedb6f16f84bff3fce87e26e1a5d63fbe39fb34cab0ecc8a1239f2818471281"
+    },
+    "README.md": {
+      "bytes": 15788,
+      "sha256": "f48840338555e9ea2a9188c58cd6a61335a13345c8c0755a3a9ae446cf145b8f"
+    },
+    "expected_findings.json": {
+      "bytes": 889,
+      "sha256": "3de69652b94beffe34a3ffc481cc8b74ce35bb31abca00066fc07561fd49b39a"
+    },
+    "item_math.json": {
+      "bytes": 41069,
+      "sha256": "00d9602f5580216fed524fe731601ae8750e62b22c357ea7b1d2eb866debd403"
+    },
+    "material_mappings.json": {
+      "bytes": 19457,
+      "sha256": "205cb6118c162741fccde5ca69642a7ae3c53cae9b297c685acad1a472dd82ef"
+    },
+    "materials/exercises.json": {
+      "bytes": 60350,
+      "sha256": "8d17163dcf55f69fe5740ead113ffe372ba8ad6cffba4961bf5b634297e29671"
+    },
+    "materials/textbook_A.pdf": {
+      "bytes": 90759,
+      "sha256": "631792f1c2833e2b02a80e4f4648cdd3cc3720b3c92f781950cbe17d4269007f"
+    },
+    "materials/textbook_B.pdf": {
+      "bytes": 90372,
+      "sha256": "604436271e698f7519cc5b6c3574b3932b0df868fa946d2f3a28d312fd7716ac"
+    },
+    "misconceptions.json": {
+      "bytes": 741,
+      "sha256": "58f24bff283bdded06709c3a243764cb78b7ac6fa503009fad7af4d9f44f7fc6"
+    }
+  },
+  "font_sha256": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+  "is_synthetic": true,
+  "kz_note": "KZ: перевод не проверен носителем языка",
+  "seed": 20261111
+}

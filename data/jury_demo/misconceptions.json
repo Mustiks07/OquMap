@@ -1,0 +1,26 @@
+{
+  "CALC": {
+    "backend_code": "calc_error",
+    "label_ru": "Ошибка выбора действия или вычисления"
+  },
+  "M1": {
+    "backend_code": "add_across",
+    "label_ru": "Складывание знаменателей"
+  },
+  "M2": {
+    "backend_code": "numerators_not_scaled",
+    "label_ru": "Неверное приведение к общему знаменателю"
+  },
+  "M3": {
+    "backend_code": "sign_lost",
+    "label_ru": "Потеря знака"
+  },
+  "M4": {
+    "backend_code": "order_error",
+    "label_ru": "Ошибка порядка действий"
+  },
+  "M5": {
+    "backend_code": "area_perimeter",
+    "label_ru": "Путаница площади и периметра"
+  }
+}

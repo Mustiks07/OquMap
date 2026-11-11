@@ -1,0 +1,842 @@
+[
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I01",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I02",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I03",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I04",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I05",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 6,
+    "page_printed": "6",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I06",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 7,
+    "page_printed": "7",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I07",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 8,
+    "page_printed": "8",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I08",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 3,
+    "page_printed": "3",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I09",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 3,
+    "page_printed": "3",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I10",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 3,
+    "page_printed": "3",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I11",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 4,
+    "page_printed": "4",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I12",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 5,
+    "page_printed": "5",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I13",
+    "objective_code": "6.3.1",
+    "origin": "human_fixture",
+    "page_physical": 11,
+    "page_printed": "11",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I14",
+    "objective_code": "6.3.1",
+    "origin": "human_fixture",
+    "page_physical": 11,
+    "page_printed": "11",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I15",
+    "objective_code": "6.3.2",
+    "origin": "human_fixture",
+    "page_physical": 12,
+    "page_printed": "12",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I16",
+    "objective_code": "6.3.2",
+    "origin": "human_fixture",
+    "page_physical": 13,
+    "page_printed": "13",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I17",
+    "objective_code": "6.3.3",
+    "origin": "human_fixture",
+    "page_physical": 14,
+    "page_printed": "14",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I18",
+    "objective_code": "6.3.3",
+    "origin": "human_fixture",
+    "page_physical": 11,
+    "page_printed": "11",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I19",
+    "objective_code": "6.4.1",
+    "origin": "human_fixture",
+    "page_physical": 22,
+    "page_printed": "22",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I20",
+    "objective_code": "6.4.1",
+    "origin": "human_fixture",
+    "page_physical": 19,
+    "page_printed": "19",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I21",
+    "objective_code": "6.4.2",
+    "origin": "human_fixture",
+    "page_physical": 19,
+    "page_printed": "19",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I22",
+    "objective_code": "6.4.2",
+    "origin": "human_fixture",
+    "page_physical": 19,
+    "page_printed": "19",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I23",
+    "objective_code": "6.4.3",
+    "origin": "human_fixture",
+    "page_physical": 20,
+    "page_printed": "20",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I24",
+    "objective_code": "6.4.3",
+    "origin": "human_fixture",
+    "page_physical": 21,
+    "page_printed": "21",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I25",
+    "objective_code": "6.5.1",
+    "origin": "human_fixture",
+    "page_physical": 28,
+    "page_printed": "28",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I26",
+    "objective_code": "6.5.1",
+    "origin": "human_fixture",
+    "page_physical": 29,
+    "page_printed": "29",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I27",
+    "objective_code": "6.5.2",
+    "origin": "human_fixture",
+    "page_physical": 30,
+    "page_printed": "30",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I28",
+    "objective_code": "6.5.2",
+    "origin": "human_fixture",
+    "page_physical": 27,
+    "page_printed": "27",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I29",
+    "objective_code": "6.5.3",
+    "origin": "human_fixture",
+    "page_physical": 27,
+    "page_printed": "27",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I30",
+    "objective_code": "6.5.3",
+    "origin": "human_fixture",
+    "page_physical": 27,
+    "page_printed": "27",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I31",
+    "objective_code": "6.6.1",
+    "origin": "human_fixture",
+    "page_physical": 35,
+    "page_printed": "35",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I32",
+    "objective_code": "6.6.1",
+    "origin": "human_fixture",
+    "page_physical": 35,
+    "page_printed": "35",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I33",
+    "objective_code": "6.6.2",
+    "origin": "human_fixture",
+    "page_physical": 36,
+    "page_printed": "36",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I34",
+    "objective_code": "6.6.2",
+    "origin": "human_fixture",
+    "page_physical": 37,
+    "page_printed": "37",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I35",
+    "objective_code": "6.6.3",
+    "origin": "human_fixture",
+    "page_physical": 38,
+    "page_printed": "38",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I36",
+    "objective_code": "6.6.3",
+    "origin": "human_fixture",
+    "page_physical": 35,
+    "page_printed": "35",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I37",
+    "objective_code": "6.7.1",
+    "origin": "human_fixture",
+    "page_physical": 46,
+    "page_printed": "46",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I38",
+    "objective_code": "6.7.1",
+    "origin": "human_fixture",
+    "page_physical": 43,
+    "page_printed": "43",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I39",
+    "objective_code": "6.7.2",
+    "origin": "human_fixture",
+    "page_physical": 43,
+    "page_printed": "43",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I40",
+    "objective_code": "6.7.2",
+    "origin": "human_fixture",
+    "page_physical": 43,
+    "page_printed": "43",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I41",
+    "objective_code": "6.7.3",
+    "origin": "human_fixture",
+    "page_physical": 44,
+    "page_printed": "44",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-A",
+    "item_code": "JURY-I42",
+    "objective_code": "6.7.3",
+    "origin": "human_fixture",
+    "page_physical": 45,
+    "page_printed": "45",
+    "role": "practices",
+    "status": "proposed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I01",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I02",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I03",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I04",
+    "objective_code": "6.2.1",
+    "origin": "human_fixture",
+    "page_physical": 47,
+    "page_printed": "47",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I05",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 6,
+    "page_printed": "6",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I06",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 7,
+    "page_printed": "7",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I07",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 8,
+    "page_printed": "8",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I08",
+    "objective_code": "6.2.2",
+    "origin": "human_fixture",
+    "page_physical": 3,
+    "page_printed": "3",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I09",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 3,
+    "page_printed": "3",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I10",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 3,
+    "page_printed": "3",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I11",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 4,
+    "page_printed": "4",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I12",
+    "objective_code": "6.2.3",
+    "origin": "human_fixture",
+    "page_physical": 5,
+    "page_printed": "5",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I13",
+    "objective_code": "6.3.1",
+    "origin": "human_fixture",
+    "page_physical": 11,
+    "page_printed": "11",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I14",
+    "objective_code": "6.3.1",
+    "origin": "human_fixture",
+    "page_physical": 11,
+    "page_printed": "11",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I15",
+    "objective_code": "6.3.2",
+    "origin": "human_fixture",
+    "page_physical": 12,
+    "page_printed": "12",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I16",
+    "objective_code": "6.3.2",
+    "origin": "human_fixture",
+    "page_physical": 13,
+    "page_printed": "13",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I17",
+    "objective_code": "6.3.3",
+    "origin": "human_fixture",
+    "page_physical": 14,
+    "page_printed": "14",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I18",
+    "objective_code": "6.3.3",
+    "origin": "human_fixture",
+    "page_physical": 11,
+    "page_printed": "11",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I19",
+    "objective_code": "6.4.1",
+    "origin": "human_fixture",
+    "page_physical": 22,
+    "page_printed": "22",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I20",
+    "objective_code": "6.4.1",
+    "origin": "human_fixture",
+    "page_physical": 19,
+    "page_printed": "19",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I21",
+    "objective_code": "6.4.2",
+    "origin": "human_fixture",
+    "page_physical": 19,
+    "page_printed": "19",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I22",
+    "objective_code": "6.4.2",
+    "origin": "human_fixture",
+    "page_physical": 19,
+    "page_printed": "19",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I23",
+    "objective_code": "6.4.3",
+    "origin": "human_fixture",
+    "page_physical": 20,
+    "page_printed": "20",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I24",
+    "objective_code": "6.4.3",
+    "origin": "human_fixture",
+    "page_physical": 21,
+    "page_printed": "21",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I25",
+    "objective_code": "6.5.1",
+    "origin": "human_fixture",
+    "page_physical": 28,
+    "page_printed": "28",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I26",
+    "objective_code": "6.5.1",
+    "origin": "human_fixture",
+    "page_physical": 29,
+    "page_printed": "29",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I27",
+    "objective_code": "6.5.2",
+    "origin": "human_fixture",
+    "page_physical": 30,
+    "page_printed": "30",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I28",
+    "objective_code": "6.5.2",
+    "origin": "human_fixture",
+    "page_physical": 27,
+    "page_printed": "27",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I29",
+    "objective_code": "6.5.3",
+    "origin": "human_fixture",
+    "page_physical": 27,
+    "page_printed": "27",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I30",
+    "objective_code": "6.5.3",
+    "origin": "human_fixture",
+    "page_physical": 27,
+    "page_printed": "27",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I31",
+    "objective_code": "6.6.1",
+    "origin": "human_fixture",
+    "page_physical": 35,
+    "page_printed": "35",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I32",
+    "objective_code": "6.6.1",
+    "origin": "human_fixture",
+    "page_physical": 35,
+    "page_printed": "35",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I33",
+    "objective_code": "6.6.2",
+    "origin": "human_fixture",
+    "page_physical": 36,
+    "page_printed": "36",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I34",
+    "objective_code": "6.6.2",
+    "origin": "human_fixture",
+    "page_physical": 37,
+    "page_printed": "37",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I35",
+    "objective_code": "6.6.3",
+    "origin": "human_fixture",
+    "page_physical": 38,
+    "page_printed": "38",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I36",
+    "objective_code": "6.6.3",
+    "origin": "human_fixture",
+    "page_physical": 35,
+    "page_printed": "35",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I37",
+    "objective_code": "6.7.1",
+    "origin": "human_fixture",
+    "page_physical": 46,
+    "page_printed": "46",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I38",
+    "objective_code": "6.7.1",
+    "origin": "human_fixture",
+    "page_physical": 43,
+    "page_printed": "43",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I39",
+    "objective_code": "6.7.2",
+    "origin": "human_fixture",
+    "page_physical": 43,
+    "page_printed": "43",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I40",
+    "objective_code": "6.7.2",
+    "origin": "human_fixture",
+    "page_physical": 43,
+    "page_printed": "43",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I41",
+    "objective_code": "6.7.3",
+    "origin": "human_fixture",
+    "page_physical": 44,
+    "page_printed": "44",
+    "role": "practices",
+    "status": "confirmed"
+  },
+  {
+    "edition_code": "JURY-B",
+    "item_code": "JURY-I42",
+    "objective_code": "6.7.3",
+    "origin": "human_fixture",
+    "page_physical": 45,
+    "page_printed": "45",
+    "role": "practices",
+    "status": "proposed"
+  }
+]

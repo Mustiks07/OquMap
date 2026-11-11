@@ -1,0 +1,52 @@
+{
+  "adjusted_A_minus_B": [
+    0.03,
+    0.07
+  ],
+  "comparison": {
+    "api_difference": "B minus A; negate to report A minus B",
+    "strata_scheme": "pre_three_level",
+    "weight_mode": "pooled"
+  },
+  "filters": {
+    "aggregation": "learner",
+    "attempt_rule": "first",
+    "mapping_status": "confirmed_only",
+    "omitted_policy": "as_incorrect",
+    "outcome_stage": "post"
+  },
+  "fractions_mean": [
+    0.59,
+    0.65
+  ],
+  "is_synthetic": true,
+  "pilots": {
+    "A": {
+      "gain": [
+        0.08,
+        0.12
+      ],
+      "status": "positive_signal"
+    },
+    "B": {
+      "gain": [
+        -0.05,
+        0.05
+      ],
+      "status": "invalid_due_to_fidelity"
+    },
+    "C": {
+      "status": "needs_more_data"
+    }
+  },
+  "raw_A_minus_B": [
+    -0.07,
+    -0.04
+  ],
+  "seed": 20261111,
+  "target_mean": [
+    0.43,
+    0.5
+  ],
+  "target_objective": "6.2.1"
+}

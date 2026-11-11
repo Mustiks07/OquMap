@@ -1,0 +1,3721 @@
+[
+  {
+    "answer": "3/5",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 3,
+    "params": [
+      "7/12",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/5",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 3,
+    "params": [
+      "2/3",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/14",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 3,
+    "params": [
+      "3/4",
+      "2/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/5",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 4,
+    "params": [
+      "2/3",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/14",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 4,
+    "params": [
+      "3/4",
+      "2/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/6",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 4,
+    "params": [
+      "4/9",
+      "3/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/14",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 5,
+    "params": [
+      "3/4",
+      "2/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/6",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 5,
+    "params": [
+      "4/9",
+      "3/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/3",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 5,
+    "params": [
+      "5/6",
+      "2/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/6",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 6,
+    "params": [
+      "4/9",
+      "3/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/3",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 6,
+    "params": [
+      "5/6",
+      "2/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/7",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 6,
+    "params": [
+      "2/5",
+      "3/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/3",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 7,
+    "params": [
+      "5/6",
+      "2/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/7",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 7,
+    "params": [
+      "2/5",
+      "3/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/2",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 7,
+    "params": [
+      "3/8",
+      "1/2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/7",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 8,
+    "params": [
+      "2/5",
+      "3/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/2",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 8,
+    "params": [
+      "3/8",
+      "1/2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/3",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 8,
+    "params": [
+      "5/9",
+      "2/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/2",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 9,
+    "params": [
+      "3/8",
+      "1/2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/3",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 9,
+    "params": [
+      "5/9",
+      "2/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/5",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 9,
+    "params": [
+      "7/12",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/3",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 10,
+    "params": [
+      "5/9",
+      "2/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/5",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 10,
+    "params": [
+      "7/12",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/5",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 10,
+    "params": [
+      "2/3",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 11,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 11,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 11,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 12,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 12,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 12,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 13,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 13,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-3/10",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 13,
+    "params": [
+      "1/2",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 14,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-3/10",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 14,
+    "params": [
+      "1/2",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "9/20",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 14,
+    "params": [
+      "1/2",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-3/10",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 15,
+    "params": [
+      "1/2",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "9/20",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 15,
+    "params": [
+      "1/2",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 15,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "9/20",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 16,
+    "params": [
+      "1/2",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 16,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 16,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 17,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 17,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 17,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 18,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 18,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 18,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 19,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 19,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 19,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 20,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 20,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 20,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 21,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 21,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 21,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 22,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 22,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 22,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 23,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 23,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 23,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 24,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 24,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 24,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 25,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 25,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 25,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 26,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 26,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 26,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 27,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 27,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 27,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 28,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 28,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 28,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 29,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 29,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-11",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 29,
+    "params": [
+      "-4",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 30,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-11",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 30,
+    "params": [
+      "-4",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "4",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 30,
+    "params": [
+      "-4",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-11",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 31,
+    "params": [
+      "-4",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "4",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 31,
+    "params": [
+      "-4",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 31,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "4",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 32,
+    "params": [
+      "-4",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 32,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 32,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 33,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 33,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 33,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 34,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 34,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 34,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 35,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 35,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 35,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 36,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 36,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 36,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 37,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 37,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 37,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 38,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 38,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "23",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 38,
+    "params": [
+      "5",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 39,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "23",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 39,
+    "params": [
+      "5",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 39,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "23",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 40,
+    "params": [
+      "5",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 40,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 40,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 41,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 41,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 41,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 42,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 42,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 42,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "28",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.7.1",
+    "op": "area",
+    "page": 43,
+    "params": [
+      "4",
+      "7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 43,
+    "params": [
+      "4",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "26",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 43,
+    "params": [
+      "5",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 44,
+    "params": [
+      "4",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "26",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 44,
+    "params": [
+      "5",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 44,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "26",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 45,
+    "params": [
+      "5",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 45,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 45,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 46,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 46,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "21",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.7.1",
+    "op": "area",
+    "page": 46,
+    "params": [
+      "3",
+      "7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/15",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "2/5",
+      "1/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/4",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "3/6",
+      "1/4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/35",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "4/7",
+      "1/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "19/24",
+    "edition_code": "JURY-A",
+    "number": 4,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "5/8",
+      "1/6"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/21",
+    "edition_code": "JURY-A",
+    "number": 5,
+    "objective_code": "6.2.1",
+    "op": "sub",
+    "page": 47,
+    "params": [
+      "6/9",
+      "1/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "23/40",
+    "edition_code": "JURY-A",
+    "number": 6,
+    "objective_code": "6.2.1",
+    "op": "sub",
+    "page": 47,
+    "params": [
+      "7/10",
+      "1/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "61/99",
+    "edition_code": "JURY-A",
+    "number": 7,
+    "objective_code": "6.2.1",
+    "op": "sub",
+    "page": 47,
+    "params": [
+      "8/11",
+      "1/9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "13/20",
+    "edition_code": "JURY-A",
+    "number": 8,
+    "objective_code": "6.2.1",
+    "op": "sub",
+    "page": 47,
+    "params": [
+      "9/12",
+      "1/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "97/143",
+    "edition_code": "JURY-A",
+    "number": 9,
+    "objective_code": "6.2.1",
+    "op": "sub",
+    "page": 47,
+    "params": [
+      "10/13",
+      "1/11"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "59/84",
+    "edition_code": "JURY-A",
+    "number": 10,
+    "objective_code": "6.2.1",
+    "op": "sub",
+    "page": 47,
+    "params": [
+      "11/14",
+      "1/12"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 1,
+    "objective_code": "6.2.1",
+    "op": "mul",
+    "page": 48,
+    "params": [
+      "1/2",
+      6
+    ],
+    "role": "denominator_drill"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 2,
+    "objective_code": "6.2.1",
+    "op": "mul",
+    "page": 48,
+    "params": [
+      "1/3",
+      9
+    ],
+    "role": "denominator_drill"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 3,
+    "objective_code": "6.2.1",
+    "op": "mul",
+    "page": 48,
+    "params": [
+      "1/4",
+      12
+    ],
+    "role": "denominator_drill"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-A",
+    "number": 4,
+    "objective_code": "6.2.1",
+    "op": "mul",
+    "page": 48,
+    "params": [
+      "1/5",
+      15
+    ],
+    "role": "denominator_drill"
+  },
+  {
+    "answer": "3/5",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 3,
+    "params": [
+      "7/12",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/5",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 3,
+    "params": [
+      "2/3",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/14",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 3,
+    "params": [
+      "3/4",
+      "2/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/5",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 4,
+    "params": [
+      "2/3",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/14",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 4,
+    "params": [
+      "3/4",
+      "2/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/6",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 4,
+    "params": [
+      "4/9",
+      "3/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/14",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 5,
+    "params": [
+      "3/4",
+      "2/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/6",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 5,
+    "params": [
+      "4/9",
+      "3/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/3",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 5,
+    "params": [
+      "5/6",
+      "2/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/6",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 6,
+    "params": [
+      "4/9",
+      "3/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/3",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 6,
+    "params": [
+      "5/6",
+      "2/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/7",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 6,
+    "params": [
+      "2/5",
+      "3/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/3",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 7,
+    "params": [
+      "5/6",
+      "2/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/7",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 7,
+    "params": [
+      "2/5",
+      "3/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/2",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 7,
+    "params": [
+      "3/8",
+      "1/2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/7",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 8,
+    "params": [
+      "2/5",
+      "3/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/2",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 8,
+    "params": [
+      "3/8",
+      "1/2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/3",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 8,
+    "params": [
+      "5/9",
+      "2/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1/2",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 9,
+    "params": [
+      "3/8",
+      "1/2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/3",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 9,
+    "params": [
+      "5/9",
+      "2/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/5",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 9,
+    "params": [
+      "7/12",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/3",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 10,
+    "params": [
+      "5/9",
+      "2/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/5",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.2",
+    "op": "max",
+    "page": 10,
+    "params": [
+      "7/12",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "2/5",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.3",
+    "op": "mul",
+    "page": 10,
+    "params": [
+      "2/3",
+      "3/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 11,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 11,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 11,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 12,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 12,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 12,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 13,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 13,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-3/10",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 13,
+    "params": [
+      "1/2",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 14,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-3/10",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 14,
+    "params": [
+      "1/2",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "9/20",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 14,
+    "params": [
+      "1/2",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-3/10",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 15,
+    "params": [
+      "1/2",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "9/20",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 15,
+    "params": [
+      "1/2",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 15,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "9/20",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 16,
+    "params": [
+      "1/2",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 16,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 16,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/50",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.3",
+    "op": "mul",
+    "page": 17,
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 17,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 17,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "1",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 18,
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/10",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.3.1",
+    "op": "add",
+    "page": 18,
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-2/5",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.3.2",
+    "op": "sub",
+    "page": 18,
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 19,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 19,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 19,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 20,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 20,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 20,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 21,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 21,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 21,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 22,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 22,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 22,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 23,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 23,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 23,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 24,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 24,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 24,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "7",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.1",
+    "op": "div",
+    "page": 25,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 25,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 25,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 26,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.4.2",
+    "op": "div",
+    "page": 26,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.4.3",
+    "op": "mul",
+    "page": 26,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 27,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 27,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 27,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 28,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 28,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 28,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 29,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 29,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-11",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 29,
+    "params": [
+      "-4",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 30,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-11",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 30,
+    "params": [
+      "-4",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "4",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 30,
+    "params": [
+      "-4",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-11",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 31,
+    "params": [
+      "-4",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "4",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 31,
+    "params": [
+      "-4",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 31,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "4",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 32,
+    "params": [
+      "-4",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 32,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 32,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.2",
+    "op": "sub",
+    "page": 33,
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 33,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 33,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 34,
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.5.3",
+    "op": "mul",
+    "page": 34,
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "-10",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.5.1",
+    "op": "add",
+    "page": 34,
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 35,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 35,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 35,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 36,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 36,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 36,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 37,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 37,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 37,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 38,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 38,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "23",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 38,
+    "params": [
+      "5",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 39,
+    "params": [
+      "40",
+      "5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "23",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 39,
+    "params": [
+      "5",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 39,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "23",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 40,
+    "params": [
+      "5",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 40,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 40,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.3",
+    "op": "order",
+    "page": 41,
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 41,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 41,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "18",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 42,
+    "params": [
+      "21",
+      "3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.6.1",
+    "op": "sub",
+    "page": 42,
+    "params": [
+      "28",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "8",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.6.2",
+    "op": "div",
+    "page": 42,
+    "params": [
+      "32",
+      "4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "28",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.7.1",
+    "op": "area",
+    "page": 43,
+    "params": [
+      "4",
+      "7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 43,
+    "params": [
+      "4",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "26",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 43,
+    "params": [
+      "5",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "24",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 44,
+    "params": [
+      "4",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "26",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 44,
+    "params": [
+      "5",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 44,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "26",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.7.2",
+    "op": "perimeter",
+    "page": 45,
+    "params": [
+      "5",
+      "8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 45,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 45,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "45",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 46,
+    "params": [
+      "5",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "54",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.7.3",
+    "op": "area",
+    "page": 46,
+    "params": [
+      "6",
+      "9"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "21",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.7.1",
+    "op": "area",
+    "page": 46,
+    "params": [
+      "3",
+      "7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "11/15",
+    "edition_code": "JURY-B",
+    "number": 1,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "2/5",
+      "1/3"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "3/4",
+    "edition_code": "JURY-B",
+    "number": 2,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "3/6",
+      "1/4"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "27/35",
+    "edition_code": "JURY-B",
+    "number": 3,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "4/7",
+      "1/5"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "19/24",
+    "edition_code": "JURY-B",
+    "number": 4,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "5/8",
+      "1/6"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "17/21",
+    "edition_code": "JURY-B",
+    "number": 5,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "6/9",
+      "1/7"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "33/40",
+    "edition_code": "JURY-B",
+    "number": 6,
+    "objective_code": "6.2.1",
+    "op": "add",
+    "page": 47,
+    "params": [
+      "7/10",
+      "1/8"
+    ],
+    "role": "practices"
+  },
+  {
+    "answer": "61/99",
+    "edition_code": "JURY-B",
+    "number": 7,
+    "objective_code": "6.2.1",
+    "op": "sub",
+    "page": 47,
+    "params": [
+      "8/11",
+      "1/9"
+    ],
+    "role": "practices"
+  }
+]

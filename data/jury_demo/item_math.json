@@ -1,0 +1,2319 @@
+[
+  {
+    "answer": "11/12",
+    "answer_key": "C",
+    "code": "JURY-I01",
+    "difficulty": 0.0,
+    "distractors": [
+      [
+        "1/4",
+        "M2"
+      ],
+      [
+        "3/7",
+        "M1"
+      ],
+      [
+        "1/6",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.1",
+    "objective_codes": "6.2.1",
+    "op": "add",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "1/6"
+      },
+      {
+        "key": "B",
+        "tag": "M1",
+        "text": "3/7"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "11/12"
+      },
+      {
+        "key": "D",
+        "tag": "M2",
+        "text": "1/4"
+      }
+    ],
+    "params": [
+      "2/3",
+      "1/4"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 2/3 + 1/4",
+    "stem_ru": "Вычислите 2/3 + 1/4",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "7/12",
+    "answer_key": "B",
+    "code": "JURY-I02",
+    "difficulty": 0.1,
+    "distractors": [
+      [
+        "1/3",
+        "M2"
+      ],
+      [
+        "3/5",
+        "M1"
+      ],
+      [
+        "5/24",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.1",
+    "objective_codes": "6.2.1",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": "M1",
+        "text": "3/5"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "7/12"
+      },
+      {
+        "key": "C",
+        "tag": "M2",
+        "text": "1/3"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "5/24"
+      }
+    ],
+    "params": [
+      "5/6",
+      "1/4"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 5/6 - 1/4",
+    "stem_ru": "Вычислите 5/6 - 1/4",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "11/12",
+    "answer_key": "D",
+    "code": "JURY-I03",
+    "difficulty": 0.2,
+    "distractors": [
+      [
+        "1/3",
+        "M2"
+      ],
+      [
+        "2/5",
+        "M1"
+      ],
+      [
+        "1/8",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.1",
+    "objective_codes": "6.2.1",
+    "op": "add",
+    "options": [
+      {
+        "key": "A",
+        "tag": "M1",
+        "text": "2/5"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "1/8"
+      },
+      {
+        "key": "C",
+        "tag": "M2",
+        "text": "1/3"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "11/12"
+      }
+    ],
+    "params": [
+      "3/4",
+      "1/6"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 3/4 + 1/6",
+    "stem_ru": "Вычислите 3/4 + 1/6",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "13/24",
+    "answer_key": "B",
+    "code": "JURY-I04",
+    "difficulty": 0.30000000000000004,
+    "distractors": [
+      [
+        "1/4",
+        "M2"
+      ],
+      [
+        "8/11",
+        "M1"
+      ],
+      [
+        "7/24",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.1",
+    "objective_codes": "6.2.1",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": "M2",
+        "text": "1/4"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "13/24"
+      },
+      {
+        "key": "C",
+        "tag": "M1",
+        "text": "8/11"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "7/24"
+      }
+    ],
+    "params": [
+      "7/8",
+      "1/3"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 7/8 - 1/3",
+    "stem_ru": "Вычислите 7/8 - 1/3",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "3/7",
+    "answer_key": "D",
+    "code": "JURY-I05",
+    "difficulty": -0.0,
+    "distractors": [
+      [
+        "-3/7",
+        "CALC"
+      ],
+      [
+        "10/7",
+        "CALC"
+      ],
+      [
+        "-4/7",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.2",
+    "objective_codes": "6.2.2",
+    "op": "max",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "10/7"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "-4/7"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-3/7"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "3/7"
+      }
+    ],
+    "params": [
+      "2/5",
+      "3/7"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Үлкен бөлшекті таңдаңыз: 2/5 немесе 3/7",
+    "stem_ru": "Выберите большую дробь: 2/5 или 3/7",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "1/2",
+    "answer_key": "B",
+    "code": "JURY-I06",
+    "difficulty": -0.15,
+    "distractors": [
+      [
+        "-1/2",
+        "CALC"
+      ],
+      [
+        "3/2",
+        "CALC"
+      ],
+      [
+        "5/2",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.2",
+    "objective_codes": "6.2.2",
+    "op": "max",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "5/2"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "1/2"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-1/2"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "3/2"
+      }
+    ],
+    "params": [
+      "3/8",
+      "1/2"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Үлкен бөлшекті таңдаңыз: 3/8 немесе 1/2",
+    "stem_ru": "Выберите большую дробь: 3/8 или 1/2",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "2/3",
+    "answer_key": "B",
+    "code": "JURY-I07",
+    "difficulty": -0.3,
+    "distractors": [
+      [
+        "-2/3",
+        "CALC"
+      ],
+      [
+        "5/3",
+        "CALC"
+      ],
+      [
+        "-1/3",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.2",
+    "objective_codes": "6.2.2",
+    "op": "max",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-2/3"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "2/3"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-1/3"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "5/3"
+      }
+    ],
+    "params": [
+      "5/9",
+      "2/3"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Үлкен бөлшекті таңдаңыз: 5/9 немесе 2/3",
+    "stem_ru": "Выберите большую дробь: 5/9 или 2/3",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "3/5",
+    "answer_key": "C",
+    "code": "JURY-I08",
+    "difficulty": -0.44999999999999996,
+    "distractors": [
+      [
+        "-3/5",
+        "CALC"
+      ],
+      [
+        "8/5",
+        "CALC"
+      ],
+      [
+        "-2/5",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.2",
+    "objective_codes": "6.2.2",
+    "op": "max",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-2/5"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "8/5"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "3/5"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-3/5"
+      }
+    ],
+    "params": [
+      "7/12",
+      "3/5"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Үлкен бөлшекті таңдаңыз: 7/12 немесе 3/5",
+    "stem_ru": "Выберите большую дробь: 7/12 или 3/5",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "2/5",
+    "answer_key": "C",
+    "code": "JURY-I09",
+    "difficulty": 0.0,
+    "distractors": [
+      [
+        "-2/5",
+        "CALC"
+      ],
+      [
+        "7/5",
+        "CALC"
+      ],
+      [
+        "-3/5",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.3",
+    "objective_codes": "6.2.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-3/5"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "-2/5"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "2/5"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "7/5"
+      }
+    ],
+    "params": [
+      "2/3",
+      "3/5"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 2/3 · 3/5",
+    "stem_ru": "Вычислите 2/3 · 3/5",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "3/14",
+    "answer_key": "A",
+    "code": "JURY-I10",
+    "difficulty": 0.1,
+    "distractors": [
+      [
+        "-3/14",
+        "CALC"
+      ],
+      [
+        "17/14",
+        "CALC"
+      ],
+      [
+        "-11/14",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.3",
+    "objective_codes": "6.2.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "3/14"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "-11/14"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "17/14"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-3/14"
+      }
+    ],
+    "params": [
+      "3/4",
+      "2/7"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 3/4 · 2/7",
+    "stem_ru": "Вычислите 3/4 · 2/7",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "1/6",
+    "answer_key": "C",
+    "code": "JURY-I11",
+    "difficulty": 0.2,
+    "distractors": [
+      [
+        "-1/6",
+        "CALC"
+      ],
+      [
+        "7/6",
+        "CALC"
+      ],
+      [
+        "-5/6",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.3",
+    "objective_codes": "6.2.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-1/6"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "7/6"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "1/6"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-5/6"
+      }
+    ],
+    "params": [
+      "4/9",
+      "3/8"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 4/9 · 3/8",
+    "stem_ru": "Вычислите 4/9 · 3/8",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "1/3",
+    "answer_key": "B",
+    "code": "JURY-I12",
+    "difficulty": 0.30000000000000004,
+    "distractors": [
+      [
+        "-1/3",
+        "CALC"
+      ],
+      [
+        "4/3",
+        "CALC"
+      ],
+      [
+        "-2/3",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.2.3",
+    "objective_codes": "6.2.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "4/3"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "1/3"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-1/3"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-2/3"
+      }
+    ],
+    "params": [
+      "5/6",
+      "2/5"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 5/6 · 2/5",
+    "stem_ru": "Вычислите 5/6 · 2/5",
+    "topic": "JURY-T1"
+  },
+  {
+    "answer": "1",
+    "answer_key": "D",
+    "code": "JURY-I13",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "3",
+        "CALC"
+      ],
+      [
+        "1/2",
+        "M1"
+      ],
+      [
+        "21/100",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.3.1",
+    "objective_codes": "6.3.1",
+    "op": "add",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "3"
+      },
+      {
+        "key": "B",
+        "tag": "M1",
+        "text": "1/2"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "21/100"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "1"
+      }
+    ],
+    "params": [
+      "3/10",
+      "7/10"
+    ],
+    "quality": "too_easy",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 0.3 + 0.7",
+    "stem_ru": "Вычислите 0.3 + 0.7",
+    "topic": "JURY-T2"
+  },
+  {
+    "answer": "11/10",
+    "answer_key": "D",
+    "code": "JURY-I14",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "9/10",
+        "M2"
+      ],
+      [
+        "3/5",
+        "M1"
+      ],
+      [
+        "7/25",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.3.1",
+    "objective_codes": "6.3.1",
+    "op": "add",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "7/25"
+      },
+      {
+        "key": "B",
+        "tag": "M2",
+        "text": "9/10"
+      },
+      {
+        "key": "C",
+        "tag": "M1",
+        "text": "3/5"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "11/10"
+      }
+    ],
+    "params": [
+      "2/5",
+      "7/10"
+    ],
+    "quality": "dead_distractor",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 0.4 + 0.7",
+    "stem_ru": "Вычислите 0.4 + 0.7",
+    "topic": "JURY-T2"
+  },
+  {
+    "answer": "-2/5",
+    "answer_key": "D",
+    "code": "JURY-I15",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "8/5",
+        "CALC"
+      ],
+      [
+        "3/5",
+        "M1"
+      ],
+      [
+        "8/25",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.3.2",
+    "objective_codes": "6.3.2",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": "M1",
+        "text": "3/5"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "8/25"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "8/5"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "-2/5"
+      }
+    ],
+    "params": [
+      "2/5",
+      "4/5"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 0.4 - 0.8",
+    "stem_ru": "Вычислите 0.4 - 0.8",
+    "topic": "JURY-T2"
+  },
+  {
+    "answer": "-3/10",
+    "answer_key": "A",
+    "code": "JURY-I16",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "17/10",
+        "CALC"
+      ],
+      [
+        "5/7",
+        "M1"
+      ],
+      [
+        "2/5",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.3.2",
+    "objective_codes": "6.3.2",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "-3/10"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "2/5"
+      },
+      {
+        "key": "C",
+        "tag": "M1",
+        "text": "5/7"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "17/10"
+      }
+    ],
+    "params": [
+      "1/2",
+      "4/5"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 0.5 - 0.8",
+    "stem_ru": "Вычислите 0.5 - 0.8",
+    "topic": "JURY-T2"
+  },
+  {
+    "answer": "9/20",
+    "answer_key": "C",
+    "code": "JURY-I17",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-9/20",
+        "CALC"
+      ],
+      [
+        "29/20",
+        "CALC"
+      ],
+      [
+        "-11/20",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.3.3",
+    "objective_codes": "6.3.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-9/20"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "29/20"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "9/20"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-11/20"
+      }
+    ],
+    "params": [
+      "1/2",
+      "9/10"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 0.5 · 0.9",
+    "stem_ru": "Вычислите 0.5 · 0.9",
+    "topic": "JURY-T2"
+  },
+  {
+    "answer": "27/50",
+    "answer_key": "A",
+    "code": "JURY-I18",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-27/50",
+        "CALC"
+      ],
+      [
+        "77/50",
+        "CALC"
+      ],
+      [
+        "-23/50",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.3.3",
+    "objective_codes": "6.3.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "27/50"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "-23/50"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "77/50"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-27/50"
+      }
+    ],
+    "params": [
+      "3/5",
+      "9/10"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 0.6 · 0.9",
+    "stem_ru": "Вычислите 0.6 · 0.9",
+    "topic": "JURY-T2"
+  },
+  {
+    "answer": "7",
+    "answer_key": "A",
+    "code": "JURY-I19",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-7",
+        "CALC"
+      ],
+      [
+        "8",
+        "CALC"
+      ],
+      [
+        "6",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.4.1",
+    "objective_codes": "6.4.1",
+    "op": "div",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "7"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "-7"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "6"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "8"
+      }
+    ],
+    "params": [
+      "21",
+      "3"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "x : 7 = 3 : 3 теңдеуін шешіңіз",
+    "stem_ru": "Решите x : 7 = 3 : 3",
+    "topic": "JURY-T3"
+  },
+  {
+    "answer": "7",
+    "answer_key": "A",
+    "code": "JURY-I20",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-7",
+        "CALC"
+      ],
+      [
+        "8",
+        "CALC"
+      ],
+      [
+        "6",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.4.1",
+    "objective_codes": "6.4.1",
+    "op": "div",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "7"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "-7"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "8"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "6"
+      }
+    ],
+    "params": [
+      "28",
+      "4"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "x : 7 = 4 : 4 теңдеуін шешіңіз",
+    "stem_ru": "Решите x : 7 = 4 : 4",
+    "topic": "JURY-T3"
+  },
+  {
+    "answer": "8",
+    "answer_key": "A",
+    "code": "JURY-I21",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-8",
+        "CALC"
+      ],
+      [
+        "9",
+        "CALC"
+      ],
+      [
+        "7",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.4.2",
+    "objective_codes": "6.4.2",
+    "op": "div",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "8"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "9"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "7"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-8"
+      }
+    ],
+    "params": [
+      "32",
+      "4"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "32 санының 4 санына қатынасын табыңыз",
+    "stem_ru": "Найдите отношение 32 к 4",
+    "topic": "JURY-T3"
+  },
+  {
+    "answer": "8",
+    "answer_key": "D",
+    "code": "JURY-I22",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-8",
+        "CALC"
+      ],
+      [
+        "9",
+        "CALC"
+      ],
+      [
+        "7",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.4.2",
+    "objective_codes": "6.4.2",
+    "op": "div",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "7"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "9"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-8"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "8"
+      }
+    ],
+    "params": [
+      "40",
+      "5"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "40 санының 5 санына қатынасын табыңыз",
+    "stem_ru": "Найдите отношение 40 к 5",
+    "topic": "JURY-T3"
+  },
+  {
+    "answer": "45",
+    "answer_key": "B",
+    "code": "JURY-I23",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-45",
+        "CALC"
+      ],
+      [
+        "46",
+        "CALC"
+      ],
+      [
+        "44",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.4.3",
+    "objective_codes": "6.4.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-45"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "45"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "44"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "46"
+      }
+    ],
+    "params": [
+      "5",
+      "9"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Масштаб 1:9. Жоспарда 5 см. Нақты ұзындығын см-мен табыңыз",
+    "stem_ru": "Масштаб 1:9. Длина на плане 5 см. Найдите длину в см",
+    "topic": "JURY-T3"
+  },
+  {
+    "answer": "54",
+    "answer_key": "A",
+    "code": "JURY-I24",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-54",
+        "CALC"
+      ],
+      [
+        "55",
+        "CALC"
+      ],
+      [
+        "53",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.4.3",
+    "objective_codes": "6.4.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "54"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "55"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "53"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-54"
+      }
+    ],
+    "params": [
+      "6",
+      "9"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Масштаб 1:9. Жоспарда 6 см. Нақты ұзындығын см-мен табыңыз",
+    "stem_ru": "Масштаб 1:9. Длина на плане 6 см. Найдите длину в см",
+    "topic": "JURY-T3"
+  },
+  {
+    "answer": "-10",
+    "answer_key": "A",
+    "code": "JURY-I25",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "10",
+        "M3"
+      ],
+      [
+        "-9",
+        "CALC"
+      ],
+      [
+        "-11",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.5.1",
+    "objective_codes": "6.5.1",
+    "op": "add",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "-10"
+      },
+      {
+        "key": "B",
+        "tag": "M3",
+        "text": "10"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-9"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-11"
+      }
+    ],
+    "params": [
+      "-3",
+      "-7"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: (-3) + (-7)",
+    "stem_ru": "Вычислите (-3) + (-7)",
+    "topic": "JURY-T4"
+  },
+  {
+    "answer": "-11",
+    "answer_key": "B",
+    "code": "JURY-I26",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "11",
+        "M3"
+      ],
+      [
+        "-10",
+        "CALC"
+      ],
+      [
+        "-12",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.5.1",
+    "objective_codes": "6.5.1",
+    "op": "add",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-12"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "-11"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-10"
+      },
+      {
+        "key": "D",
+        "tag": "M3",
+        "text": "11"
+      }
+    ],
+    "params": [
+      "-4",
+      "-7"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: (-4) + (-7)",
+    "stem_ru": "Вычислите (-4) + (-7)",
+    "topic": "JURY-T4"
+  },
+  {
+    "answer": "4",
+    "answer_key": "C",
+    "code": "JURY-I27",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-4",
+        "M3"
+      ],
+      [
+        "5",
+        "CALC"
+      ],
+      [
+        "3",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.5.2",
+    "objective_codes": "6.5.2",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "3"
+      },
+      {
+        "key": "B",
+        "tag": "M3",
+        "text": "-4"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "4"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "5"
+      }
+    ],
+    "params": [
+      "-4",
+      "-8"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: (-4) - (-8)",
+    "stem_ru": "Вычислите (-4) - (-8)",
+    "topic": "JURY-T4"
+  },
+  {
+    "answer": "3",
+    "answer_key": "D",
+    "code": "JURY-I28",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-3",
+        "M3"
+      ],
+      [
+        "4",
+        "CALC"
+      ],
+      [
+        "2",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.5.2",
+    "objective_codes": "6.5.2",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "2"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "4"
+      },
+      {
+        "key": "C",
+        "tag": "M3",
+        "text": "-3"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "3"
+      }
+    ],
+    "params": [
+      "-5",
+      "-8"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: (-5) - (-8)",
+    "stem_ru": "Вычислите (-5) - (-8)",
+    "topic": "JURY-T4"
+  },
+  {
+    "answer": "45",
+    "answer_key": "A",
+    "code": "JURY-I29",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-45",
+        "M3"
+      ],
+      [
+        "46",
+        "CALC"
+      ],
+      [
+        "44",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.5.3",
+    "objective_codes": "6.5.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "45"
+      },
+      {
+        "key": "B",
+        "tag": "M3",
+        "text": "-45"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "46"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "44"
+      }
+    ],
+    "params": [
+      "-5",
+      "-9"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: (-5) · (-9)",
+    "stem_ru": "Вычислите (-5) · (-9)",
+    "topic": "JURY-T4"
+  },
+  {
+    "answer": "54",
+    "answer_key": "C",
+    "code": "JURY-I30",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-54",
+        "M3"
+      ],
+      [
+        "55",
+        "CALC"
+      ],
+      [
+        "53",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.5.3",
+    "objective_codes": "6.5.3",
+    "op": "mul",
+    "options": [
+      {
+        "key": "A",
+        "tag": "M3",
+        "text": "-54"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "55"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "54"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "53"
+      }
+    ],
+    "params": [
+      "-6",
+      "-9"
+    ],
+    "quality": "too_hard",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: (-6) · (-9)",
+    "stem_ru": "Вычислите (-6) · (-9)",
+    "topic": "JURY-T4"
+  },
+  {
+    "answer": "18",
+    "answer_key": "B",
+    "code": "JURY-I31",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-18",
+        "CALC"
+      ],
+      [
+        "19",
+        "CALC"
+      ],
+      [
+        "17",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.6.1",
+    "objective_codes": "6.6.1",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "-18"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "18"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "19"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "17"
+      }
+    ],
+    "params": [
+      "21",
+      "3"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "x + 3 = 21 теңдеуін шешіңіз",
+    "stem_ru": "Решите x + 3 = 21",
+    "topic": "JURY-T5"
+  },
+  {
+    "answer": "24",
+    "answer_key": "B",
+    "code": "JURY-I32",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-24",
+        "CALC"
+      ],
+      [
+        "25",
+        "CALC"
+      ],
+      [
+        "23",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.6.1",
+    "objective_codes": "6.6.1",
+    "op": "sub",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "23"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "24"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-24"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "25"
+      }
+    ],
+    "params": [
+      "28",
+      "4"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "x + 4 = 28 теңдеуін шешіңіз",
+    "stem_ru": "Решите x + 4 = 28",
+    "topic": "JURY-T5"
+  },
+  {
+    "answer": "8",
+    "answer_key": "C",
+    "code": "JURY-I33",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "-8",
+        "CALC"
+      ],
+      [
+        "9",
+        "CALC"
+      ],
+      [
+        "7",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.6.2",
+    "objective_codes": "6.6.2",
+    "op": "div",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "7"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "9"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "8"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "-8"
+      }
+    ],
+    "params": [
+      "32",
+      "4"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "4x = 32 теңдеуін шешіңіз",
+    "stem_ru": "Решите 4x = 32",
+    "topic": "JURY-T5"
+  },
+  {
+    "answer": "8",
+    "answer_key": "B",
+    "code": "JURY-I34",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "-8",
+        "CALC"
+      ],
+      [
+        "9",
+        "CALC"
+      ],
+      [
+        "7",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.6.2",
+    "objective_codes": "6.6.2",
+    "op": "div",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "9"
+      },
+      {
+        "key": "B",
+        "tag": null,
+        "text": "8"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "-8"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "7"
+      }
+    ],
+    "params": [
+      "40",
+      "5"
+    ],
+    "quality": "partial_credit",
+    "rubric": {
+      "full": "Верное деление обеих частей и правильный ответ",
+      "max_points": 2,
+      "partial": "Верно указано деление обеих частей, вычисление не завершено",
+      "zero": "Преобразование не обосновано"
+    },
+    "stem_kz": "5x = 40 теңдеуін шешіңіз",
+    "stem_ru": "Решите 5x = 40",
+    "topic": "JURY-T5"
+  },
+  {
+    "answer": "23",
+    "answer_key": "C",
+    "code": "JURY-I35",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "28",
+        "M4"
+      ],
+      [
+        "24",
+        "CALC"
+      ],
+      [
+        "22",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.6.3",
+    "objective_codes": "6.6.3",
+    "op": "order",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "22"
+      },
+      {
+        "key": "B",
+        "tag": "M4",
+        "text": "28"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "23"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "24"
+      }
+    ],
+    "params": [
+      "5",
+      "9",
+      "2"
+    ],
+    "quality": "high_omission",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 5 + 9 · 2",
+    "stem_ru": "Вычислите 5 + 9 · 2",
+    "topic": "JURY-T5"
+  },
+  {
+    "answer": "24",
+    "answer_key": "A",
+    "code": "JURY-I36",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "30",
+        "M4"
+      ],
+      [
+        "25",
+        "CALC"
+      ],
+      [
+        "23",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.6.3",
+    "objective_codes": "6.6.3",
+    "op": "order",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "24"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "23"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "25"
+      },
+      {
+        "key": "D",
+        "tag": "M4",
+        "text": "30"
+      }
+    ],
+    "params": [
+      "6",
+      "9",
+      "2"
+    ],
+    "quality": "negative_discrimination",
+    "rubric": null,
+    "stem_kz": "Есептеңіз: 6 + 9 · 2",
+    "stem_ru": "Вычислите 6 + 9 · 2",
+    "topic": "JURY-T5"
+  },
+  {
+    "answer": "21",
+    "answer_key": "D",
+    "code": "JURY-I37",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "20",
+        "M5"
+      ],
+      [
+        "22",
+        "CALC"
+      ],
+      [
+        "23",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.7.1",
+    "objective_codes": "6.7.1",
+    "op": "area",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "22"
+      },
+      {
+        "key": "B",
+        "tag": "M5",
+        "text": "20"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "23"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "21"
+      }
+    ],
+    "params": [
+      "3",
+      "7"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Тіктөртбұрыш: 3 см × 7 см. Ауданын табыңыз (см²)",
+    "stem_ru": "Прямоугольник 3 см × 7 см. Найдите площадь (см²)",
+    "topic": "JURY-T6"
+  },
+  {
+    "answer": "28",
+    "answer_key": "A",
+    "code": "JURY-I38",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "22",
+        "M5"
+      ],
+      [
+        "29",
+        "CALC"
+      ],
+      [
+        "27",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.7.1",
+    "objective_codes": "6.7.1",
+    "op": "area",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "28"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "27"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "29"
+      },
+      {
+        "key": "D",
+        "tag": "M5",
+        "text": "22"
+      }
+    ],
+    "params": [
+      "4",
+      "7"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Тіктөртбұрыш: 4 см × 7 см. Ауданын табыңыз (см²)",
+    "stem_ru": "Прямоугольник 4 см × 7 см. Найдите площадь (см²)",
+    "topic": "JURY-T6"
+  },
+  {
+    "answer": "24",
+    "answer_key": "C",
+    "code": "JURY-I39",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "32",
+        "M5"
+      ],
+      [
+        "25",
+        "CALC"
+      ],
+      [
+        "23",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.7.2",
+    "objective_codes": "6.7.2",
+    "op": "perimeter",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "25"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "23"
+      },
+      {
+        "key": "C",
+        "tag": null,
+        "text": "24"
+      },
+      {
+        "key": "D",
+        "tag": "M5",
+        "text": "32"
+      }
+    ],
+    "params": [
+      "4",
+      "8"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Тіктөртбұрыш: 4 см × 8 см. Периметрін табыңыз (см)",
+    "stem_ru": "Прямоугольник 4 см × 8 см. Найдите периметр (см)",
+    "topic": "JURY-T6"
+  },
+  {
+    "answer": "26",
+    "answer_key": "D",
+    "code": "JURY-I40",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "40",
+        "M5"
+      ],
+      [
+        "27",
+        "CALC"
+      ],
+      [
+        "25",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.7.2",
+    "objective_codes": "6.7.2",
+    "op": "perimeter",
+    "options": [
+      {
+        "key": "A",
+        "tag": "M5",
+        "text": "40"
+      },
+      {
+        "key": "B",
+        "tag": "CALC",
+        "text": "27"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "25"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "26"
+      }
+    ],
+    "params": [
+      "5",
+      "8"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Тіктөртбұрыш: 5 см × 8 см. Периметрін табыңыз (см)",
+    "stem_ru": "Прямоугольник 5 см × 8 см. Найдите периметр (см)",
+    "topic": "JURY-T6"
+  },
+  {
+    "answer": "45",
+    "answer_key": "A",
+    "code": "JURY-I41",
+    "difficulty": -0.16,
+    "distractors": [
+      [
+        "28",
+        "M5"
+      ],
+      [
+        "46",
+        "CALC"
+      ],
+      [
+        "44",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "confirmed",
+    "objective": "6.7.3",
+    "objective_codes": "6.7.3:0.7;6.7.1:0.3",
+    "op": "area",
+    "options": [
+      {
+        "key": "A",
+        "tag": null,
+        "text": "45"
+      },
+      {
+        "key": "B",
+        "tag": "M5",
+        "text": "28"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "44"
+      },
+      {
+        "key": "D",
+        "tag": "CALC",
+        "text": "46"
+      }
+    ],
+    "params": [
+      "5",
+      "9"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Тіктөртбұрыш: 5 см × 9 см. Ауданын табыңыз (см²)",
+    "stem_ru": "Прямоугольник 5 см × 9 см. Найдите площадь (см²)",
+    "topic": "JURY-T6"
+  },
+  {
+    "answer": "54",
+    "answer_key": "D",
+    "code": "JURY-I42",
+    "difficulty": 0.12,
+    "distractors": [
+      [
+        "30",
+        "M5"
+      ],
+      [
+        "55",
+        "CALC"
+      ],
+      [
+        "53",
+        "CALC"
+      ]
+    ],
+    "mapping_status": "proposed",
+    "objective": "6.7.3",
+    "objective_codes": "6.7.3",
+    "op": "area",
+    "options": [
+      {
+        "key": "A",
+        "tag": "CALC",
+        "text": "53"
+      },
+      {
+        "key": "B",
+        "tag": "M5",
+        "text": "30"
+      },
+      {
+        "key": "C",
+        "tag": "CALC",
+        "text": "55"
+      },
+      {
+        "key": "D",
+        "tag": null,
+        "text": "54"
+      }
+    ],
+    "params": [
+      "6",
+      "9"
+    ],
+    "quality": "regular",
+    "rubric": null,
+    "stem_kz": "Тіктөртбұрыш: 6 см × 9 см. Ауданын табыңыз (см²)",
+    "stem_ru": "Прямоугольник 6 см × 9 см. Найдите площадь (см²)",
+    "topic": "JURY-T6"
+  }
+]
