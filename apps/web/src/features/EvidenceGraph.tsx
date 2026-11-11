@@ -15,6 +15,25 @@ const LANE_W = 214;
 const PATH_COLS = 3;
 const PATH_STEP = 236;
 
+const GRAPH_STATUS: Record<string, [string, string]> = {
+  proposed: ["предложено", "ұсынылған"],
+  approved: ["утверждено", "бекітілген"],
+  draft: ["черновик", "жоба"],
+  active: ["активно", "белсенді"],
+  measured: ["измерено", "өлшенген"],
+  not_measured: ["не измерено", "өлшенбеген"],
+  unverified_mapping: ["разметка не подтверждена", "белгілеу расталмаған"],
+  insufficient_data: ["мало данных", "деректер аз"],
+  no_decision: ["решения пока нет", "шешім әзірге жоқ"],
+  no_follow_up: ["нет повторного измерения", "қайта өлшеу жоқ"],
+  no_plan_hours: ["часы не назначены", "сағаттар бөлінбеген"],
+};
+
+export function graphStatusText(status: string, lang: Lang): string {
+  const label = GRAPH_STATUS[status];
+  return label ? label[lang === "kz" ? 1 : 0] : status.replaceAll("_", " ");
+}
+
 function tone(n: GraphNode): Tone {
   if (n.kind === "gap") return "warn";
   if (n.kind === "misconception") return "synthetic";
@@ -130,7 +149,7 @@ export function NodeDetail({ node }: { node: GraphNode }) {
     <div className="stack" data-testid="node-detail">
       <div className="row" style={{ gap: 6 }}>
         <Badge tone={tone(node)}>{t(`graph.kind.${node.kind}` as DictKey)}</Badge>
-        <span className="xs mono muted">{node.status}</span>
+        <span className="xs muted">{graphStatusText(node.status, lang)}</span>
       </div>
       <strong>{label}</strong>
       {node.kind === "gap" && <p className="small">{t("graph.gap_hint")}</p>}

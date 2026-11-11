@@ -8,7 +8,7 @@ import { useAppState } from "../state/AppState";
 import { Button, EmptyState, QueryView, Select, StaleBanner } from "../ui";
 import { pct } from "../ui/format";
 import { CouncilPanel } from "./Council";
-import { EvidenceGraph, NodeDetail } from "./EvidenceGraph";
+import { EvidenceGraph, graphStatusText, NodeDetail } from "./EvidenceGraph";
 
 function nodeMetric(node: GraphNode, lang: Lang): string {
   const m = node.metrics;
@@ -16,7 +16,7 @@ function nodeMetric(node: GraphNode, lang: Lang): string {
   if (typeof m.p_correct === "number") return pct(m.p_correct, lang);
   if (typeof m.share_of_learners === "number") return `${pct(m.share_of_learners, lang)} · n=${m.n_learners ?? "—"}`;
   if (typeof m.planned_hours === "number") return `${m.planned_hours} ч`;
-  return node.code ?? "";
+  return graphStatusText(node.code ?? node.status, lang);
 }
 
 function EvidenceRoute({ nodes, selected, onSelect }: { nodes: GraphNode[]; selected: string | null; onSelect: (id: string) => void }) {
@@ -99,7 +99,9 @@ export function GraphPage() {
                 <div>
                   <span className="atlas-eyebrow">{lang === "kz" ? "Зерттеу сұрағы" : "Исследовательский вопрос"}</span>
                   <h1 id="atlas-question">{lang === "kz" ? `${title}: нәтиже неге төмен?` : `Почему проседает тема «${title}»?`}</h1>
-                  <p>{d.result.note_ru}</p>
+                  <p>{lang === "kz"
+                    ? "Әр түйін ашылады: сақталған есептеу, құрал беті, жауап жолдары, жоспар немесе шешім. Оқушы қатесі — диагноз емес, тексерілетін гипотеза."
+                    : d.result.note_ru}</p>
                 </div>
                 <div className="atlas-audit" aria-label={lang === "kz" ? "Талдау паспорты" : "Паспорт анализа"}>
                   <span><strong>{route.length}</strong> {lang === "kz" ? "қадам" : "шагов"}</span>
