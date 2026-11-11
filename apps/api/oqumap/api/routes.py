@@ -138,6 +138,21 @@ def load_lab_scenario(code: str, p: P, session: DB) -> dict[str, Any]:
     return an.dataset_summary(an.get_dataset(session, p.org_id, ds_id))
 
 
+@router.get("/demo/measurement-readiness", tags=["demo"])
+def demo_measurement_readiness(p: P, session: DB) -> dict[str, Any]:
+    """Report preparation state without exposing a half-built measurement demo."""
+    if not p.org.is_demo:
+        raise ApiError("not_demo", "Контур измерения доступен только в демо", 403)
+    return demo_tenants.measurement_readiness(session, p.org_id)
+
+
+@router.post("/demo/measurement-readiness/retry", tags=["demo"])
+def retry_demo_measurement(p: P, session: DB) -> dict[str, Any]:
+    """Requeue a failed disposable-demo preparation job."""
+    ratelimit.check(session, "demo_measurement_retry", p.org_id, "rate_compute")
+    return demo_tenants.retry_measurement(session, p.org, p.user_id)
+
+
 @router.get("/auth/me", response_model=S.UserOut, tags=["auth"])
 def me(p: P, session: DB):
     return _user_out(session, p.user)

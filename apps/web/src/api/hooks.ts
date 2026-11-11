@@ -54,6 +54,35 @@ export function useDatasets() {
   return useQuery({ queryKey: ["datasets"], queryFn: () => api.get<DatasetSummary[]>("/api/v1/datasets") });
 }
 
+export interface MeasurementReadiness {
+  status: "preparing" | "ready" | "failed" | "unavailable";
+  dataset_id: string | null;
+  job_status: string | null;
+  error: { code?: string; message?: string } | null;
+}
+
+export function useMeasurementReadiness(enabled: boolean) {
+  return useQuery({
+    queryKey: ["demo-measurement-readiness"],
+    enabled,
+    queryFn: () => api.get<MeasurementReadiness>("/api/v1/demo/measurement-readiness"),
+    staleTime: 0,
+    refetchInterval: (query) => {
+      const status = (query.state.data as MeasurementReadiness | undefined)?.status;
+      if (status && status !== "preparing") return false;
+      return Math.min(750 * (2 ** Math.min(query.state.dataUpdateCount, 3)), 5_000);
+    },
+  });
+}
+
+export function useRetryMeasurementReadiness() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post<MeasurementReadiness>("/api/v1/demo/measurement-readiness/retry"),
+    onSuccess: (data) => qc.setQueryData(["demo-measurement-readiness"], data),
+  });
+}
+
 export function useCurrentDataset() {
   const { datasetId } = useAppState();
   const q = useDatasets();

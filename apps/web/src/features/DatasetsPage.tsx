@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
-import { useConfig, useDatasets, useQuality } from "../api/hooks";
+import { useConfig, useDatasets, useMeasurementReadiness, useQuality, useRetryMeasurementReadiness } from "../api/hooks";
 import type { DatasetSummary, QualityReport } from "../api/types";
 import { AiStatusCard } from "./AiStatusCard";
 import { useI18n } from "../i18n/I18n";
@@ -10,9 +10,11 @@ import type { DictKey } from "../i18n/dict";
 import { useAppState } from "../state/AppState";
 import { Alert, Badge, Button, Card, Disclosure, EmptyState, ErrorState, QueryView, SyntheticBadge } from "../ui";
 import { dateTime, num } from "../ui/format";
+import { useMT } from "./measurement/i18n";
 
 export function DatasetsPage() {
   const { t, lang } = useI18n();
+  const { t2 } = useMT();
   const q = useDatasets();
   const cfg = useConfig();
   const { user, datasetId, setDatasetId } = useAppState();
@@ -20,7 +22,13 @@ export function DatasetsPage() {
   const qc = useQueryClient();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const readiness = useMeasurementReadiness(!!user?.org_is_ephemeral);
+  const retryReadiness = useRetryMeasurementReadiness();
   const recommendedCode = cfg.data?.recommended_dataset_code ?? "base";
+
+  useEffect(() => {
+    if (readiness.data?.status === "ready") void qc.invalidateQueries({ queryKey: ["datasets"] });
+  }, [qc, readiness.data?.status]);
 
   async function loadLab(code: string) {
     setLoading(code);
@@ -63,6 +71,18 @@ export function DatasetsPage() {
         <Button onClick={() => nav("/import")} data-testid="own-data">{t("datasets.own_data")}</Button>
       </div>
       {error ? <ErrorState error={error} /> : null}
+      {user?.org_is_ephemeral && readiness.data?.status !== "ready" && (
+        <Alert tone={readiness.data?.status === "failed" ? "danger" : "info"}>
+          <span data-testid="measurement-readiness">
+            {readiness.data?.status === "failed" ? t2("nav.failed") : t2("nav.preparing")}
+          </span>{" "}
+          {readiness.data?.status === "failed" && (
+            <Button size="sm" onClick={() => retryReadiness.mutate()} disabled={retryReadiness.isPending}>
+              {t2("nav.retry")}
+            </Button>
+          )}
+        </Alert>
+      )}
       <QueryView q={q}>
         {(ds) => {
           const rec = ds.find((d) => d.code === recommendedCode && d.is_synthetic);

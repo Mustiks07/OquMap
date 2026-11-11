@@ -202,6 +202,47 @@ def load_lab_dataset(session: Session, org: m.Organization, code: str) -> str:
     return session.scalar(select(m.Dataset.id).where(m.Dataset.org_id == org.id, m.Dataset.code == code))
 
 
+def measurement_readiness(session: Session, org_id: str) -> dict:
+    """Observable state of the asynchronously prepared measurement demo for one tenant."""
+    from ..demo.measurement_seed import DATASET_CODE
+
+    dataset_id = session.scalar(select(m.Dataset.id).where(m.Dataset.org_id == org_id, m.Dataset.code == DATASET_CODE))
+    if dataset_id is not None:
+        return {"status": "ready", "dataset_id": dataset_id, "job_status": "succeeded", "error": None}
+    job = session.scalar(select(m.Job).where(m.Job.org_id == org_id, m.Job.kind == "demo_measurement")
+                         .order_by(m.Job.created_at.desc()))
+    if job is None:
+        return {"status": "unavailable", "dataset_id": None, "job_status": None, "error": None}
+    status = "failed" if job.status in {"failed", "cancelled"} else "preparing"
+    return {"status": status, "dataset_id": None, "job_status": job.status,
+            "error": job.error if status == "failed" else None}
+
+
+def retry_measurement(session: Session, org: m.Organization, user_id: str) -> dict:
+    """Retry only a failed disposable-demo seed; an active or completed job stays idempotent."""
+    if not org.is_demo or not org.is_ephemeral:
+        raise ApiError("not_disposable_demo", "Подготовка доступна только в одноразовой демо-сессии", 403)
+    current = measurement_readiness(session, org.id)
+    if current["status"] == "ready":
+        return current
+    job = session.scalar(select(m.Job).where(m.Job.org_id == org.id, m.Job.kind == "demo_measurement")
+                         .order_by(m.Job.created_at.desc()))
+    if job is None:
+        from . import jobs
+
+        jobs.enqueue(session, org.id, "demo_measurement", {"user_id": user_id},
+                     idempotency_key=f"demo_measurement:{org.id}", user_id=user_id)
+    elif job.status in {"failed", "cancelled"}:
+        job.status = "queued"
+        job.error = None
+        job.result = None
+        job.progress = 0.0
+        job.started_at = None
+        job.finished_at = None
+        session.commit()
+    return measurement_readiness(session, org.id)
+
+
 # ---------------------------------------------------------------------------
 # Deletion
 # ---------------------------------------------------------------------------

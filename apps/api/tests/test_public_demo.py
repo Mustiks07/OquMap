@@ -217,6 +217,11 @@ def test_demo_measurement_runs_as_a_background_job(public, monkeypatch):
     monkeypatch.setattr(s, "job_mode", "worker")  # queue only; executed below like the worker does
     h, b = demo(public)
     assert public.get("/api/v1/pilots", headers=h).json()["total"] == 0  # not ready yet, login was not delayed
+    waiting = public.get("/api/v1/demo/measurement-readiness", headers=h)
+    assert waiting.status_code == 200
+    assert waiting.json() == {
+        "status": "preparing", "dataset_id": None, "job_status": "queued", "error": None,
+    }
     from oqumap.services.jobs import claim_next, execute
 
     with db.session_factory()() as ss:
@@ -226,3 +231,22 @@ def test_demo_measurement_runs_as_a_background_job(public, monkeypatch):
             execute(ss, j)
         assert ss.get(m.Job, job.id).status == "succeeded"
     assert public.get("/api/v1/pilots", headers=h).json()["total"] >= 4
+    ready = public.get("/api/v1/demo/measurement-readiness", headers=h).json()
+    assert ready["status"] == "ready" and ready["dataset_id"] and ready["error"] is None
+
+
+def test_failed_demo_measurement_can_be_requeued(public, monkeypatch):
+    s = get_settings()
+    monkeypatch.setattr(s, "demo_tenant_measurement", "background")
+    monkeypatch.setattr(s, "job_mode", "worker")
+    h, b = demo(public)
+    with db.session_factory()() as ss:
+        job = ss.scalar(select(m.Job).where(m.Job.org_id == b["user"]["org_id"], m.Job.kind == "demo_measurement"))
+        job.status = "failed"
+        job.error = {"code": "internal_error", "message": "Внутренняя ошибка обработки"}
+        ss.commit()
+    failed = public.get("/api/v1/demo/measurement-readiness", headers=h).json()
+    assert failed["status"] == "failed" and failed["error"]["code"] == "internal_error"
+    retried = public.post("/api/v1/demo/measurement-readiness/retry", headers=h)
+    assert retried.status_code == 200
+    assert retried.json()["status"] == "preparing" and retried.json()["job_status"] == "queued"

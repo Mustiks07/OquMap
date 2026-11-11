@@ -9,6 +9,10 @@ import { expect, test, type Page } from "@playwright/test";
 async function login(page: Page) {
   await page.goto("/login");
   await page.getByTestId("enter-demo").click();
+  // Public demo prepares the measurement corpus asynchronously. Wait for the observable
+  // ready state (the dataset card), never for an arbitrary timeout or a dev-only login.
+  await page.goto("/datasets");
+  await expect(page.getByTestId("choose-measurement_loop")).toBeVisible({ timeout: 120_000 });
   await page.getByTestId("choose-measurement_loop").click();
 }
 
