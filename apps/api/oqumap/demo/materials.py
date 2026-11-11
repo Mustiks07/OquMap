@@ -201,4 +201,14 @@ def build_docx() -> bytes:
     d.core_properties.revision = 1
     buf = io.BytesIO()
     d.save(buf)
-    return buf.getvalue()
+    # Normalise zip entry timestamps so the demo file is byte-identical on every seed.
+    import zipfile
+
+    src = zipfile.ZipFile(io.BytesIO(buf.getvalue()))
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+        for info in sorted(src.infolist(), key=lambda i: i.filename):
+            zi = zipfile.ZipInfo(info.filename, date_time=(2026, 1, 1, 0, 0, 0))
+            zi.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(zi, src.read(info.filename))
+    return out.getvalue()
