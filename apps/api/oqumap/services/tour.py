@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import time
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from .. import models as m
 from ..ai.provider import get_provider
 from ..errors import ApiError
 from . import analysis as an
@@ -48,6 +50,11 @@ def preflight(session: Session, p, dataset_id: str) -> dict:
 
     run("comparison", comp)
     run("plan", lambda: {"topics": len(planning.plan_context(session, p.org_id, dataset_id, an.Filters(), p.user_id)["topics"])})
+    from ..demo.measurement_seed import DATASET_CODE as MEASUREMENT_CODE
+
+    ml = session.scalar(select(m.Dataset.id).where(m.Dataset.org_id == p.org_id, m.Dataset.code == MEASUREMENT_CODE))
+    # informational: in a fresh demo tenant the measurement & learning-loop demo is built by a background job
+    checks.append({"code": "measurement_loop", "ok": True, "detail": {"status": "ready" if ml else "preparing"}, "ms": 0})
     prov = get_provider()
     mode = "live_model" if prov.available and not prov.is_recorded else ("recorded_demo" if prov.is_recorded else "template")
     checks.append({"code": "ai_mode", "ok": True, "detail": {"mode": mode, "provider": prov.name, "model": prov.model,

@@ -182,3 +182,47 @@ def test_production_mode_disables_demo_login(public, monkeypatch):
 
 
 _ = io
+
+
+def test_demo_tenant_gets_the_measurement_loop_isolated_and_fully_cleaned(public, monkeypatch):
+    """Integration: the measurement & learning-loop demo (Claude 2) is built natively in each disposable tenant."""
+    monkeypatch.setattr(get_settings(), "demo_tenant_measurement", "sync")
+    h, b = demo(public)
+    org_id = b["user"]["org_id"]
+    pilots = public.get("/api/v1/pilots", headers=h).json()
+    codes = {p["code"] for p in pilots["items"]}
+    assert {"PIL-M01", "PIL-M02", "PIL-M03", "PIL-M04"} <= codes
+    by = {p["code"]: p for p in pilots["items"]}
+    assert public.get(f"/api/v1/pilots/{by['PIL-M01']['id']}", headers=h).status_code == 200
+    port = public.get("/api/v1/portfolio/interventions", headers=h)
+    assert port.status_code == 200
+    # another visitor cannot see this tenant's pilots
+    h2, _ = demo(public)
+    assert public.get(f"/api/v1/pilots/{by['PIL-M01']['id']}", headers=h2).status_code == 404
+    with db.session_factory()() as s:
+        s.get(m.Organization, org_id).expires_at = utcnow() - timedelta(minutes=1)
+        s.commit()
+    from oqumap.maintenance import cleanup
+
+    cleanup()
+    with db.session_factory()() as s:
+        for table in db.Base.metadata.sorted_tables:
+            if "org_id" in table.c:
+                assert s.scalar(select(func.count()).select_from(table).where(table.c.org_id == org_id)) == 0, table.name
+
+
+def test_demo_measurement_runs_as_a_background_job(public, monkeypatch):
+    s = get_settings()
+    monkeypatch.setattr(s, "demo_tenant_measurement", "background")
+    monkeypatch.setattr(s, "job_mode", "worker")  # queue only; executed below like the worker does
+    h, b = demo(public)
+    assert public.get("/api/v1/pilots", headers=h).json()["total"] == 0  # not ready yet, login was not delayed
+    from oqumap.services.jobs import claim_next, execute
+
+    with db.session_factory()() as ss:
+        job = ss.scalar(select(m.Job).where(m.Job.org_id == b["user"]["org_id"], m.Job.kind == "demo_measurement"))
+        assert job is not None and job.status == "queued"
+        while (j := claim_next(ss)) is not None:
+            execute(ss, j)
+        assert ss.get(m.Job, job.id).status == "succeeded"
+    assert public.get("/api/v1/pilots", headers=h).json()["total"] >= 4

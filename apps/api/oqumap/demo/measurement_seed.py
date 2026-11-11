@@ -162,8 +162,27 @@ def _diag_answer(rng, theta: float, opts, key: str, b: float, beh: str | None) -
 # ---------------------------------------------------------------------------
 
 
+def _ref(session: Session, org_id: str, entity: str, code: str) -> str:
+    """ID of the organisation's programme / topic / objective by code (integration: works for the seeded template
+    and for disposable demo tenants, whose programme rows are clones with remapped IDs)."""
+    pv = session.scalar(select(m.ProgramVersion.id).where(m.ProgramVersion.org_id == org_id, m.ProgramVersion.title == PROGRAM["title"],
+                                                         m.ProgramVersion.version == PROGRAM["version"]))
+    if pv is None:
+        raise RuntimeError("measurement seed needs the demo programme in the organisation")
+    if entity == "program":
+        return pv
+    model = m.Topic if entity == "topic" else m.LearningObjective
+    rid = session.scalar(select(model.id).where(model.program_version_id == pv, model.code == code))
+    if rid is None:
+        raise RuntimeError(f"{entity} {code} not found in the demo programme")
+    return rid
+
+
 def _seed_form(session: Session, org_id: str) -> None:
-    pv_id = stable_id(org_id, "program", PROGRAM["code"])
+    pv_id = _ref(session, org_id, "program", PROGRAM["code"])
+    if session.scalar(select(m.AssessmentForm.id).where(m.AssessmentForm.program_version_id == pv_id,
+                                                        m.AssessmentForm.code == FORM_CODE)) is not None:
+        return  # a demo tenant already has the form and items (cloned with the template programme)
     if session.scalar(select(m.Scale).where(m.Scale.code == SCALE_CODE)) is None:
         session.add(m.Scale(id=stable_id("scale", SCALE_CODE), code=SCALE_CODE, name="Диагностика T3 (одна форма, до и после)",
                             linking_method="identical_form",
@@ -179,7 +198,7 @@ def _seed_form(session: Session, org_id: str) -> None:
                            options=[{"key": letter, "text": t, "correct": letter == key, "misconception": tag}
                                     for letter, (t, tag) in zip(LETTERS, opts, strict=True)],
                            answer_key=key, max_points=1.0))
-        session.add(m.ItemObjective(id=stable_id(org_id, "io", code, O + obj), item_id=iid, objective_id=stable_id(org_id, "objective", O + obj),
+        session.add(m.ItemObjective(id=stable_id(org_id, "io", code, O + obj), item_id=iid, objective_id=_ref(session, org_id, "objective", O + obj),
                                     weight=1.0, status="confirmed", origin="item_bank_author", org_id=org_id))
     session.flush()  # items before form items (no ORM relationships → explicit ordering)
     for pos, (code, *_rest) in enumerate(DIAG_ITEMS, start=1):
@@ -191,7 +210,7 @@ def _seed_form(session: Session, org_id: str) -> None:
 def _seed_dataset(session: Session, org: m.Organization) -> m.Dataset:
     csv_text = gen.to_csv(generate_rows())
     ds = m.Dataset(id=stable_id(org.id, "dataset", DATASET_CODE), org_id=org.id,
-                   program_version_id=stable_id(org.id, "program", PROGRAM["code"]), code=DATASET_CODE,
+                   program_version_id=_ref(session, org.id, "program", PROGRAM["code"]), code=DATASET_CODE,
                    name_ru="Контур измерения и обучения: диагностика T3 и пилоты, 2026–2027",
                    name_kz="Өлшеу және оқу контуры: T3 диагностикасы және пилоттар, 2026–2027",
                    description_ru="Синтетический набор: 6 школ × 4 класса, входная проверка, диагностика T3 до и после пилотов. "
@@ -232,11 +251,14 @@ def _iv(code, title_ru, title_kz, targets, level, *, minutes=20, per_week=3, wee
         limitations_ru=limits, limitations_kz="", targets=targets)
 
 
+_SESSION: list[Session] = []  # the session of the running seed (set in seed_measurement)
+
+
 def _t(org_id: str, kind: str, code: str) -> S.TargetIn:
     if kind == "misconception":
         return S.TargetIn(target_type="misconception", misconception_code=code)
     entity = "topic" if kind == "topic" else "objective"
-    return S.TargetIn(target_type=kind, target_id=stable_id(org_id, entity, code))
+    return S.TargetIn(target_type=kind, target_id=_ref(_SESSION[-1], org_id, entity, code))
 
 
 def _weekly_dates(start: date, end: date, weekdays: tuple[int, ...]) -> list[date]:
@@ -248,12 +270,21 @@ def _weekly_dates(start: date, end: date, weekdays: tuple[int, ...]) -> list[dat
     return out
 
 
-def seed_measurement(session: Session, org_id: str) -> dict:
-    """Idempotent: does nothing when the dataset already exists."""
+def seed_measurement(session: Session, org_id: str, user_id: str | None = None) -> dict:
+    """Idempotent: does nothing when the dataset already exists. ``user_id`` — the methodist acting in the organisation
+    (default: the demo template's methodist; a disposable demo tenant passes its own user)."""
     if session.scalar(select(m.Dataset).where(m.Dataset.org_id == org_id, m.Dataset.code == DATASET_CODE)) is not None:
         return {"status": "exists"}
+    _SESSION.append(session)
+    try:
+        return _seed_measurement(session, org_id, user_id)
+    finally:
+        _SESSION.pop()
+
+
+def _seed_measurement(session: Session, org_id: str, user_id: str | None) -> dict:
     org = session.get(m.Organization, org_id)
-    user = session.get(m.User, stable_id("user", "demo-methodist"))
+    user = session.get(m.User, user_id or stable_id("user", "demo-methodist"))
     p = Principal(user, org)  # demo methodist holds methodist + approver roles
     _seed_form(session, org_id)
     session.commit()
@@ -304,7 +335,7 @@ def seed_measurement(session: Session, org_id: str) -> dict:
     cohorts = {c.code: c.id for c in session.scalars(select(m.Cohort).where(m.Cohort.dataset_id == ds.id))}
     assess = {a.code: a.id for a in session.scalars(select(m.Assessment).where(m.Assessment.dataset_id == ds.id))}
     letter = gen.LETTERS_RU
-    t3 = stable_id(org_id, "topic", "T3")
+    t3 = _ref(session, org_id, "topic", "T3")
 
     def group(ci):
         return [cohorts[f"{s}-6{letter[ci]}"] for s, _ in SCHOOLS]
@@ -313,7 +344,7 @@ def seed_measurement(session: Session, org_id: str) -> dict:
                           notes="Зарегистрировано до анализа: стандартизация изменений по уровню входной диагностики.")
     p1 = pls.create(session, p, S.PilotCreate(
         dataset_id=ds.id, title="Полоса дробей в 6А классах (сравнение с 6Б)", intervention_id=lib["INT-STRIPS"]["id"], topic_id=t3,
-        objective_id=stable_id(org_id, "objective", O + "3.1"),
+        objective_id=_ref(session, org_id, "objective", O + "3.1"),
         primary_outcome_ru="Доля баллов по диагностике T3 (цель 3.1): изменение DIAG-BASE → DIAG-END",
         design="matched_comparison", assignment_unit="cohort",
         cohorts=[S.PilotCohortIn(cohort_id=c, arm="intervention") for c in group(0)] + [S.PilotCohortIn(cohort_id=c, arm="comparison") for c in group(1)],
@@ -329,7 +360,7 @@ def seed_measurement(session: Session, org_id: str) -> dict:
         follow_up_due=date(2026, 10, 30), owner="Методист (демо)", inclusion_criteria="6В классы."), code="PIL-M02")
     p3 = pls.create(session, p, S.PilotCreate(
         dataset_id=ds.id, title="Числовая прямая для смешанных чисел в 6Г классах", intervention_id=lib["INT-NUMLINE"]["id"], topic_id=t3,
-        objective_id=stable_id(org_id, "objective", O + "3.2"),
+        objective_id=_ref(session, org_id, "objective", O + "3.2"),
         primary_outcome_ru="Доля баллов по цели 3.2 на следующей диагностике T3", design="single_group",
         cohorts=[S.PilotCohortIn(cohort_id=c, arm="intervention") for c in group(3)], baseline_assessment_id=assess["DIAG-END"],
         start_date=date(2026, 11, 2), end_date=date(2026, 12, 25), follow_up_due=date(2026, 12, 28), owner="Методист (демо)",

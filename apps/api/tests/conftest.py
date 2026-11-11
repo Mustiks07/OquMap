@@ -19,6 +19,7 @@ os.environ["OQUMAP_DEPLOYMENT_MODE"] = "dev"
 for _k in ("LOGIN", "IMPORT", "DOCUMENT", "AI", "ASSISTANT", "COMPUTE"):
     os.environ[f"OQUMAP_RATE_{_k}"] = "100000/60"
 os.environ["OQUMAP_DEMO_TENANTS_PER_IP_PER_HOUR"] = "100000"
+os.environ.setdefault("OQUMAP_DEMO_TENANT_MEASUREMENT", "off")  # one test enables "sync" explicitly
 
 from oqumap import db  # noqa: E402
 from oqumap.config import get_settings  # noqa: E402

@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     trusted_proxies: list[str] = ["127.0.0.1/32", "::1/128"]
 
     # Public demo tenants
+    # measurement & learning-loop demo inside a disposable tenant: background job (default), sync (tests), off
+    demo_tenant_measurement: str = "background"
     demo_tenant_ttl_hours: float = 6.0
     demo_max_active_tenants: int = 300
     demo_tenants_per_ip_per_hour: int = 6

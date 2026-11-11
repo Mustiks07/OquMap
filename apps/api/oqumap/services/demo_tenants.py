@@ -169,6 +169,19 @@ def create_demo_tenant(session: Session, client_ip: str) -> tuple[str, m.User, m
     res = clone_into(session, org.id, INITIAL_DATASETS)
     audit(session, org.id, user.id, "demo.tenant_created", "organization", org.id, rows=res["rows"])
     session.commit()
+    # The measurement & learning-loop demo (interventions, pilots, fidelity, outcomes, conclusions) is built natively
+    # in the tenant by its own seed — not cloned row by row, because snapshots and content hashes must stay
+    # consistent. It takes a few seconds, so it runs as a background job; the visitor is not kept waiting.
+    mode = s.demo_tenant_measurement
+    if mode == "sync":
+        from ..demo.measurement_seed import seed_measurement
+
+        seed_measurement(session, org.id, user.id)
+    elif mode == "background":
+        from . import jobs
+
+        jobs.enqueue(session, org.id, "demo_measurement", {"user_id": user.id}, idempotency_key=f"demo_measurement:{org.id}",
+                     user_id=user.id)
     rec = session.scalar(select(m.Dataset.id).where(m.Dataset.org_id == org.id, m.Dataset.code == RECOMMENDED_DATASET))
     token = issue_token(session, user, expires_at=org.expires_at)
     return token, user, org, rec
@@ -209,6 +222,11 @@ def delete_org_data(session: Session, org_id: str) -> int:
         nonlocal n
         n += session.execute(stmt).rowcount or 0
 
+    # measurement & learning-loop tables (Claude 2), children first; all of them carry org_id
+    for name in ("pilot_session_events", "pilot_sessions", "intervention_evidence", "pilot_conclusions", "pilot_outcomes",
+                 "fidelity_logs", "pilot_events", "pilot_cohorts", "pilots", "intervention_targets", "intervention_versions",
+                 "interventions", "assessment_cohorts"):
+        run(delete(_t(name)).where(T(name).org_id == org_id))
     quiz_ids = list(session.scalars(select(m.Quiz.id).where(m.Quiz.org_id == org_id)))
     run(delete(_t("quiz_response_sets")).where(T("quiz_response_sets").org_id == org_id))
     run(delete(_t("quiz_versions")).where(T("quiz_versions").quiz_id.in_(quiz_ids)))
@@ -256,3 +274,19 @@ def cleanup_expired(session: Session) -> dict:
     counters = ratelimit.purge_expired(session)
     return {"tenants_deleted": len(expired), "rows_deleted": rows, "sessions_deleted": sessions,
             "rate_counters_deleted": counters}
+
+
+def _register_jobs() -> None:
+    from . import jobs
+
+    @jobs.handler("demo_measurement")
+    def _demo_measurement(session: Session, job: m.Job) -> dict:
+        from ..demo.measurement_seed import seed_measurement
+
+        org = session.get(m.Organization, job.org_id)
+        if org is None or not org.is_ephemeral:  # tenant already cleaned up, or not a demo tenant
+            return {"status": "skipped"}
+        return seed_measurement(session, job.org_id, job.payload.get("user_id"))
+
+
+_register_jobs()
