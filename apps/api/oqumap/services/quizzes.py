@@ -18,6 +18,7 @@ from __future__ import annotations
 import csv
 import io
 import random
+import re
 from datetime import UTC, datetime
 from fractions import Fraction
 from math import gcd
@@ -31,6 +32,7 @@ from ..errors import ApiError, not_found
 from . import analysis as an
 from . import graph as gr
 from .common import audit, sha256_bytes
+from .quiz_families import EXTRA_FAMILIES, FAMILY_TITLES
 
 GENERATOR_VERSION = "quiz-gen-v1"
 DIFFICULTY = ("easy", "medium", "hard")
@@ -187,10 +189,11 @@ FAMILIES = {
     "lcm": (fam_lcm, render_lcm, {"lcm_as_product", "gcd_lcm_confusion", "lcm_as_sum"}),
     "percent": (fam_percent, render_percent, {"percent_as_number", "percent_divide", "divides_by_percent_fraction"}),
 }
+FAMILIES.update(EXTRA_FAMILIES)
 
 
 def _parse_value(text: str) -> Fraction | None:
-    t = text.strip().replace("−", "-")
+    t = re.sub(r"\s*(см²|см|тг)$", "", text.strip()).replace("−", "-")
     try:
         if " " in t and "/" in t:
             w, fr = t.split(" ", 1)
@@ -263,6 +266,10 @@ class GenerateReq(BaseModel):
     topic_id: str
     n_items: int = 5
     seed: int | None = None
+    # explicit families chosen by the teacher (e.g. for a topic that was not measured); otherwise families are
+    # chosen by the misconception hypotheses observed in the topic
+    families: list[str] | None = None
+    objective_id: str | None = None
 
 
 class EditReq(BaseModel):
@@ -290,15 +297,30 @@ def generate(session: Session, p, req: GenerateReq, persist: bool = True) -> dic
     g = gr.build(session, p.org_id, req.dataset_id, req.topic_id, an.Filters(), p.user_id)
     ev = an.get_run(session, p.org_id, g["context"]["analysis_id"])["result"]
     item_by_code = {it["code"]: it for it in ev["items"]}
-    # hypotheses actually observed in this topic, most frequent first → families that test them
-    plan: list[tuple[str, dict]] = []
-    for mc in ev["misconceptions"]:
-        fam = next((f for f, (_, _, mcs) in FAMILIES.items() if mc["code"] in mcs), None)
-        if fam and all(f != fam for f, _ in plan):
-            plan.append((fam, mc))
+    plan: list[tuple[str, dict | None]] = []
+    if req.families:
+        unknown = [f for f in req.families if f not in FAMILIES]
+        if unknown:
+            raise ApiError("unknown_family", "Неизвестное семейство заданий", 422, {"unknown": unknown, "allowed": sorted(FAMILIES)})
+        observed = {mc["code"]: mc for mc in ev["misconceptions"]}
+        for f in dict.fromkeys(req.families):
+            plan.append((f, next((observed[c] for c in FAMILIES[f][2] if c in observed), None)))
+    else:
+        # hypotheses actually observed in this topic, most frequent first → families that test them
+        for mc in ev["misconceptions"]:
+            fam = next((f for f, (_, _, mcs) in FAMILIES.items() if mc["code"] in mcs), None)
+            if fam and all(f != fam for f, _ in plan):
+                plan.append((fam, mc))
     if not plan:
-        raise ApiError("no_template_family", "Для гипотез этой темы нет шаблонного семейства заданий: автоматическая "
-                       "генерация недоступна, задания нужно составить вручную", 422, {"misconceptions": [x["code"] for x in ev["misconceptions"]]})
+        raise ApiError("no_template_family", "Для гипотез этой темы нет шаблонного семейства заданий: выберите семейство "
+                       "вручную или составьте задания сами", 422,
+                       {"misconceptions": [x["code"] for x in ev["misconceptions"]], "families": sorted(FAMILIES)})
+    topic_objs = [o for o in ev["objectives"]]
+    if req.objective_id and not any(o["objective_id"] == req.objective_id for o in topic_objs):
+        raise ApiError("unknown_objective", "Цель не относится к теме", 422)
+    measured = [o for o in topic_objs if o["score"]]
+    default_obj = next((o for o in topic_objs if o["objective_id"] == req.objective_id), None) or \
+        (min(measured, key=lambda o: o["score"]["mean"]) if measured else (topic_objs[0] if topic_objs else None))
     rng = random.Random(req.seed if req.seed is not None else int(sha256_bytes(f"{req.topic_id}{ds.version}".encode())[:8], 16))
     items: list[dict] = []
     stems = set()
@@ -313,9 +335,13 @@ def generate(session: Session, p, req: GenerateReq, persist: bool = True) -> dic
         if r["stem_ru"] in stems or len(set(vals)) < len(vals):  # coinciding distractors would not discriminate
             continue
         stems.add(r["stem_ru"])
-        sig_items = [item_by_code[c] for c in mc["items"] if c in item_by_code]
-        obj = next((ol for it in sig_items for ol in it["objectives"] if ol["status"] == "confirmed"), None) or \
-            (sig_items[0]["objectives"][0] if sig_items and sig_items[0]["objectives"] else None)
+        sig_items = [item_by_code[c] for c in mc["items"] if c in item_by_code] if mc else []
+        obj = None
+        if mc and not req.families:
+            obj = next((ol for it in sig_items for ol in it["objectives"] if ol["status"] == "confirmed"), None) or \
+                (sig_items[0]["objectives"][0] if sig_items and sig_items[0]["objectives"] else None)
+        elif default_obj:
+            obj = {"objective_id": default_obj["objective_id"], "code": default_obj["code"]}
         if obj is None:
             continue
         letters = "ABCD"
@@ -327,9 +353,12 @@ def generate(session: Session, p, req: GenerateReq, persist: bool = True) -> dic
             "code": f"Q{len(items) + 1}", "family": spec["family"], "params": spec["params"], "objective_id": obj["objective_id"],
             "objective_code": obj["code"], "stem_ru": r["stem_ru"], "stem_kz": r["stem_kz"], "options": opts,
             "answer_key": next(o["key"] for o in opts if o["correct"]), "rubric_ru": r["rubric_ru"], "rubric_kz": r["rubric_kz"],
-            "difficulty": DIFFICULTY[level], "target_misconception": mc["code"],
-            "evidence_ids": [f"misconception:{mc['code']}"] + [f"item:{it['item_id']}" for it in sig_items[:2]],
-            "evidence_note_ru": f"Гипотеза «{mc['label_ru']}»: {mc['n_learners']} уч. в заданиях {', '.join(mc['items'][:3])}.",
+            "difficulty": DIFFICULTY[level], "target_misconception": mc["code"] if mc else None,
+            "evidence_ids": ([f"misconception:{mc['code']}"] + [f"item:{it['item_id']}" for it in sig_items[:2]] if mc else [])
+            + ([f"objective:{obj['objective_id']}"] if not mc or req.families else []),
+            "evidence_note_ru": (f"Гипотеза «{mc['label_ru']}»: {mc['n_learners']} уч. в заданиях {', '.join(mc['items'][:3])}." if mc else
+                                 f"Семейство «{FAMILY_TITLES.get(spec['family'], (spec['family'],))[0]}» выбрано учителем для цели "
+                                 f"{obj['code']}; в данных темы гипотез этого типа нет — работа проверяет их впервые."),
         })
     meta = an.load_meta(session, p.org_id, req.dataset_id)
     checks = check_quiz(items, {o.id for o in meta.objectives}, {n["id"] for n in g["result"]["nodes"]})

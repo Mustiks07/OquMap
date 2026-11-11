@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { api, download } from "../api/client";
 import { useCurriculum } from "../api/hooks";
 import { useQuiz, useQuizMutation, useQuizzes, type Quiz, type QuizItem } from "../api/wow";
@@ -12,14 +13,16 @@ const STATUS_TONE = { draft: "neutral", edited: "info", approved: "ok", rejected
 
 /** Diagnostic quiz generator: 3–7 items from observed misconception hypotheses, teacher review, exports, responses. */
 export function QuizPage() {
-  const { t, pick } = useI18n();
+  const { t, pick, lang } = useI18n();
   const st = useAppState();
   const cur = useCurriculum();
   const list = useQuizzes();
   const [topicId, setTopicId] = useState<string>(st.topicId ?? "");
   const [n, setN] = useState("5");
   const [openId, setOpenId] = useState<string | null>(null);
-  const gen = useQuizMutation((b: { dataset_id: string; topic_id: string; n_items: number }) => api.post<Quiz>("/api/v1/quizzes/generate", b));
+  const [fams, setFams] = useState<string[]>([]);
+  const families = useQuery({ queryKey: ["quiz-families"], queryFn: () => api.get<{ code: string; title_ru: string; title_kz: string }[]>("/api/v1/quizzes/families") });
+  const gen = useQuizMutation((b: { dataset_id: string; topic_id: string; n_items: number; families: string[] | null }) => api.post<Quiz>("/api/v1/quizzes/generate", b));
   if (!st.datasetId) return <div className="page"><EmptyState>{t("datasets.lead")}</EmptyState></div>;
   const tid = topicId || cur.data?.topics[0]?.id || "";
   return (
@@ -36,10 +39,22 @@ export function QuizPage() {
           <label className="small" htmlFor="quiz-n">{t("quiz.n_items")}</label>
           <Select id="quiz-n" value={n} onChange={setN} options={["3", "4", "5", "6", "7"].map((v) => ({ value: v, label: v }))} />
           <Button variant="primary" disabled={!tid || gen.isPending} data-testid="quiz-generate"
-            onClick={() => gen.mutate({ dataset_id: st.datasetId!, topic_id: tid, n_items: Number(n) }, { onSuccess: (q) => setOpenId(q.id) })}>
+            onClick={() => gen.mutate({ dataset_id: st.datasetId!, topic_id: tid, n_items: Number(n), families: fams.length ? fams : null }, { onSuccess: (q) => setOpenId(q.id) })}>
             {t("quiz.generate_btn")}
           </Button>
         </div>
+        <details className="small" style={{ marginTop: 8 }}>
+          <summary>{t("quiz.families")}{fams.length ? ` (${fams.length})` : ""}</summary>
+          <p className="xs muted">{t("quiz.families_hint")}</p>
+          <div className="row" style={{ gap: 12 }} data-testid="quiz-families">
+            {(families.data ?? []).map((f) => (
+              <label key={f.code} className="xs row" style={{ gap: 4 }}>
+                <input type="checkbox" checked={fams.includes(f.code)} onChange={(e) => setFams(e.target.checked ? [...fams, f.code] : fams.filter((x) => x !== f.code))} />
+                {lang === "kz" ? f.title_kz : f.title_ru}
+              </label>
+            ))}
+          </div>
+        </details>
         <p className="xs muted">{t("quiz.not_grade")}</p>
         {gen.isError && <ErrorState error={gen.error} />}
       </Card>

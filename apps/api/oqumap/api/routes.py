@@ -659,6 +659,15 @@ def quiz_generate(body: QuizGenerateReq, p: P, session: DB) -> dict[str, Any]:
     return quizzes.generate(session, p, body)
 
 
+@router.get("/quizzes/families", tags=["quizzes"])
+def quiz_families(p: P) -> list[dict[str, Any]]:
+    """Exact item families: code, title and the misconception rules their distractors apply."""
+    from ..services.quiz_families import FAMILY_TITLES
+
+    return [{"code": f, "title_ru": FAMILY_TITLES.get(f, (f, f))[0], "title_kz": FAMILY_TITLES.get(f, (f, f))[1],
+             "misconceptions": sorted(v[2])} for f, v in quizzes.FAMILIES.items()]
+
+
 @router.post("/quizzes/preview", tags=["quizzes"])
 def quiz_preview(body: QuizGenerateReq, p: P, session: DB) -> dict[str, Any]:
     """Same generator and checks without saving anything (used by the read-only presentation mode)."""

@@ -194,7 +194,7 @@ def test_quiz_generate_review_export_and_responses(client, H, datasets, curricul
     assert rs["summary"]["hypotheses"][wrong["misconception"]]["n_learners"] == 1 and rs["summary"]["n_rejected"] == 2
 
 
-def test_quiz_for_topic_without_family_is_honest(client, H, datasets, curriculum):
+def test_quiz_for_topic_without_family_is_honest(client, H, datasets, curriculum):  # no explicit families
     t8 = _topic(curriculum, "T8")  # not measured: no hypotheses → no template family
     r = client.post("/api/v1/quizzes/generate", json={"dataset_id": datasets["base"]["id"], "topic_id": t8["id"]}, headers=H)
     assert r.status_code == 422 and r.json()["error"]["code"] == "no_template_family"
@@ -224,3 +224,64 @@ def test_quiz_stems_use_lowest_terms():
                 spec = qz.FAMILIES[fam][0](rng, lvl)
                 stem = qz.FAMILIES[fam][1](spec["params"])["stem_ru"]
                 assert all(gcd(int(n), int(d)) == 1 for n, d in re.findall(r"(\d+)/(\d+)", stem)), stem
+
+
+def test_extra_families_exact_keys_rule_based_distractors_and_checks():
+    import random
+    from fractions import Fraction
+
+    from oqumap.services import quizzes as qz
+    from oqumap.services.quiz_families import fmt
+
+    # spot checks of the rules on fixed numbers
+    r = qz.FAMILIES["dec_add"][1]({"a": 5, "b": 25})
+    by = {o["misconception"]: o["text"] for o in r["options"]}
+    assert by[None] == "0,75" and by["decimal_align_right"] == "0,3"
+    r = qz.FAMILIES["proportion"][1]({"a": 6, "b": 2, "c": 3})
+    assert {o["misconception"]: o["text"] for o in r["options"]}[None] == "4"
+    r = qz.FAMILIES["neg_add"][1]({"a": 7, "b": 3})
+    assert {o["misconception"]: o["text"] for o in r["options"]} == {None: "−4", "neg_wrong_sign": "4", "neg_add_absolute": "−10", "neg_ignore_signs": "10"}
+    r = qz.FAMILIES["linear_eq"][1]({"a": 3, "b": 4, "c": 19})
+    assert r["key_value"] == 5
+    r = qz.FAMILIES["order_ops"][1]({"a": 2, "b": 3, "c": 4, "d": 1})
+    assert r["key_value"] == 13 and {o["misconception"]: o["text"] for o in r["options"]}["ops_left_to_right"] == "19"
+    r = qz.FAMILIES["area_perimeter"][1]({"a": 5, "b": 3, "ask": "area"})
+    assert r["options"][0]["text"] == "15 см²" and qz._parse_value("15 см²") == 15
+    assert fmt(Fraction(-7, 4)) == "−1,75" and fmt(Fraction(1, 3)) == "1/3"
+    # random instances: exactly one correct, key recomputed from params, every distractor has a rule
+    rng = random.Random(5)
+    for fam in ("dec_add", "dec_compare", "dec_mul", "proportion", "unit_rate", "neg_add", "neg_compare", "linear_eq", "order_ops",
+                "area_perimeter"):
+        for lvl in range(3):
+            spec = qz.FAMILIES[fam][0](rng, lvl)
+            out = qz.FAMILIES[fam][1](spec["params"])
+            assert sum(o["correct"] for o in out["options"]) == 1
+            key = next(o for o in out["options"] if o["correct"])
+            assert qz._parse_value(key["text"]) == out["key_value"] or key["text"] == out.get("key_text")
+            assert all(o["misconception"] and o["rationale_ru"] for o in out["options"] if not o["correct"])
+
+
+def test_teacher_chosen_families_for_unmeasured_topic(client, H, datasets, curriculum):
+    t8 = _topic(curriculum, "T8")  # not measured: no hypotheses observed, families chosen explicitly
+    r = client.post("/api/v1/quizzes/generate", headers=H, json={"dataset_id": datasets["base"]["id"], "topic_id": t8["id"],
+                                                                 "n_items": 4, "families": ["neg_add", "neg_compare"]})
+    assert r.status_code == 200, r.text
+    q = r.json()
+    assert q["checks"]["approvable"], q["checks"]["blocking_failed"]
+    assert {i["family"] for i in q["items"]} == {"neg_add", "neg_compare"}
+    assert all(i["evidence_ids"][0].startswith("objective:") and "впервые" in i["evidence_note_ru"] for i in q["items"])
+    bad = client.post("/api/v1/quizzes/generate", headers=H, json={"dataset_id": datasets["base"]["id"], "topic_id": t8["id"], "families": ["nope"]})
+    assert bad.status_code == 422 and bad.json()["error"]["code"] == "unknown_family"
+
+
+def test_observed_decimal_and_proportion_hypotheses_get_families(client, H, datasets, curriculum):
+    # T5: hypotheses observed → families chosen automatically; T6 has only unconfirmed item links (no hypotheses
+    # under confirmed_only), so the teacher picks the proportion families explicitly
+    for code, fams in (("T5", None), ("T6", ["proportion", "unit_rate"])):
+        t = _topic(curriculum, code)
+        r = client.post("/api/v1/quizzes/preview", headers=H, json={"dataset_id": datasets["base"]["id"], "topic_id": t["id"], "n_items": 3,
+                                                                     "families": fams})
+        assert r.status_code == 200, (code, r.text)
+        assert r.json()["checks"]["approvable"], r.json()["checks"]["blocking_failed"]
+    fams = client.get("/api/v1/quizzes/families", headers=H).json()
+    assert {"dec_add", "proportion", "neg_add", "linear_eq", "order_ops", "area_perimeter"} <= {f["code"] for f in fams}
