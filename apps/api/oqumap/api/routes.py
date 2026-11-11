@@ -5,7 +5,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, Form, Header, Query, UploadFile
 from fastapi.responses import Response
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -356,6 +356,29 @@ def topic_evidence(topic_id: str, dataset_id: str, p: P, session: DB, filters: s
     return an.topic_evidence(session, p.org_id, dataset_id, topic_id, parse_filters(filters), p.user_id)
 
 
+@router.get("/topics/{topic_id}/graph", tags=["analyses"])
+def topic_graph(topic_id: str, dataset_id: str, p: P, session: DB, filters: str | None = None) -> dict[str, Any]:
+    """Evidence graph for a topic: every node opens its calculation, page, rows, plan or decision; gaps are nodes."""
+    from ..services import graph
+
+    return graph.build(session, p.org_id, dataset_id, topic_id, parse_filters(filters), p.user_id)
+
+
+class GraphSelection(BaseModel):
+    dataset_id: str
+    topic_id: str
+    node_ids: list[str]
+    filters: an.Filters = Field(default_factory=an.Filters)
+
+
+@router.post("/graph/validate", tags=["analyses"])
+def validate_graph_selection(body: GraphSelection, p: P, session: DB) -> dict[str, Any]:
+    from ..services import graph
+
+    g = graph.build(session, p.org_id, body.dataset_id, body.topic_id, body.filters, p.user_id)
+    return graph.validate_selection(g, body.node_ids[:50])
+
+
 @router.post("/comparisons", response_model=S.Envelope[S.ComparisonResult], tags=["analyses"])
 def comparison(body: an.ComparisonRequest, p: P, session: DB):
     ratelimit.check(session, "compute", p.user_id, "rate_compute")
@@ -693,6 +716,24 @@ class RecommendReq(BaseModel):
     topic_analysis_id: str
     comparison_analysis_id: str | None = None
     lang: str = "ru"
+
+
+class CouncilReq(BaseModel):
+    dataset_id: str
+    topic_id: str
+    edition_a_id: str | None = None
+    edition_b_id: str | None = None
+    lang: str = "ru"
+
+
+@router.post("/ai/council", response_model=S.GenerationOut, tags=["ai"])
+def ai_council(body: CouncilReq, p: P, session: DB):
+    """Agent council on a topic with a public audit trail and a server-verified final card."""
+    from ..ai import council
+
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    with use_gate(LiveGate.for_principal(session, p)):
+        return council.run(session, p, body.dataset_id, body.topic_id, body.edition_a_id, body.edition_b_id, body.lang)
 
 
 @router.post("/ai/explain-comparison", response_model=S.GenerationOut, tags=["ai"])
