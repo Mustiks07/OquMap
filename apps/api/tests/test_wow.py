@@ -93,3 +93,41 @@ def test_council_rejects_invented_ids_and_numbers_from_a_model(client, H, datase
     reasons = [v["reasons"] for v in out["verdicts"] if v["role"] == "analyst"]
     assert ["unverified_numbers"] in reasons and ["unknown_evidence_ids"] in reasons
     assert "fact:invented" not in out["final"]["evidence_ids"] and "12%" not in out["final"]["claim"]
+
+
+def test_sandbox_intent_to_typed_ops_with_diff():
+    from oqumap.services.sandbox import parse_intent
+
+    ops, rest = parse_intent("Добавь 2 часа на T3 за счёт T7, T5 не трогать, каждую тему менять не больше чем на 3")
+    got = [(o.op, o.topic, o.value) for o in ops]
+    assert ("add", "T3", 2) in got and ("remove", "T7", 2) in got and ("fix", "T5", None) in got and ("max_change", None, 3) in got
+    assert rest == []
+    ops, rest = parse_intent("сделай красиво и T4 не меньше 12")
+    assert [(o.op, o.topic, o.value) for o in ops] == [("min", "T4", 12)] and rest  # leftovers reported, not guessed
+
+
+def test_sandbox_compares_scenarios_and_converts_to_decision(client, H, datasets, curriculum):
+    ds = datasets["base"]["id"]
+    r = client.post("/api/v1/sandbox/intent", json={"dataset_id": ds, "text": "добавь 2 часа на T3 за счёт T7"}, headers=H).json()
+    assert {d["topic"] for d in r["diff"]} == {"T3", "T7"}
+    bad = client.post("/api/v1/sandbox/intent", json={"dataset_id": ds, "text": "добавь 2 часа на T42"}, headers=H)
+    assert bad.status_code == 422 and bad.json()["error"]["code"] == "unknown_topic"
+    body = {"dataset_id": ds, "scenarios": [{"name": "A: +2 к T3", "ops": r["all_ops"]},
+                                            {"name": "B: T3 ровно 30", "ops": [{"op": "set", "topic": "T3", "value": 30}]}]}
+    res = client.post("/api/v1/sandbox/run", json=body, headers=H).json()
+    a, b = res["result"]["scenarios"]
+    before = res["result"]["before"]
+    assert a["status"] in ("optimal", "feasible") and a["hours"]["T3"] == before["hours"]["T3"] + 2
+    assert a["hours"]["T7"] == before["hours"]["T7"] - 2 and a["validation"]["valid"]
+    assert b["status"] == "infeasible" and b["conflict"]["constraints"]  # verified minimal conflict, not a silent fix
+    assert res["result"]["is_forecast"] is False
+    # replay: same request → same stored analysis
+    again = client.post("/api/v1/sandbox/run", json=body, headers=H).json()
+    assert again["context"]["analysis_id"] == res["context"]["analysis_id"]
+    t3 = _topic(curriculum, "T3")
+    d = client.post("/api/v1/decisions", headers=H, json={
+        "dataset_id": ds, "topic_id": t3["id"], "target_group": "6 классы", "problem": "Низкий уровень по T3",
+        "hypothesis": "Не хватает часов на смешанные числа", "action": "Сценарий A песочницы", "responsible": "Методист",
+        "plan_analysis_id": a["plan_analysis_id"], "plan_preset": "balanced"})
+    assert d.status_code == 200, d.text
+    assert d.json()["snapshot"]["plan"]["analysis_id"] == a["plan_analysis_id"]

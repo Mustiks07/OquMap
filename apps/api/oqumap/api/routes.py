@@ -36,6 +36,8 @@ from ..services import (
 )
 from ..services.auth import Principal
 from ..services.ratelimit import client_ip_var
+from ..services.sandbox import IntentRequest as IntentRequestModel
+from ..services.sandbox import SandboxRequest as SandboxRequestModel
 
 router = APIRouter(prefix="/api/v1")
 DB = Annotated[Session, Depends(get_session)]
@@ -608,6 +610,24 @@ def solve_plan(body: planning.PlanSolveRequest, p: P, session: DB):
 # ---------------------------------------------------------------------------
 # Decisions and reports
 # ---------------------------------------------------------------------------
+
+
+@router.post("/sandbox/intent", tags=["planning"])
+def sandbox_intent(body: IntentRequestModel, p: P, session: DB) -> dict[str, Any]:
+    """Plain-language intent → typed planner operations with a diff preview (nothing is solved yet)."""
+    from ..services import sandbox
+
+    ratelimit.check(session, "compute", p.user_id, "rate_compute")
+    return sandbox.preview(session, p.org_id, body, p.user_id)
+
+
+@router.post("/sandbox/run", tags=["planning"])
+def sandbox_run(body: SandboxRequestModel, p: P, session: DB) -> dict[str, Any]:
+    """Solve up to three scenarios and compare them with the current plan; stored as a replayable analysis."""
+    from ..services import sandbox
+
+    ratelimit.check(session, "compute", p.user_id, "rate_compute")
+    return sandbox.run(session, p.org_id, body, p.user_id)
 
 
 @router.post("/decisions", response_model=S.DecisionOut, tags=["decisions"])
