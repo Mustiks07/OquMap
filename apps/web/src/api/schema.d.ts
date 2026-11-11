@@ -229,6 +229,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/calendar/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Calendar Context
+         * @description Default calendar settings, topic prerequisites and the current week-by-week calendar.
+         */
+        get: operations["calendar_context_api_v1_calendar_context_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/calendar/solve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Calendar Solve
+         * @description Proposed weekly calendar vs the current one, with an explanation for every move or a verified conflict.
+         */
+        post: operations["calendar_solve_api_v1_calendar_solve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/comparisons": {
         parameters: {
             query?: never;
@@ -1285,6 +1325,52 @@ export interface components {
             /** File */
             file: string;
         };
+        /** CalendarRequest */
+        CalendarRequest: {
+            /** Dataset Id */
+            dataset_id: string;
+            filters?: components["schemas"]["Filters"];
+            /** Fixed */
+            fixed?: components["schemas"]["FixedWindow"][];
+            /**
+             * Keep Order
+             * @default true
+             */
+            keep_order: boolean;
+            /**
+             * N Weeks
+             * @default 34
+             */
+            n_weeks: number;
+            /** Plan Analysis Id */
+            plan_analysis_id?: string | null;
+            /**
+             * Plan Preset
+             * @default balanced
+             */
+            plan_preset: string;
+            /**
+             * Start Date
+             * Format: date
+             * @default 2026-08-31
+             */
+            start_date: string;
+            /** Topic Hours */
+            topic_hours?: {
+                [key: string]: number;
+            };
+            /** Unavailable Weeks */
+            unavailable_weeks?: number[] | null;
+            /** Week Hours */
+            week_hours?: {
+                [key: string]: number;
+            };
+            /**
+             * Weekly Hours
+             * @default 4
+             */
+            weekly_hours: number;
+        };
         /** CommitRequest */
         CommitRequest: {
             /** Batch Id */
@@ -1646,6 +1732,15 @@ export interface components {
             outcome_stage: string;
             /** School Ids */
             school_ids?: string[];
+        };
+        /** FixedWindow */
+        FixedWindow: {
+            /** From Week */
+            from_week?: number | null;
+            /** To Week */
+            to_week?: number | null;
+            /** Topic */
+            topic: string;
         };
         /** FollowUpRequest */
         FollowUpRequest: {
@@ -3517,6 +3612,169 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    calendar_context_api_v1_calendar_context_get: {
+        parameters: {
+            query: {
+                dataset_id: string;
+                filters?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    calendar_solve_api_v1_calendar_solve_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CalendarRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Bad Request */

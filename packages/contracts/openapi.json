@@ -441,6 +441,94 @@
         "title": "Body_upload_document_api_v1_documents_post",
         "type": "object"
       },
+      "CalendarRequest": {
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/Filters"
+          },
+          "fixed": {
+            "items": {
+              "$ref": "#/components/schemas/FixedWindow"
+            },
+            "title": "Fixed",
+            "type": "array"
+          },
+          "keep_order": {
+            "default": true,
+            "title": "Keep Order",
+            "type": "boolean"
+          },
+          "n_weeks": {
+            "default": 34,
+            "title": "N Weeks",
+            "type": "integer"
+          },
+          "plan_analysis_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Analysis Id"
+          },
+          "plan_preset": {
+            "default": "balanced",
+            "title": "Plan Preset",
+            "type": "string"
+          },
+          "start_date": {
+            "default": "2026-08-31",
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "topic_hours": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Topic Hours",
+            "type": "object"
+          },
+          "unavailable_weeks": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Weeks"
+          },
+          "week_hours": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Week Hours",
+            "type": "object"
+          },
+          "weekly_hours": {
+            "default": 4,
+            "title": "Weekly Hours",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dataset_id"
+        ],
+        "title": "CalendarRequest",
+        "type": "object"
+      },
       "CommitRequest": {
         "properties": {
           "batch_id": {
@@ -1339,6 +1427,41 @@
           }
         },
         "title": "Filters",
+        "type": "object"
+      },
+      "FixedWindow": {
+        "properties": {
+          "from_week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Week"
+          },
+          "to_week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Week"
+          },
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "title": "FixedWindow",
         "type": "object"
       },
       "FollowUpRequest": {
@@ -5117,6 +5240,245 @@
         "summary": "Me",
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/api/v1/calendar/context": {
+      "get": {
+        "description": "Default calendar settings, topic prerequisites and the current week-by-week calendar.",
+        "operationId": "calendar_context_api_v1_calendar_context_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "title": "Dataset Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "filters",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Filters"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Calendar Context Api V1 Calendar Context Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Calendar Context",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/calendar/solve": {
+      "post": {
+        "description": "Proposed weekly calendar vs the current one, with an explanation for every move or a verified conflict.",
+        "operationId": "calendar_solve_api_v1_calendar_solve_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalendarRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Calendar Solve Api V1 Calendar Solve Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Calendar Solve",
+        "tags": [
+          "planning"
         ]
       }
     },

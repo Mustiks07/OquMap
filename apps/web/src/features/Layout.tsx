@@ -98,6 +98,12 @@ export function Layout() {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/calendar" className={({ isActive }) => (isActive ? "active" : "")} data-testid="nav-calendar">
+              <span className="nav-step" aria-hidden="true">▦</span>
+              {t("calendar.title")}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/quizzes" className={({ isActive }) => (isActive ? "active" : "")}>
               <span className="nav-step" aria-hidden="true">?</span>
               {t("quiz.title")}

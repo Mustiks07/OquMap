@@ -435,3 +435,10 @@ textarea.input {
 .tour-bar .bar > span { display: block; height: 100%; background: var(--color-border-strong); }
 .tour-bar.hl .bar > span { background: var(--color-danger); }
 .tour-bar.hl { font-weight: 600; }
+.gantt table { border-collapse: collapse; }
+.gantt th, .gantt td { padding: 2px 4px; min-width: 22px; text-align: center; }
+.gantt th[scope="row"] { text-align: left; white-space: nowrap; position: sticky; left: 0; background: var(--color-surface); }
+.gantt-cell.hol, .gantt th.hol { background: var(--color-neutral-soft); color: var(--color-text-muted); }
+.gantt-cur .gantt-cell.on { background: var(--color-surface-muted); }
+.gantt-new .gantt-cell.on { background: var(--color-primary-soft); color: var(--color-primary); font-weight: 600; }
+.gantt-new th[scope="row"] { border-bottom: 1px solid var(--color-border); }

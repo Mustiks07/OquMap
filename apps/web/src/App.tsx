@@ -16,6 +16,7 @@ import { OverviewPage } from "./features/OverviewPage";
 import { PlannerPage } from "./features/PlannerPage";
 import { TopicPage } from "./features/TopicPage";
 import { GraphPage } from "./features/GraphPage";
+import { CalendarPage } from "./features/CalendarPage";
 import { QuizPage } from "./features/QuizPage";
 import { SandboxPage } from "./features/SandboxPage";
 import { TourPage } from "./features/TourPage";
@@ -59,6 +60,7 @@ export function App() {
         <Route path="/graph" element={<GraphPage />} />
         <Route path="/graph/:topicId" element={<GraphPage />} />
         <Route path="/sandbox" element={<SandboxPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/quizzes" element={<QuizPage />} />
         <Route path="/demo-3min" element={<TourPage />} />
         <Route path="/decisions" element={<DecisionsPage />} />

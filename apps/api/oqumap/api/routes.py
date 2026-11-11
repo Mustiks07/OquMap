@@ -36,6 +36,7 @@ from ..services import (
     search,
 )
 from ..services.auth import Principal
+from ..services.calendar import CalendarRequest as CalendarRequestModel
 from ..services.quizzes import EditReq as QuizEditReq
 from ..services.quizzes import GenerateReq as QuizGenerateReq
 from ..services.quizzes import ReviewReq as QuizReviewReq
@@ -614,6 +615,23 @@ def solve_plan(body: planning.PlanSolveRequest, p: P, session: DB):
 # ---------------------------------------------------------------------------
 # Decisions and reports
 # ---------------------------------------------------------------------------
+
+
+@router.get("/calendar/context", tags=["planning"])
+def calendar_context(dataset_id: str, p: P, session: DB, filters: str | None = None) -> dict[str, Any]:
+    """Default calendar settings, topic prerequisites and the current week-by-week calendar."""
+    from ..services import calendar
+
+    return calendar.context(session, p.org_id, dataset_id, parse_filters(filters), p.user_id)
+
+
+@router.post("/calendar/solve", tags=["planning"])
+def calendar_solve(body: CalendarRequestModel, p: P, session: DB) -> dict[str, Any]:
+    """Proposed weekly calendar vs the current one, with an explanation for every move or a verified conflict."""
+    from ..services import calendar
+
+    ratelimit.check(session, "compute", p.user_id, "rate_compute")
+    return calendar.solve(session, p.org_id, body, p.user_id)
 
 
 @router.post("/sandbox/intent", tags=["planning"])
