@@ -55,8 +55,13 @@ export function DatasetsPage() {
         <Badge>v{d.version}</Badge>
       </div>
       <Button variant={primary ? "primary" : "default"} data-testid={`choose-${d.code}`}
-        onClick={() => { setDatasetId(d.id); nav(d.data_level === "setup" ? "/import" : "/overview"); }}>
-        {d.data_level === "setup" ? t("datasets.own_data") : t("datasets.open_overview")}
+        onClick={() => {
+          setDatasetId(d.id);
+          nav(d.data_level === "setup" ? "/import" : d.code === "measurement_loop" ? "/quality" : "/overview");
+        }}>
+        {d.data_level === "setup"
+          ? t("datasets.own_data")
+          : t(d.code === "measurement_loop" ? "datasets.open_quality" : "datasets.open_overview")}
       </Button>
     </Card>
   );

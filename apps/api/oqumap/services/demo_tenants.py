@@ -207,12 +207,20 @@ def measurement_readiness(session: Session, org_id: str) -> dict:
     from ..demo.measurement_seed import DATASET_CODE
 
     dataset_id = session.scalar(select(m.Dataset.id).where(m.Dataset.org_id == org_id, m.Dataset.code == DATASET_CODE))
-    if dataset_id is not None:
-        return {"status": "ready", "dataset_id": dataset_id, "job_status": "succeeded", "error": None}
     job = session.scalar(select(m.Job).where(m.Job.org_id == org_id, m.Job.kind == "demo_measurement")
                          .order_by(m.Job.created_at.desc()))
     if job is None:
-        return {"status": "unavailable", "dataset_id": None, "job_status": None, "error": None}
+        # Synchronous demo seeds and the non-ephemeral template do not create a job.
+        status = "ready" if dataset_id is not None else "unavailable"
+        return {"status": status, "dataset_id": dataset_id, "job_status": None, "error": None}
+    if job.status == "succeeded":
+        if dataset_id is not None:
+            return {"status": "ready", "dataset_id": dataset_id, "job_status": job.status, "error": None}
+        # A succeeded seed without its dataset is an inconsistent state. Do not let the
+        # UI proceed to an empty measurement workspace.
+        return {"status": "failed", "dataset_id": None, "job_status": job.status,
+                "error": {"code": "measurement_dataset_missing",
+                          "message": "Набор измерительного контура не найден после подготовки"}}
     status = "failed" if job.status in {"failed", "cancelled"} else "preparing"
     return {"status": status, "dataset_id": None, "job_status": job.status,
             "error": job.error if status == "failed" else None}

@@ -231,6 +231,18 @@ def test_demo_measurement_runs_as_a_background_job(public, monkeypatch):
             execute(ss, j)
         assert ss.get(m.Job, job.id).status == "succeeded"
     assert public.get("/api/v1/pilots", headers=h).json()["total"] >= 4
+    # The dataset row is committed before all assessments and pilots are seeded. A
+    # running job must therefore remain "preparing" even when that row is visible.
+    with db.session_factory()() as ss:
+        job = ss.get(m.Job, job.id)
+        job.status = "running"
+        ss.commit()
+    partial = public.get("/api/v1/demo/measurement-readiness", headers=h).json()
+    assert partial == {"status": "preparing", "dataset_id": None, "job_status": "running", "error": None}
+    with db.session_factory()() as ss:
+        job = ss.get(m.Job, job.id)
+        job.status = "succeeded"
+        ss.commit()
     ready = public.get("/api/v1/demo/measurement-readiness", headers=h).json()
     assert ready["status"] == "ready" and ready["dataset_id"] and ready["error"] is None
 
