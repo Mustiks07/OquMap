@@ -88,6 +88,7 @@ export const api = {
     return request<T>("GET", path + qs);
   },
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body ?? {}),
+  put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body ?? {}),
   upload: <T>(path: string, form: FormData) => request<T>("POST", path, form),
 };
 

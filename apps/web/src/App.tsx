@@ -15,6 +15,10 @@ import { MaterialsPage } from "./features/MaterialsPage";
 import { OverviewPage } from "./features/OverviewPage";
 import { PlannerPage } from "./features/PlannerPage";
 import { TopicPage } from "./features/TopicPage";
+import { GraphPage } from "./features/GraphPage";
+import { QuizPage } from "./features/QuizPage";
+import { SandboxPage } from "./features/SandboxPage";
+import { TourPage } from "./features/TourPage";
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { user, setUser } = useAppState();
@@ -52,6 +56,11 @@ export function App() {
         <Route path="/compare" element={<ComparePage />} />
         <Route path="/materials" element={<MaterialsPage />} />
         <Route path="/planner" element={<PlannerPage />} />
+        <Route path="/graph" element={<GraphPage />} />
+        <Route path="/graph/:topicId" element={<GraphPage />} />
+        <Route path="/sandbox" element={<SandboxPage />} />
+        <Route path="/quizzes" element={<QuizPage />} />
+        <Route path="/demo-3min" element={<TourPage />} />
         <Route path="/decisions" element={<DecisionsPage />} />
         <Route path="/decisions/:decisionId" element={<DecisionsPage />} />
       </Route>

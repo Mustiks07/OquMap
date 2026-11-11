@@ -157,9 +157,9 @@ def run(session: Session, p, dataset_id: str, topic_id: str, edition_a_id: str |
 
     weakest = min((o for o in tr["objectives"] if o["score"]), key=lambda o: o["score"]["mean"], default=None)
     top = tr["misconceptions"][0] if tr["misconceptions"] else None
-    if weakest:  # prefer the hypothesis signalled by items of the weakest objective
-        w_items = {it["code"] for it in tr["items"] if any(ol["objective_id"] == weakest["objective_id"] for ol in it["objectives"])}
-        top = next((mc for mc in tr["misconceptions"] if set(mc["items"]) & w_items), top)
+    # the same hypothesis as on the evidence-graph path (weakest objective → its weakest item → its hypothesis)
+    path_mc = next((n.split(":", 1)[1] for n in g["result"]["path"] if n.startswith("misconception:")), None)
+    top = next((mc for mc in tr["misconceptions"] if mc["code"] == path_mc), top)
     analyst_t: list[dict] = []
     if s.get("mean") is not None:
         txt = f"Тема {tr['topic']['code']}: средняя доля баллов {_pct(s['mean'])} ({s['n_learners']} уч., {s['n_classes']} кл.)"

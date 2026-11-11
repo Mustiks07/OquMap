@@ -33,9 +33,9 @@ export function Layout() {
           OquMap
         </a>
         {dataset ? (
-          <span className="row small" style={{ gap: 8, flexWrap: "nowrap" }} data-testid="dataset-chip">
+          <span className="row small" style={{ gap: 8, flexWrap: "nowrap", minWidth: 0, flex: "0 1 auto", overflow: "hidden" }} data-testid="dataset-chip">
             <span className="muted">{t("header.dataset")}:</span>
-            <strong style={{ maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={lang === "kz" ? dataset.name_kz : dataset.name_ru}>
+            <strong style={{ maxWidth: 320, minWidth: 40, flexShrink: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={lang === "kz" ? dataset.name_kz : dataset.name_ru}>
               {lang === "kz" ? dataset.name_kz : dataset.name_ru}
             </strong>
             <Badge tone="info" title={dateTime(dataset.version_updated_at, lang)}>
@@ -45,7 +45,9 @@ export function Layout() {
           </span>
         ) : null}
         {user?.org_is_ephemeral && user.org_expires_at && (
-          <Badge tone="synthetic" title={user.org_name}>{t("header.demo_until", { time: dateTime(user.org_expires_at, lang) })}</Badge>
+          <Badge tone="synthetic" title={`${user.org_name} · ${dateTime(user.org_expires_at, lang)}`}>
+            {t("header.demo_until", { time: new Date(user.org_expires_at).toLocaleTimeString(lang === "kz" ? "kk-KZ" : "ru-RU", { hour: "2-digit", minute: "2-digit" }) })}
+          </Badge>
         )}
         <span className="header-spacer" />
         <div className="row" role="group" aria-label={t("header.lang")} style={{ gap: 4 }}>
@@ -59,7 +61,7 @@ export function Layout() {
           {t("nav.assistant")}
         </Button>
         {user && (
-          <span className="small muted" title={user.org_name} style={{ whiteSpace: "nowrap" }}>
+          <span className="small muted" title={`${user.display_name} · ${user.org_name}`} style={{ whiteSpace: "nowrap", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis" }}>
             {user.display_name}
           </span>
         )}
@@ -78,6 +80,30 @@ export function Layout() {
             </li>
           ))}
           <li style={{ marginTop: 8, borderTop: "1px solid var(--color-border)", paddingTop: 8 }}>
+            <NavLink to="/demo-3min" className={({ isActive }) => (isActive ? "active" : "")} data-testid="nav-tour">
+              <span className="nav-step" aria-hidden="true">▶</span>
+              {t("tour.title")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/graph" className={({ isActive }) => (isActive ? "active" : "")} data-testid="nav-graph">
+              <span className="nav-step" aria-hidden="true">◇</span>
+              {t("graph.title")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/sandbox" className={({ isActive }) => (isActive ? "active" : "")}>
+              <span className="nav-step" aria-hidden="true">⇄</span>
+              {t("sandbox.title")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/quizzes" className={({ isActive }) => (isActive ? "active" : "")}>
+              <span className="nav-step" aria-hidden="true">?</span>
+              {t("quiz.title")}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/quality" className={({ isActive }) => (isActive ? "active" : "")}>
               <span className="nav-step" aria-hidden="true">i</span>
               {t("quality.title")}

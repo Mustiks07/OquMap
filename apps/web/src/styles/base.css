@@ -78,6 +78,7 @@ code,
 }
 .app-header {
   grid-column: 1 / -1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -239,3 +240,7 @@ code,
     overflow-x: auto;
   }
 }
+.app-header > * { flex-shrink: 0; }
+.app-header > [data-testid="dataset-chip"] { flex-shrink: 1; }
+.app-header .row { flex-wrap: nowrap; }
+.app-header .badge { white-space: nowrap; flex-shrink: 0; }

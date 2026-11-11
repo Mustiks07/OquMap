@@ -382,3 +382,56 @@ textarea.input {
 .option-correct {
   font-weight: var(--weight-bold);
 }
+
+/* ---- evidence graph, council, sandbox, quiz, tour ---------------------------------------------- */
+.graph-scroll { overflow-x: auto; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); }
+.graph-layout { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(260px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 960px) { .graph-layout { grid-template-columns: 1fr; } }
+.graph-lane { font-size: 11px; fill: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.graph-edge { fill: none; stroke: var(--color-border-strong); stroke-width: 1; opacity: 0.55; }
+.graph-edge.on-path { stroke: var(--color-primary); stroke-width: 2.5; opacity: 1; }
+.graph-edge.gap { stroke: var(--color-warn); stroke-dasharray: 4 3; }
+.graph-node { cursor: pointer; }
+.graph-node rect { fill: var(--color-surface); stroke: var(--color-border-strong); stroke-width: 1; }
+.graph-node.on-path rect { stroke: var(--color-primary); stroke-width: 2; }
+.graph-node.selected rect { stroke: var(--color-focus); stroke-width: 3; }
+.graph-node:focus-visible { outline: none; }
+.graph-node:focus-visible rect { stroke: var(--color-focus); stroke-width: 3; }
+.graph-node.tone-danger rect { fill: var(--color-danger-soft); }
+.graph-node.tone-warn rect { fill: var(--color-warn-soft); }
+.graph-node.tone-ok rect { fill: var(--color-ok-soft); }
+.graph-node.tone-synthetic rect { fill: var(--color-synthetic-soft); }
+.graph-node.tone-neutral rect { fill: var(--color-neutral-soft); }
+.graph-node.tone-info rect { fill: var(--color-info-soft); }
+.graph-label { font-size: 11.5px; fill: var(--color-text); }
+.graph-metric { font-size: 10.5px; fill: var(--color-text-muted); }
+.json-box { max-height: 260px; overflow: auto; background: var(--color-surface-muted); padding: 8px; border-radius: 6px; margin: 0; }
+.path-list { list-style: none; padding-left: 0; margin: 0; }
+.path-list li .badge { margin-right: 4px; }
+.linklike { background: none; border: 0; padding: 0; color: var(--color-primary); cursor: pointer; text-align: left; font: inherit; }
+.linklike:hover { text-decoration: underline; }
+.final-card { border: 2px solid var(--color-primary); border-radius: 10px; padding: 12px 16px; background: var(--color-primary-soft); }
+.final-card h3 { margin: 0 0 8px; }
+.final-card dt { font-weight: 600; margin-top: 6px; }
+.final-card dd { margin: 2px 0 0; }
+.claim { border-left: 4px solid var(--color-ok); padding: 6px 10px; background: var(--color-surface); border-radius: 4px; }
+.claim-weakened { border-left-color: var(--color-warn); }
+.claim-blocked { border-left-color: var(--color-danger); background: var(--color-danger-soft); }
+.struck { text-decoration: line-through; text-decoration-color: var(--color-danger); }
+.delta-up { color: var(--color-ok); font-size: 0.85em; }
+.delta-down { color: var(--color-danger); font-size: 0.85em; }
+.metric-row td { background: var(--color-surface-muted); }
+.scenario-card, .quiz-item { border: 1px solid var(--color-border); border-radius: 8px; padding: 10px 12px; background: var(--color-surface); }
+.strong { font-weight: 600; }
+.tour-steps ol { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
+.tour-steps button { border: 1px solid var(--color-border); background: var(--color-surface); border-radius: 999px; padding: 4px 12px 4px 4px; cursor: pointer; font: inherit; font-size: 0.875rem; }
+.tour-steps button.active { border-color: var(--color-primary); background: var(--color-primary-soft); font-weight: 600; }
+.tour-steps button.done { color: var(--color-text-muted); }
+.tour-answers > div { border-top: 3px solid var(--color-primary); padding-top: 6px; }
+.tour-answers h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin: 0 0 4px; }
+.tour-bars { display: grid; gap: 4px; max-width: 560px; }
+.tour-bar { display: grid; grid-template-columns: 32px 1fr 110px; align-items: center; gap: 8px; }
+.tour-bar .bar { height: 10px; background: var(--color-surface-muted); border-radius: 5px; overflow: hidden; }
+.tour-bar .bar > span { display: block; height: 100%; background: var(--color-border-strong); }
+.tour-bar.hl .bar > span { background: var(--color-danger); }
+.tour-bar.hl { font-weight: 600; }
