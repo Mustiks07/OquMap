@@ -6,7 +6,7 @@ import { dateTime } from "../../ui/format";
 import {
   useConclusions, useMAction, useOutcomes, usePilot, type ConclusionCreate, type ConclusionOut, type PilotOutcomeOut,
 } from "../measurement/api";
-import { ActionError, CIRange, FidelityBadge, KV, LabelText, MQuery, Messages, Num, OutcomeBadge, PP, Share, useRoles } from "../measurement/components";
+import { ActionError, CIRange, CodeLabel, FidelityBadge, KV, LabelText, MQuery, Messages, Num, OutcomeBadge, PP, Share, useRoles } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
 
 type Arm = { assigned: number; matched: number; attrition: number; baseline_mean: number | null; outcome_mean: number | null;
@@ -23,13 +23,14 @@ function OutcomeView({ o }: { o: PilotOutcomeOut }) {
       {o.interim && <Alert tone="warn">{t2("fu.interim")}</Alert>}
       {o.is_stale && <Alert tone="warn">{t2("fu.stale")}</Alert>}
       <div className="grid grid-4">
-        <Metric label={t2("common.status")} value={<OutcomeBadge status={o.status} />} sub={(r.status_rules_fired as string[]).join(", ")} />
+        <Metric label={t2("common.status")} value={<OutcomeBadge status={o.status} />} sub={<>{(r.status_rules_fired as string[]).map((c, i) => <span key={c}>{i > 0 && ", "}<CodeLabel prefix="rule." code={c} /></span>)}</>} />
         <Metric label={t2("fu.causal")} value={<span className="small"><LabelText label={o.causal_level} /></span>} sub={<>{t2("fu.ceiling")}: <LabelText label={o.causal_ceiling} /></>} />
         <Metric label={t2("fu.fidelity")} value={<FidelityBadge code={o.fidelity.code} />} sub={`${o.method_version} · v${o.dataset_version}`} />
         <Metric label={t2(`fu.estimand.${primary.estimand}`)} value={<PP v={primary.estimate} />}
           sub={<><CIRange low={primary.ci_low} high={primary.ci_high} reason={primary.ci_unavailable_reason} asPP /> · {t2(`fu.source.${primary.source}`)}</>} />
       </div>
       <Alert tone={o.status === "positive_signal" ? "ok" : o.status.startsWith("invalid") ? "danger" : "info"}>{String(r.interpretation_ru)}</Alert>
+      {(r.suppression as { applied?: boolean } | undefined)?.applied && <Alert tone="info" role="note">{t2("fu.suppression_note")}</Alert>}
       {Object.keys(arms).length > 0 && (
         <div className="table-wrap">
           <table className="table" data-testid="outcome-arms">
@@ -42,7 +43,7 @@ function OutcomeView({ o }: { o: PilotOutcomeOut }) {
             <tbody>
               {Object.entries(arms).map(([arm, a]) => (
                 <tr key={arm}>
-                  <td>{t2(`pilot.arm.${arm}`)}</td><td className="num"><Num v={a.assigned} /></td><td className="num"><Num v={a.matched} /></td>
+                  <th scope="row">{t2(`pilot.arm.${arm}`)}{(a as { suppressed?: boolean }).suppressed && <span className="xs muted"> — {t2("fu.suppressed")}</span>}</th><td className="num"><Num v={a.assigned} /></td><td className="num"><Num v={a.matched} /></td>
                   <td className="num"><Share v={a.attrition} /></td><td className="num"><Share v={a.baseline_mean} /></td><td className="num"><Share v={a.outcome_mean} /></td>
                   <td className="num"><PP v={a.change.mean} /></td>
                   <td><CIRange low={a.change.ci_low} high={a.change.ci_high} reason={a.change.ci_unavailable_reason} asPP /></td>
@@ -53,7 +54,7 @@ function OutcomeView({ o }: { o: PilotOutcomeOut }) {
         </div>
       )}
       <KV rows={[
-        [t2("fu.comparability"), <span key="c" className="mono small">{String((r.comparability as { code: string }).code)} · {String(r.n_outcome_items)} items</span>],
+        [t2("fu.comparability"), <span key="c" className="small"><CodeLabel prefix="fu.cmp." code={String((r.comparability as { code: string }).code)} /> · {t2("fu.items_n", { n: Number(r.n_outcome_items) })}</span>],
         [t2("fu.attrition"), <Share key="a" v={r.attrition as number | null} />],
         [t2("common.generated"), dateTime(o.created_at, lang)],
       ]} />
@@ -70,16 +71,26 @@ function OutcomeView({ o }: { o: PilotOutcomeOut }) {
   );
 }
 
+const UNINTERPRETABLE = new Set(["invalid_due_to_fidelity", "invalid_due_to_comparability", "needs_more_data"]);
+const STANDARD_ACKS = ["no_effectiveness_conclusion", "requires_new_pilot_or_implementation", "synthetic_data_only", "observational_design", "interim_result"];
+
 function ConclusionForm({ pilotId, outcome, onSaved }: { pilotId: string; outcome: PilotOutcomeOut; onSaved: (c: ConclusionOut) => void }) {
   const { t2 } = useMT();
   const [f, setF] = useState({ decision: "continue" as ConclusionCreate["decision"], summary_ru: "", lessons_ru: "", questions: "", next_action_ru: "",
-    create_next_decision_version: true, propose_evidence_update: true });
+    create_next_decision_version: true, propose_evidence_update: true,
+    decision_basis: (UNINTERPRETABLE.has(outcome.status) ? "insufficient_evidence" : "evidence_supports") as ConclusionCreate["decision_basis"],
+    stop_reason_code: "" as string, acks: [] as string[] });
+  const reasonCodes = ((outcome.result as { reasons?: { code: string; severity: string }[] }).reasons ?? [])
+    .filter((x) => x.severity !== "info").map((x) => x.code);
+  const ackOptions = Array.from(new Set([...STANDARD_ACKS, ...reasonCodes]));
   const save = useMAction<ConclusionCreate, ConclusionOut>("POST", () => `/api/v1/pilots/${pilotId}/conclusions`);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const res = await save.mutateAsync({ outcome_id: outcome.id, decision: f.decision, summary_ru: f.summary_ru, summary_kz: "", lessons_ru: f.lessons_ru,
       open_questions: f.questions.split("\n").map((x) => x.trim()).filter(Boolean), evidence_ids: [], next_action_ru: f.next_action_ru,
-      create_next_decision_version: f.create_next_decision_version, propose_evidence_update: f.propose_evidence_update });
+      create_next_decision_version: f.create_next_decision_version, propose_evidence_update: f.propose_evidence_update,
+      decision_basis: f.decision_basis, acknowledged_limitation_codes: f.acks,
+      stop_reason_code: f.decision === "stop" ? ((f.stop_reason_code || null) as ConclusionCreate["stop_reason_code"]) : null });
     onSaved(res);
   }
   const area = (k: "summary_ru" | "lessons_ru" | "questions" | "next_action_ru", label: string) => (
@@ -89,6 +100,28 @@ function ConclusionForm({ pilotId, outcome, onSaved }: { pilotId: string; outcom
     <form className="stack" onSubmit={submit} aria-label={t2("fu.conclusion")}>
       <Field label={t2("fu.decision")}>{(id) => <Select id={id} value={f.decision} onChange={(v) => setF((x) => ({ ...x, decision: v as ConclusionCreate["decision"] }))}
         options={(["continue", "modify", "stop", "extend_data_collection"] as const).map((d) => ({ value: d, label: t2(`fu.decision.${d}`) }))} />}</Field>
+      <Field label={t2("fu.basis")}>{(id) => <Select id={id} value={f.decision_basis ?? "insufficient_evidence"}
+        onChange={(v) => setF((x) => ({ ...x, decision_basis: v as ConclusionCreate["decision_basis"] }))}
+        options={(["evidence_supports", "operational", "insufficient_evidence", "external_factors"] as const)
+          .filter((b) => !(UNINTERPRETABLE.has(outcome.status) && b === "evidence_supports"))
+          .map((b) => ({ value: b, label: t2(`fu.basis.${b}`) }))} />}</Field>
+      {f.decision === "stop" && (
+        <Field label={t2("fu.stop_reason")}>{(id) => <Select id={id} value={f.stop_reason_code} onChange={(v) => setF((x) => ({ ...x, stop_reason_code: v }))}
+          options={[{ value: "", label: "—" }, ...(["implementation_not_feasible", "resource_constraints", "priority_change", "safety_or_harm_concern",
+            "replaced_by_alternative", "other"] as const).map((c) => ({ value: c, label: t2(`fu.stop.${c}`) }))]} />}</Field>
+      )}
+      <fieldset style={{ border: "1px solid var(--color-border)", borderRadius: 8, padding: 12 }}>
+        <legend className="small">{t2("fu.acks")}</legend>
+        <div className="stack">
+          {ackOptions.map((code) => (
+            <label key={code} className="row small" style={{ gap: 6 }}>
+              <input type="checkbox" checked={f.acks.includes(code)}
+                onChange={(e) => setF((x) => ({ ...x, acks: e.target.checked ? [...x.acks, code] : x.acks.filter((a) => a !== code) }))} />
+              <CodeLabel prefix={STANDARD_ACKS.includes(code) ? "ack." : "rule."} code={code} />
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {area("summary_ru", t2("fu.summary"))}
       {area("lessons_ru", t2("fu.lessons"))}
       {area("questions", t2("fu.questions"))}
@@ -150,7 +183,7 @@ export function FollowUpPage() {
             <Card title={t2("pilot.latest_outcome")}><OutcomeView o={list[0]} /></Card>
             {list.length > 1 && (
               <Card title={t2("fu.history")}>
-                <ul className="small">{list.slice(1).map((o) => <li key={o.id}><OutcomeBadge status={o.status} /> {dateTime(o.created_at, lang)} · v{o.dataset_version}{o.interim ? " · interim" : ""}</li>)}</ul>
+                <ul className="small">{list.slice(1).map((o) => <li key={o.id}><OutcomeBadge status={o.status} /> {dateTime(o.created_at, lang)} · v{o.dataset_version}{o.interim ? ` · ${t2("fu.interim_short")}` : ""}</li>)}</ul>
               </Card>
             )}
           </>
@@ -173,7 +206,7 @@ export function FollowUpPage() {
                   <p className="xs muted" style={{ margin: 0 }}>{t2("fu.evidence_ids")}: {c.evidence_ids.map((e) => e.slice(0, 8)).join(", ")}</p>
                   <div className="row">
                     {c.next_decision_id && <Link to={`/decisions/${c.next_decision_id}`}>{t2("fu.open_decision")}</Link>}
-                    {c.evidence_entry && <Badge tone={c.evidence_entry.review_status === "accepted" ? "ok" : "neutral"}>{String(c.evidence_entry.review_status)}</Badge>}
+                    {c.evidence_entry && <Badge tone={c.evidence_entry.review_status === "accepted" ? "ok" : "neutral"}><CodeLabel prefix="iv.review." code={String(c.evidence_entry.review_status)} /></Badge>}
                     {c.evidence_entry?.review_status === "proposed" && canApprove && (
                       <>
                         <input className="input" style={{ maxWidth: 280 }} aria-label={t2("fu.review_note")} placeholder={t2("fu.review_note")} value={note} onChange={(e) => setNote(e.target.value)} />

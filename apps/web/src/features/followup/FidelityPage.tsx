@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Alert, Badge, Button, Card, Field, Metric, Select } from "../../ui";
 import { dateTime } from "../../ui/format";
 import { useFidelity, useMAction, usePilot, type FidelityLogCreate, type FidelityLogOut, type FidelityMetrics } from "../measurement/api";
-import { ActionError, FidelityBadge, MQuery, Messages, Num, Share, useRoles } from "../measurement/components";
+import { ActionError, CodeLabel, FidelityBadge, MQuery, Messages, Num, Share, useRoles } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
 
 function MetricsRow({ m }: { m: FidelityMetrics }) {
@@ -117,7 +117,8 @@ export function FidelityPage() {
           <>
             <Card title={t2("fid.overall")} actions={<FidelityBadge code={d.overall.classification.code} />}>
               <MetricsRow m={d.overall} />
-              <p className="xs muted" style={{ marginTop: 8 }}>{t2("fid.rules")} · {d.method_version} · as of {d.as_of} · {d.overall.reasons.join(", ")}</p>
+              <p className="xs muted" style={{ marginTop: 8 }}>{t2("fid.rules")} · {d.method_version} · {t2("common.as_of", { date: d.as_of })} ·{" "}
+                {d.overall.reasons.map((c, i) => <span key={c}>{i > 0 && ", "}<CodeLabel prefix="fid.reason." code={c} /></span>)}</p>
               <div className="row">{Object.entries(d.distribution).map(([k, v]) => <span key={k}><FidelityBadge code={k} /> {v}</span>)}</div>
             </Card>
             <Messages items={d.limitations} />

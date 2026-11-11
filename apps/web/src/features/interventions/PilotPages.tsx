@@ -17,7 +17,7 @@ export function PilotNewPage() {
   const { datasetId } = useAppState();
   const [sp] = useSearchParams();
   const cur = useCurriculum();
-  const ivs = useInterventions({ status: "active" });
+  const ivs = useInterventions({ status: "active", limit: "200" });
   const nav = useNavigate();
   const { canDraft } = useRoles();
   const [ivId, setIvId] = useState(sp.get("intervention") ?? "");
@@ -26,7 +26,7 @@ export function PilotNewPage() {
   const [f, setF] = useState({
     title: "", topic_id: "", objective_id: "", primary_outcome_ru: "", design: "single_group" as PilotCreate["design"], assignment_unit: "cohort" as "cohort" | "school",
     baseline_assessment_id: "", outcome_assessment_id: "", start_date: "", end_date: "", follow_up_due: "", owner: "", inclusion_criteria: "",
-    exclusion_criteria: "", adjustment: "none" as "none" | "baseline_strata",
+    exclusion_criteria: "", adjustment: "none" as "none" | "baseline_strata", external_ack: "",
   });
   const [arms, setArms] = useState<Record<string, Arm>>({});
   const create = useMAction<PilotCreate, PilotOut>("POST", () => "/api/v1/pilots");
@@ -42,7 +42,7 @@ export function PilotNewPage() {
       baseline_assessment_id: f.baseline_assessment_id || null, outcome_assessment_id: f.outcome_assessment_id || null,
       pre_period_assessment_ids: [], start_date: f.start_date || null, end_date: f.end_date || null, follow_up_due: f.follow_up_due || null,
       owner: f.owner, inclusion_criteria: f.inclusion_criteria, exclusion_criteria: f.exclusion_criteria,
-      analysis_plan: { adjustment: f.adjustment, strata_scheme: "pre_three_level", attempt_rule: "first", omitted_policy: "as_incorrect", min_matched_learners: 30, notes: "", primary_estimand: null },
+      analysis_plan: { adjustment: f.adjustment, strata_scheme: "pre_three_level", attempt_rule: "first", omitted_policy: "as_incorrect", min_matched_learners: 30, notes: "", primary_estimand: null, external_analysis_acknowledged: f.external_ack === "1" },
     };
     const res = await create.mutateAsync(body);
     nav(`/pilots/${res.id}`);
@@ -65,7 +65,7 @@ export function PilotNewPage() {
           <div className="grid grid-2">
             <Field label={t2("pilot.intervention")}>
               {(id) => <Select id={id} value={ivId} onChange={(v) => { setIvId(v); setVersion(""); }}
-                options={[{ value: "", label: "—" }, ...(ivs.data ?? []).filter((x) => x.reviewed_version).map((x) => ({ value: x.id, label: `${x.code} · ${pick(x, "title")}` }))]} />}
+                options={[{ value: "", label: "—" }, ...(ivs.data?.items ?? []).filter((x) => x.reviewed_version).map((x) => ({ value: x.id, label: `${x.code} · ${pick(x, "title")}` }))]} />}
             </Field>
             <Field label={t2("common.version")}>
               {(id) => <Select id={id} value={version} onChange={setVersion}
@@ -95,6 +95,14 @@ export function PilotNewPage() {
             <Field label={t2("pilot.adjustment")}>{(id) => <Select id={id} value={f.adjustment} onChange={(v) => set("adjustment", v)}
               options={[{ value: "none", label: t2("pilot.adjustment.none") }, { value: "baseline_strata", label: t2("pilot.adjustment.baseline_strata") }]} />}</Field>
           </div>
+          {(f.design === "interrupted_time_series" || f.design === "stepped_wedge") && (
+            <Alert tone="warn" role="note">
+              {t2("pilot.analysis_mode.protocol_only_external_analysis")}
+              <label className="row small" style={{ gap: 6, marginTop: 6 }}>
+                <input type="checkbox" checked={f.external_ack === "1"} onChange={(e) => set("external_ack", e.target.checked ? "1" : "")} /> {t2("pilot.ack_external")}
+              </label>
+            </Alert>
+          )}
           <div className="table-wrap" style={{ maxHeight: 320, overflowY: "auto" }}>
             <table className="table">
               <caption className="sr-only">{t2("pilot.cohorts")}</caption>
@@ -138,7 +146,8 @@ export function PilotDetailPage() {
   const { canDraft } = useRoles();
   const [note, setNote] = useState("");
   const [seed, setSeed] = useState("2027");
-  const tr = useMAction<{ to_status: string; note: string }, PilotOut>("POST", () => `/api/v1/pilots/${id}/transition`);
+  const tr = useMAction<{ to_status: string; note: string; override_future_end: boolean }, PilotOut>("POST", () => `/api/v1/pilots/${id}/transition`);
+  const [override, setOverride] = useState(false);
   const rnd = useMAction<{ seed: number; cohort_ids: string[] }, PilotOut>("POST", () => `/api/v1/pilots/${id}/randomize`);
   return (
     <div className="page stack">
@@ -157,6 +166,7 @@ export function PilotDetailPage() {
                 <Button variant="primary" onClick={() => nav(`/pilots/${p.id}/follow-up`)}>{t2("pilot.followup")}</Button>
               </div>
             </div>
+            <Alert tone={p.analysis_mode === "built_in" ? "info" : "warn"} role="note">{t2(`pilot.analysis_mode.${p.analysis_mode}`)}</Alert>
             {(p.status === "draft" || p.status === "ready") && (
               <Card title={t2("pilot.validation")}>
                 {p.validation.ok ? <Alert tone="ok">{t2("pilot.valid")}</Alert> : <Messages items={(p.validation.errors as never) ?? []} />}
@@ -168,11 +178,16 @@ export function PilotDetailPage() {
                 {p.allowed_transitions.length === 0 && <span className="small muted">—</span>}
                 {p.allowed_transitions.map((to) => (
                   <Button key={to} variant={to === "stopped" ? "danger" : to === "active" || to === "ready" ? "primary" : "default"}
-                    disabled={tr.isPending || (to === "stopped" && note.trim().length < 3)} onClick={() => tr.mutate({ to_status: to, note })}>
+                    disabled={tr.isPending || (to === "stopped" && note.trim().length < 3)} onClick={() => tr.mutate({ to_status: to, note, override_future_end: override })}>
                     {t2(`pilot.to.${to}`)}
                   </Button>
                 ))}
-                {p.allowed_transitions.includes("stopped") && (
+                {p.allowed_transitions.includes("completed") && p.end_date && p.end_date > new Date().toISOString().slice(0, 10) && (
+                  <label className="row small" style={{ gap: 4 }}>
+                    <input type="checkbox" checked={override} onChange={(e) => setOverride(e.target.checked)} /> {t2("pilot.override_end")}
+                  </label>
+                )}
+                {(p.allowed_transitions.includes("stopped") || override) && (
                   <input className="input" style={{ maxWidth: 320 }} aria-label={t2("pilot.stop_reason")} placeholder={t2("pilot.stop_reason")} value={note} onChange={(e) => setNote(e.target.value)} />
                 )}
               </div>
@@ -212,7 +227,7 @@ export function PilotDetailPage() {
                     <thead><tr><th scope="col">{t2("pilot.cohorts")}</th><th scope="col">{t2("pilot.arm")}</th><th scope="col" className="num">{t2("pilot.n_learners")}</th></tr></thead>
                     <tbody>
                       {p.cohorts.map((c) => (
-                        <tr key={c.cohort_id}><td className="mono">{c.code}</td><td>{t2(`pilot.arm.${c.arm}`)}{c.wave ? ` · wave ${c.wave}` : ""}</td><td className="num">{c.n_learners ?? "—"}</td></tr>
+                        <tr key={c.cohort_id}><td className="mono">{c.code}</td><td>{t2(`pilot.arm.${c.arm}`)}{c.wave ? ` · ${t2("pilot.wave", { n: c.wave })}` : ""}</td><td className="num">{c.n_learners ?? "—"}</td></tr>
                       ))}
                     </tbody>
                   </table>
@@ -223,7 +238,7 @@ export function PilotDetailPage() {
                 )}
                 <h3 style={{ fontSize: "var(--text-sm)" }}>{t2("pilot.events")}</h3>
                 <ol className="small" style={{ margin: 0 }}>
-                  {p.events.map((e, i) => <li key={i}><Badge tone="neutral">{e.from_status ?? "∅"} → {e.to_status}</Badge> {dateTime(e.at, lang)} · {e.by ?? "—"} {e.note && `· ${e.note}`}</li>)}
+                  {p.events.map((e, i) => <li key={i}><Badge tone="neutral">{e.from_status ? `${t2(`pilot.status.${e.from_status}`)} → ` : `${t2("pilot.event.created")}: `}{t2(`pilot.status.${e.to_status}`)}</Badge> {dateTime(e.at, lang)} · {e.by ?? "—"} {e.note && `· ${e.note}`}</li>)}
                 </ol>
               </Card>
             </div>

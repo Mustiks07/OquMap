@@ -34,10 +34,11 @@ export interface QualityRules {
   omitted_policy: "as_incorrect" | "exclude";
 }
 
-export function useQualityList(datasetId: string | null, rules: QualityRules) {
+export function useQualityList(datasetId: string | null, rules: QualityRules, limit = 50, offset = 0) {
   return useQuery({
-    queryKey: ["m-quality-list", datasetId, rules],
-    queryFn: () => api.get<AssessmentQualityList>("/api/v1/quality/assessments", { dataset_id: datasetId ?? undefined, ...rules }),
+    queryKey: ["m-quality-list", datasetId, rules, limit, offset],
+    queryFn: () => api.get<AssessmentQualityList>("/api/v1/quality/assessments", { dataset_id: datasetId ?? undefined, ...rules,
+      limit: String(limit), offset: String(offset) }),
   });
 }
 
@@ -49,9 +50,18 @@ export function useAssessmentQuality(id: string | undefined, rules: QualityRules
   });
 }
 
+export type AssignmentsOut = S["AssignmentsOut"];
+
+export function useAssignments(id: string | undefined) {
+  return useQuery({ queryKey: ["m-assignments", id], enabled: !!id, queryFn: () => api.get<AssignmentsOut>(`/api/v1/quality/assessments/${id}/assignments`) });
+}
+
 export function useItemQuality(id: string | null) {
   return useQuery({ queryKey: ["m-item", id], enabled: !!id, queryFn: () => api.get<ItemQualityDetail>(`/api/v1/quality/items/${id}`) });
 }
+
+export type InterventionPage = S["InterventionPage"];
+export type PilotPage = S["PilotPage"];
 
 export interface InterventionFilters {
   status?: string;
@@ -59,12 +69,14 @@ export interface InterventionFilters {
   topic_id?: string;
   misconception?: string;
   q?: string;
+  limit?: string;
+  offset?: string;
 }
 
 export function useInterventions(f: InterventionFilters) {
   return useQuery({
     queryKey: ["m-interventions", f],
-    queryFn: () => api.get<InterventionListItem[]>("/api/v1/interventions", { ...f } as Record<string, string | undefined>),
+    queryFn: () => api.get<InterventionPage>("/api/v1/interventions", { ...f } as Record<string, string | undefined>),
   });
 }
 
@@ -80,10 +92,10 @@ export function useSuggestions(params: Record<string, string | undefined> | null
   });
 }
 
-export function usePilots(datasetId: string | null) {
+export function usePilots(datasetId: string | null, limit = 50, offset = 0) {
   return useQuery({
-    queryKey: ["m-pilots", datasetId],
-    queryFn: () => api.get<PilotListItem[]>("/api/v1/pilots", { dataset_id: datasetId ?? undefined }),
+    queryKey: ["m-pilots", datasetId, limit, offset],
+    queryFn: () => api.get<PilotPage>("/api/v1/pilots", { dataset_id: datasetId ?? undefined, limit: String(limit), offset: String(offset) }),
   });
 }
 
@@ -118,13 +130,13 @@ export function useLearning(datasetId: string | null) {
 }
 
 /** Generic mutation that refreshes every measurement query afterwards. */
-export function useMAction<B, R>(method: "POST" | "PATCH" | "DELETE", path: (vars: B) => string, body?: (vars: B) => unknown) {
+export function useMAction<B, R>(method: "POST" | "PATCH" | "PUT" | "DELETE", path: (vars: B) => string, body?: (vars: B) => unknown) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (vars: B) => request<R>(method, path(vars), method === "DELETE" ? undefined : (body ? body(vars) : vars) ?? {}),
     onSuccess: () => {
       for (const k of ["m-interventions", "m-intervention", "m-suggest", "m-pilots", "m-pilot", "m-fidelity", "m-outcomes", "m-conclusions",
-        "m-portfolio", "m-learning", "decisions"]) {
+        "m-portfolio", "m-learning", "decisions", "m-assignments", "m-quality", "m-quality-list", "m-sessions"]) {
         qc.invalidateQueries({ queryKey: [k] });
       }
     },

@@ -1,6 +1,7 @@
 /** Small presentation helpers shared by the measurement screens (no business logic: all statuses and texts come
  *  from the server). */
 import type { ReactNode } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ApiError } from "../../api/client";
 import { useAppState } from "../../state/AppState";
 import { Alert, Badge, ErrorState, Loading, type Tone } from "../../ui";
@@ -78,8 +79,8 @@ export function Messages({ items, title }: { items: Message[] | undefined | null
       {title && <h3 style={{ margin: 0 }}>{title}</h3>}
       <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {items.map((m, i) => (
-          <li key={`${m.code}-${i}`} className={`alert alert-${m.severity === "fail" ? "danger" : m.severity === "warn" ? "warn" : "info"}`}>
-            <span className="xs mono muted">{m.code}</span>
+          <li key={`${m.code}-${i}`} className={`alert alert-${m.severity === "fail" ? "danger" : m.severity === "warn" ? "warn" : "info"}`}
+            title={m.code} data-code={m.code}>
             <div>{lang === "kz" ? m.message_kz : m.message_ru}</div>
           </li>
         ))}
@@ -167,5 +168,43 @@ export function KV({ rows }: { rows: [ReactNode, ReactNode][] }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+/** Localised label for a technical code: `t2(prefix + code)`, falling back to the code itself. The code stays
+ *  available as a tooltip for support/debugging. */
+export function CodeLabel({ prefix, code }: { prefix: string; code: string | null | undefined }) {
+  const { t2, has } = useMT();
+  if (!code) return <span className="muted">—</span>;
+  const key = `${prefix}${code}`;
+  return <span title={code}>{has(key) ? t2(key) : code}</span>;
+}
+
+/** Filters and page offset kept in the URL (shareable, survives reload). */
+export function useUrlState<T extends Record<string, string>>(defaults: T): [T, (patch: Partial<T>) => void] {
+  const [sp, setSp] = useSearchParams();
+  const state = Object.fromEntries(Object.entries(defaults).map(([k, v]) => [k, sp.get(k) ?? v])) as T;
+  const update = (patch: Partial<T>) => {
+    const next = new URLSearchParams(sp);
+    for (const [k, v] of Object.entries({ ...state, ...patch })) {
+      if (v === undefined || v === "" || v === defaults[k]) next.delete(k);
+      else next.set(k, String(v));
+    }
+    setSp(next, { replace: true });
+  };
+  return [state, update];
+}
+
+export function Pager({ total, limit, offset, onChange }: { total: number; limit: number; offset: number; onChange: (offset: number) => void }) {
+  const { t2 } = useMT();
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const page = Math.floor(offset / limit) + 1;
+  if (total <= limit) return null;
+  return (
+    <nav className="row" aria-label={t2("common.page", { page, pages, total })}>
+      <button type="button" className="btn btn-sm" disabled={offset === 0} onClick={() => onChange(Math.max(0, offset - limit))}>{t2("common.prev")}</button>
+      <span className="small" aria-live="polite">{t2("common.page", { page, pages, total })}</span>
+      <button type="button" className="btn btn-sm" disabled={offset + limit >= total} onClick={() => onChange(offset + limit)}>{t2("common.next")}</button>
+    </nav>
   );
 }

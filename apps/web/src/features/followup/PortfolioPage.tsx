@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppState } from "../../state/AppState";
-import { Alert, Button, Card, Field, Select } from "../../ui";
-import { useLearning, usePortfolio } from "../measurement/api";
-import { FidelityBadge, MQuery, Messages, OutcomeBadge, PilotStatusBadge, useRoles } from "../measurement/components";
+import { Alert, Badge, Button, Card, Field, Select } from "../../ui";
+import { useLearning, usePilots, usePortfolio } from "../measurement/api";
+import { CodeLabel, FidelityBadge, MQuery, Messages, OutcomeBadge, Pager, PilotStatusBadge, useRoles, useUrlState } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
 
 type Ref = { pilot_id: string; code: string; title: string; status: string; follow_up_due: string | null };
@@ -79,7 +79,7 @@ export function PortfolioPage() {
               <div className="grid grid-2">
                 <Card title={t2("pf.missing")}>
                   <ul className="small" style={{ margin: 0 }}>
-                    {d.missing_for_conclusions.map((m) => <li key={String(m.pilot_id)}><Link to={`/pilots/${String(m.pilot_id)}`}>{String(m.code)}</Link>: {(m.missing as string[]).join(", ")}</li>)}
+                    {d.missing_for_conclusions.map((m) => <li key={String(m.pilot_id)}><Link to={`/pilots/${String(m.pilot_id)}`}>{String(m.code)}</Link>: {(m.missing as string[]).map((c, i) => <span key={c}>{i > 0 && ", "}<CodeLabel prefix="pf.missing." code={c} /></span>)}</li>)}
                   </ul>
                 </Card>
                 <Card title={t2("pf.repeated")}>
@@ -103,25 +103,23 @@ export function PortfolioPage() {
                   </table>
                 </div>
               </Card>
-              <Card title={t2("pf.pilots")}>
-                <div className="table-wrap">
-                  <table className="table" data-testid="pilots">
-                    <caption className="sr-only">{t2("pf.pilots")}</caption>
-                    <thead><tr><th scope="col">{t2("pilot.title")}</th><th scope="col">{t2("common.status")}</th><th scope="col">{t2("pilot.design")}</th>
-                      <th scope="col">{t2("pilot.intervention")}</th><th scope="col">{t2("pf.fidelity")}</th><th scope="col">{t2("pf.outcomes")}</th></tr></thead>
-                    <tbody>
-                      {d.pilots.map((p) => (
-                        <tr key={p.id} className="clickable" onClick={() => nav(`/pilots/${p.id}`)}>
-                          <td><Link to={`/pilots/${p.id}`} onClick={(e) => e.stopPropagation()} className="mono">{p.code}</Link> <span className="small">{p.title}</span></td>
-                          <td><PilotStatusBadge status={p.status} /></td><td className="small">{t2(`pilot.design.${p.design}`)}</td>
-                          <td className="mono small">{String((p as Record<string, unknown>).intervention_code ?? "")} v{p.intervention_version}</td>
-                          <td><FidelityBadge code={p.fidelity} /></td><td><OutcomeBadge status={p.outcome_status} /></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
+              <PilotTable datasetId={ds} />
+              <div className="grid grid-2">
+                <Card title={t2("pf.learners")}>
+                  <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                    {Object.entries((d.learners_by_outcome_status as { cells: Record<string, { value: number | null; suppressed: boolean; reason: string | null }> }).cells ?? {})
+                      .map(([k, c]) => <li key={k} className="spread"><OutcomeBadge status={k} /> <strong>{c.suppressed ? <span className="small muted">{t2("fu.suppressed")}</span> : c.value}</strong></li>)}
+                  </ul>
+                </Card>
+                <Card title={t2("pf.synthetic")}>
+                  <p className="small" style={{ margin: 0 }}>{t2("iv.accepted_synthetic")}: <strong>{String((d.synthetic_evidence as { accepted_entries: number }).accepted_entries)}</strong></p>
+                  <ul className="small">
+                    {((d.synthetic_evidence as { repeated_signals_demo_only: { intervention_id: string; code: string }[] }).repeated_signals_demo_only ?? []).map((r) => (
+                      <li key={r.intervention_id}><Badge tone="synthetic">{t2("common.synthetic_demo")}</Badge> {r.code}</li>
+                    ))}
+                  </ul>
+                </Card>
+              </div>
               <Messages items={d.limitations} />
             </>
           );
@@ -143,5 +141,40 @@ export function PortfolioPage() {
         )}
       </MQuery>
     </div>
+  );
+}
+
+const PAGE = 20;
+
+function PilotTable({ datasetId }: { datasetId: string | null }) {
+  const { t2 } = useMT();
+  const [u, setU] = useUrlState({ pilots_offset: "0" });
+  const offset = Number(u.pilots_offset) || 0;
+  const q = usePilots(datasetId, PAGE, offset);
+  return (
+    <Card title={t2("pf.pilots")}>
+      <MQuery q={q} empty={(d) => d.items.length === 0}>
+        {(d) => (
+          <div className="table-wrap">
+            <table className="table" data-testid="pilots">
+              <caption className="sr-only">{t2("pf.pilots")}</caption>
+              <thead><tr><th scope="col">{t2("pilot.title")}</th><th scope="col">{t2("common.status")}</th><th scope="col">{t2("pilot.design")}</th>
+                <th scope="col">{t2("pilot.intervention")}</th><th scope="col">{t2("pf.fidelity")}</th><th scope="col">{t2("pf.outcomes")}</th></tr></thead>
+              <tbody>
+                {d.items.map((p) => (
+                  <tr key={p.id}>
+                    <th scope="row"><Link to={`/pilots/${p.id}`} className="mono" aria-label={`${p.code}: ${p.title}`}>{p.code}</Link> <span className="small">{p.title}</span></th>
+                    <td><PilotStatusBadge status={p.status} /></td><td className="small">{t2(`pilot.design.${p.design}`)}</td>
+                    <td className="mono small">{String((p as Record<string, unknown>).intervention_code ?? "")} v{p.intervention_version}</td>
+                    <td><FidelityBadge code={p.fidelity} /></td><td><OutcomeBadge status={p.outcome_status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <Pager total={d.total} limit={d.limit} offset={d.offset} onChange={(o) => setU({ pilots_offset: String(o) })} />
+          </div>
+        )}
+      </MQuery>
+    </Card>
   );
 }

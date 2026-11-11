@@ -77,7 +77,8 @@ const QUALITY = {
   method_version: "aq-v1", dataset_id: "d", dataset_version: 1, current_dataset_version: 1, is_stale: false, is_synthetic: true, generated_at: "2026-11-11T10:00:00Z",
   provenance: { analysis_id: "abcdef123456", code_version: "0.1.0", kind: "assessment_quality", method_version: "aq-v1" }, assessment: ASSESSMENT,
   rules: { attempt_rule: "first", omitted_policy: "as_incorrect" },
-  form: { denominators: { assigned: 612, present: 595, absent: 17, no_sitting_record: 0, n_items: 12, expected_item_responses: 7140 }, participation_rate: 0.97,
+  form: { denominators: { assigned: 612, present: 595, absent: 17, no_sitting_record: 0, n_items: 12, expected_item_responses: 7140,
+    assignment_scope: "inferred_from_sittings", assigned_is_exact: false, present_outside_assignment: 0, absent_outside_assignment: 0, assigned_cohorts: 24 }, participation_rate: 0.97,
     completion_rate: 0.945, omission_rate: 0.055, missing_rate: 0, item_responses: {}, reliability: { cronbach_alpha: stat(null, "too_few_learners"),
       n_complete_learners: 20, n_items: 12, n_zero_variance_items: 0, min_learners: 30, min_items: 3 },
     score_distribution: { n: 595, mean: 0.42, median: 0.41, sd: 0.19, min: 0, max: 1, floor_share: 0.01, ceiling_share: 0, histogram: [{ from: 0, to: 0.1, count: 3 }], unavailable_reason: null } },
@@ -102,12 +103,15 @@ test("measurement dictionary has a Kazakh string with the same placeholders for 
 });
 
 test("quality detail shows denominators, unavailable alpha with reason, suppressed slice and item flags; switches to KZ", async () => {
-  routes = [[/GET .*\/quality\/assessments\/a1/, () => ({ body: QUALITY })]];
+  routes = [[/GET .*\/quality\/assessments\/a1\/assignments/, () => ({ body: { assessment_id: "a1", assessment_code: "DIAG-BASE",
+    assignment_scope: "inferred_from_sittings", cohorts: [] } })], [/GET .*\/quality\/assessments\/a1/, () => ({ body: QUALITY })]];
   renderAt("/quality/a1", "/quality/:assessmentId", <QualityDetailPage />);
   expect(await screen.findByText("Диагностика проверки DIAG-BASE")).toBeInTheDocument();
   expect(screen.getByText(/too_few_learners/)).toBeInTheDocument();
   expect(screen.getByText(/скрыто \(мало учеников\)/)).toBeInTheDocument();
-  expect(screen.getByText("negative_discrimination")).toBeInTheDocument();
+  expect(screen.getByText("отрицательная различающая способность")).toBeInTheDocument(); // localised flag, code in tooltip
+  expect(screen.queryByText("negative_discrimination")).toBeNull();
+  expect(screen.getByText("Назначение выведено из записей присутствия (не точно)")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: /Q05/ }));
   expect(screen.getByText("RU negative_discrimination")).toBeInTheDocument();
   expect(screen.getByText("ключ")).toBeInTheDocument();
@@ -120,7 +124,7 @@ test("quality detail shows denominators, unavailable alpha with reason, suppress
 });
 
 test("quality list: empty state and forbidden state", async () => {
-  routes = [[/GET .*\/quality\/assessments/, () => ({ body: { method_version: "aq-v1", rules: {}, assessments: [] } })]];
+  routes = [[/GET .*\/quality\/assessments/, () => ({ body: { method_version: "aq-v1", rules: {}, assessments: [], total: 0, limit: 25, offset: 0 } })]];
   const { unmount } = renderAt("/quality", "/quality", <QualityListPage />);
   expect(await screen.findByText("Нет данных")).toBeInTheDocument();
   unmount();
@@ -147,7 +151,7 @@ test("pilot actions use server-provided transitions; stop requires a reason; the
   expect(await screen.findByText("Протокол готов к переходу")).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Остановить" })).toBeDisabled();
   fireEvent.click(screen.getByRole("button", { name: "Запустить пилот" }));
-  await waitFor(() => expect(calls.find((c) => c.method === "POST")?.body).toEqual({ to_status: "active", note: "" }));
+  await waitFor(() => expect(calls.find((c) => c.method === "POST")?.body).toEqual({ to_status: "active", note: "", override_future_end: false }));
   expect(screen.getByText("Описательная динамика")).toBeInTheDocument();
 });
 
@@ -172,7 +176,7 @@ test("follow-up shows 'not interpretable' for low fidelity and never 'ineffectiv
 });
 
 test("viewer does not get drafting actions in the library", async () => {
-  routes = [[/GET .*\/interventions/, () => ({ body: [] })]];
+  routes = [[/GET .*\/interventions/, () => ({ body: { items: [], total: 0, limit: 25, offset: 0 } })]];
   renderAt("/interventions", "/interventions", <InterventionsPage />, ["viewer"]);
   expect(await screen.findByText("Библиотека интервенций")).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "Новая интервенция" })).toBeNull();
@@ -183,13 +187,59 @@ test("portfolio shows aggregates and no 'best intervention'", async () => {
     generated_at: "x", as_of: "2026-11-11", dataset_id: null, counts_by_status: { draft: 1, ready: 0, active: 1, completed: 2, stopped: 0 },
     follow_ups: { overdue: [], due_within_14_days: [], upcoming: [] }, fidelity_distribution: { high: 1, moderate: 0, low: 1, unknown: 1 },
     outcome_distribution: { positive_signal: 1, invalid_due_to_fidelity: 1 }, interventions_with_repeated_signals: [], coverage: { topics: [] },
+    learners_by_outcome_status: { total: 157, min_cell: 10, suppression_applied: true, cells: {
+      positive_signal: { value: 150, suppressed: false, reason: null }, invalid_due_to_fidelity: { value: null, suppressed: true, reason: "small_cell" } } },
+    synthetic_evidence: { accepted_entries: 1, repeated_signals_demo_only: [], counts_toward_recommendations: false },
     missing_for_conclusions: [], action_queue: [{ pilot_id: "p2", code: "PIL-M02", title: "t", action: "record_conclusion" }], best_intervention: null,
     best_intervention_reason: "not_shown", pilots: [], limitations: [msg("no_league_tables", "info")],
   };
   routes = [[/GET .*\/portfolio\/interventions/, () => ({ body: pf })],
+    [/GET .*\/api\/v1\/pilots/, () => ({ body: { items: [], total: 0, limit: 20, offset: 0 } })],
     [/GET .*\/learning\/summary/, () => ({ body: { interventions: [], lessons: [], open_questions: [], pending_evidence_reviews: [], note_ru: "n", note_kz: "n" } })]];
   renderAt("/portfolio/interventions", "/portfolio/interventions", <PortfolioPage />);
   expect(await screen.findByText("Сохранить вывод по результату")).toBeInTheDocument();
   expect(screen.getByText(/«Лучшая интервенция» не показывается/)).toBeInTheDocument();
   expect(screen.getByText("RU no_league_tables")).toBeInTheDocument();
+  expect(screen.getByText("скрыто: малая группа")).toBeInTheDocument(); // suppressed learner cell
+});
+
+
+test("list rows are real links: keyboard Tab + Enter opens the item (no clickable <tr>)", async () => {
+  const user = (await import("@testing-library/user-event")).default.setup();
+  const row = { id: "iv1", code: "INT-A", status: "active", dataset_id: null, latest_version: 1, reviewed_version: 1, current_status: "reviewed",
+    title_ru: "Полоса дробей", title_kz: "Жолақ", evidence_level: "observational", grades: [6], languages: ["ru"], targets: [], total_minutes: 300,
+    n_pilots: 0, accepted_evidence: 0, accepted_synthetic_evidence: 0 };
+  routes = [[/GET .*\/interventions\?/, () => ({ body: { items: [row], total: 30, limit: 25, offset: 0 } })]];
+  localStorage.clear();
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(
+    <QueryClientProvider client={qc}><I18nProvider initial="ru"><AppStateProvider><SetUser roles={["viewer"]} />
+      <MemoryRouter initialEntries={["/interventions"]}>
+        <Routes>
+          <Route path="/interventions" element={<InterventionsPage />} />
+          <Route path="/interventions/:id" element={<p>detail opened</p>} />
+        </Routes>
+      </MemoryRouter>
+    </AppStateProvider></I18nProvider></QueryClientProvider>,
+  );
+  const link = await screen.findByRole("link", { name: "INT-A: Полоса дробей" });
+  expect(link.closest("tr")?.getAttribute("class") ?? "").not.toContain("clickable");
+  expect(screen.getByRole("navigation", { name: /Страница 1 из 2/ })).toBeInTheDocument(); // pager
+  link.focus();
+  expect(link).toHaveFocus();
+  await user.keyboard("{Enter}");
+  expect(await screen.findByText("detail opened")).toBeInTheDocument();
+});
+
+test("pager moves the offset and keeps it in the URL", async () => {
+  const user = (await import("@testing-library/user-event")).default.setup();
+  const row = { id: "iv1", code: "INT-A", status: "active", dataset_id: null, latest_version: 1, reviewed_version: 1, current_status: "reviewed",
+    title_ru: "А", title_kz: "А", evidence_level: "observational", grades: [], languages: [], targets: [], total_minutes: 1, n_pilots: 0,
+    accepted_evidence: 0, accepted_synthetic_evidence: 0 };
+  routes = [[/GET .*\/interventions\?/, (_, url) => ({ body: { items: [row], total: 60, limit: 25, offset: Number(new URL(url, "http://x").searchParams.get("offset")) } })]];
+  renderAt("/interventions", "/interventions", <InterventionsPage />, ["viewer"]);
+  const next = await screen.findByRole("button", { name: "Вперёд" });
+  await user.click(next);
+  await waitFor(() => expect(calls.some((c) => c.url.includes("offset=25"))).toBe(true));
+  expect(screen.getByText(/Страница 2 из 3/)).toBeInTheDocument();
 });

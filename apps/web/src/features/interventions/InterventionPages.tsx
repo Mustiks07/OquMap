@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useCurriculum } from "../../api/hooks";
 import { useAppState } from "../../state/AppState";
 import { Alert, Badge, Button, Card, Field, Select } from "../../ui";
@@ -8,7 +8,7 @@ import {
   useIntervention, useInterventions, useMAction, useSuggestions, type InterventionCreate, type InterventionOut,
   type InterventionVersionOut,
 } from "../measurement/api";
-import { ActionError, KV, MQuery, Messages, OutcomeBadge, FidelityBadge, VersionStatusBadge, useRoles } from "../measurement/components";
+import { ActionError, CodeLabel, KV, MQuery, Messages, OutcomeBadge, FidelityBadge, Pager, VersionStatusBadge, useRoles, useUrlState } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
 
 const MISCONCEPTIONS = ["add_across", "numerators_not_scaled", "subtract_across", "multiplied_instead", "mixed_subtract_reverse",
@@ -144,11 +144,14 @@ function SuggestPanel({ topicId, misconception }: { topicId?: string; misconcept
                 <li key={s.intervention_id}>
                   <Link to={`/interventions/${s.intervention_id}`}><strong>{pick(s, "title")}</strong></Link> <span className="mono xs">{s.code} v{s.version}</span>{" "}
                   <Badge tone="info">{t2("iv.score")}: {s.score}</Badge>
-                  <div className="xs muted">{s.components.map((c) => `${c.code} +${c.points}`).join(" · ")}</div>
+                  <ul className="xs muted" style={{ margin: 0, paddingLeft: 16 }}>
+                    {s.components.map((c) => <li key={c.code}><CodeLabel prefix="iv.comp." code={c.code} /> +{c.points}</li>)}
+                  </ul>
                 </li>
               ))}
             </ol>
-            {d.excluded.length > 0 && <p className="xs muted">{t2("iv.excluded")}: {d.excluded.map((e) => `${e.code} (${e.reason})`).join(", ")}</p>}
+            {d.excluded.length > 0 && <p className="xs muted">{t2("iv.excluded")}: {d.excluded.map((e, i) => (
+              <span key={String(e.code)}>{i > 0 && ", "}{String(e.code)} (<CodeLabel prefix="iv.excl." code={String(e.reason)} />)</span>))}</p>}
             <Messages items={d.limitations} />
           </div>
         )}
@@ -157,19 +160,21 @@ function SuggestPanel({ topicId, misconception }: { topicId?: string; misconcept
   );
 }
 
+const PAGE = 25;
+
 export function InterventionsPage() {
   const { t2, pick } = useMT();
-  const [sp] = useSearchParams();
   const cur = useCurriculum();
   const { canDraft } = useRoles();
   const { datasetId } = useAppState();
   const nav = useNavigate();
-  const [filters, setFilters] = useState({ status: "", evidence_level: "", q: "" });
+  const [filters, setFilters] = useUrlState({ status: "", evidence_level: "", q: "", offset: "0", suggest: "", misconception: "", topic_code: "" });
   const [creating, setCreating] = useState(false);
-  const q = useInterventions({ status: filters.status || undefined, evidence_level: filters.evidence_level || undefined, q: filters.q || undefined });
-  const topicCode = sp.get("topic_code");
+  const q = useInterventions({ status: filters.status || undefined, evidence_level: filters.evidence_level || undefined, q: filters.q || undefined,
+    limit: String(PAGE), offset: filters.offset });
+  const topicCode = filters.topic_code;
   const suggestTopic = useMemo(() => cur.data?.topics.find((x) => x.code === topicCode)?.id, [cur.data, topicCode]);
-  const suggest = sp.get("suggest") === "1";
+  const suggest = filters.suggest === "1";
   return (
     <div className="page stack">
       <div className="page-header">
@@ -179,7 +184,7 @@ export function InterventionsPage() {
         </div>
         {canDraft && <Button variant="primary" onClick={() => setCreating(true)} disabled={creating}>{t2("iv.new")}</Button>}
       </div>
-      {suggest && <SuggestPanel topicId={suggestTopic} misconception={sp.get("misconception") ?? undefined} />}
+      {suggest && <SuggestPanel topicId={suggestTopic} misconception={filters.misconception || undefined} />}
       {creating && (
         <Card title={t2("iv.new")}>
           {!datasetId && <Alert tone="info">{t2("common.current_dataset")}: —</Alert>}
@@ -187,14 +192,14 @@ export function InterventionsPage() {
         </Card>
       )}
       <div className="row" role="search">
-        <Field label={t2("common.search")}>{(id) => <input id={id} className="input" value={filters.q} onChange={(e) => setFilters({ ...filters, q: e.target.value })} />}</Field>
-        <Field label={t2("common.status")}>{(id) => <Select id={id} value={filters.status} onChange={(v) => setFilters({ ...filters, status: v })}
-          options={[{ value: "", label: t2("common.all") }, { value: "active", label: "active" }, { value: "archived", label: t2("iv.archived") }]} />}</Field>
-        <Field label={t2("iv.evidence")}>{(id) => <Select id={id} value={filters.evidence_level} onChange={(v) => setFilters({ ...filters, evidence_level: v })}
+        <Field label={t2("common.search")}>{(id) => <input id={id} className="input" value={filters.q} onChange={(e) => setFilters({ q: e.target.value, offset: "0" })} />}</Field>
+        <Field label={t2("common.status")}>{(id) => <Select id={id} value={filters.status} onChange={(v) => setFilters({ status: v, offset: "0" })}
+          options={[{ value: "", label: t2("common.all") }, { value: "active", label: t2("iv.status.active") }, { value: "archived", label: t2("iv.archived") }]} />}</Field>
+        <Field label={t2("iv.evidence")}>{(id) => <Select id={id} value={filters.evidence_level} onChange={(v) => setFilters({ evidence_level: v, offset: "0" })}
           options={[{ value: "", label: t2("common.all") }, ...(["practice_based", "observational", "experimental"] as const).map((x) => ({ value: x, label: t2(`iv.level.${x}`) }))]} />}</Field>
       </div>
-      <MQuery q={q} empty={(d) => d.length === 0}>
-        {(rows) => (
+      <MQuery q={q} empty={(d) => d.items.length === 0}>
+        {({ items: rows }) => (
           <div className="table-wrap">
             <table className="table" data-testid="interventions">
               <caption className="sr-only">{t2("iv.title")}</caption>
@@ -207,19 +212,20 @@ export function InterventionsPage() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="clickable" onClick={() => nav(`/interventions/${r.id}`)}>
-                    <td className="mono"><Link to={`/interventions/${r.id}`} onClick={(e) => e.stopPropagation()}>{r.code}</Link></td>
+                  <tr key={r.id}>
+                    <th scope="row" className="mono"><Link to={`/interventions/${r.id}`} aria-label={`${r.code}: ${pick(r, "title")}`}>{r.code}</Link></th>
                     <td>{pick(r, "title")} {r.status === "archived" && <Badge tone="warn">{t2("iv.archived")}</Badge>}</td>
                     <td>v{r.latest_version} <VersionStatusBadge status={r.current_status} />{r.reviewed_version && r.reviewed_version !== r.latest_version ? <span className="xs muted"> (v{r.reviewed_version} ✓)</span> : null}</td>
                     <td>{t2(`iv.level.${r.evidence_level}`)}</td>
                     <td className="xs">{r.targets.map((x) => x.code).join(", ")}</td>
                     <td className="num xs">{t2("iv.minutes_total", { total: r.total_minutes })}</td>
                     <td className="num">{r.n_pilots}</td>
-                    <td className="num">{r.accepted_evidence}</td>
+                    <td className="num">{r.accepted_evidence}{r.accepted_synthetic_evidence ? <span className="xs muted" title={t2("iv.accepted_synthetic")}> (+{r.accepted_synthetic_evidence} {t2("common.synthetic_demo")})</span> : null}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            <Pager total={q.data?.total ?? 0} limit={q.data?.limit ?? PAGE} offset={q.data?.offset ?? 0} onChange={(o) => setFilters({ offset: String(o) })} />
           </div>
         )}
       </MQuery>
@@ -240,7 +246,7 @@ function VersionView({ v }: { v: InterventionVersionOut }) {
         [t2("iv.dosage"), `${v.minutes_per_session} × ${v.sessions_per_week} × ${v.duration_weeks} = ${t2("iv.minutes_total", { total: v.total_minutes })}${v.cadence_ru ? ` (${v.cadence_ru})` : ""}`],
         [t2("iv.evidence"), t2(`iv.level.${v.evidence_level}`)],
         [t2("iv.targets"), v.targets.map((x) => `${x.code} — ${lang === "kz" ? x.label_kz : x.label_ru}`).join("; ") || "—"],
-        ["Классы / языки", `${v.grades.join(", ") || "—"} / ${v.languages.join(", ") || "—"}`],
+        [t2("iv.grades_languages"), `${v.grades.join(", ") || "—"} / ${v.languages.join(", ") || "—"}`],
         [t2("iv.instructions"), <span key="i" style={{ whiteSpace: "pre-wrap" }}>{pick(v, "instructions") || "—"}</span>],
         [t2("iv.resources"), v.resources.join("; ") || "—"],
         [t2("iv.evidence_links"), v.evidence_links.length ? v.evidence_links.map((l) => `${String(l.title)}${l.url ? ` (${String(l.url)})` : ""}`).join("; ") : "—"],
@@ -317,12 +323,14 @@ export function InterventionDetailPage() {
                 <Card title={`${t2("common.version")} ${cur.version}`}><VersionView v={cur} /></Card>
                 <Card title={t2("iv.evidence_summary")}>
                   <p className="xs muted">{t2("iv.evidence_note")}</p>
-                  <KV rows={[[t2("iv.accepted"), iv.evidence_summary.accepted_entries], ["proposed", iv.evidence_summary.proposed_entries],
-                    ["repeated", iv.evidence_summary.repeated_positive_signal ? t2("common.yes") : t2("common.none")]]} />
+                  <KV rows={[[t2("iv.accepted"), iv.evidence_summary.accepted_entries], [t2("iv.proposed"), iv.evidence_summary.proposed_entries],
+                    [t2("iv.repeated"), iv.evidence_summary.repeated_positive_signal ? t2("common.yes") : t2("common.none")],
+                    [t2("iv.accepted_synthetic"), iv.evidence_summary.accepted_synthetic_entries]]} />
                   <ul className="stack" style={{ listStyle: "none", padding: 0, marginTop: 8 }}>
                     {iv.evidence_summary.entries.map((e) => (
                       <li key={String(e.id)} className="small">
-                        <OutcomeBadge status={String(e.outcome_status)} /> <FidelityBadge code={String(e.fidelity_class)} /> <span className="xs">v{String(e.intervention_version)} · {String(e.design)} · {String(e.review_status)}</span>
+                        <OutcomeBadge status={String(e.outcome_status)} /> <FidelityBadge code={String(e.fidelity_class)} /> <span className="xs">v{String(e.intervention_version)} · <CodeLabel prefix="pilot.design." code={String(e.design)} /> · <CodeLabel prefix="iv.review." code={String(e.review_status)} />
+                          {e.is_synthetic ? <> · <Badge tone="synthetic">{t2("common.synthetic_demo")}</Badge></> : null}</span>
                         <Link to={`/pilots/${String(e.pilot_id)}/follow-up`} className="xs"> → {t2("pilot.followup")}</Link>
                         {e.review_status === "proposed" && canApprove && (
                           <span className="row" style={{ gap: 4 }}>

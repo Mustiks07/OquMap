@@ -26,7 +26,7 @@ test("quality → intervention → pilot → fidelity → follow-up → next dec
   // 1. quality problem
   await page.getByRole("link", { name: "Качество проверок" }).click();
   await page.getByTestId("quality-list").getByRole("link", { name: "DIAG-BASE" }).click();
-  await expect(page.getByTestId("item-Q05")).toContainText("negative_discrimination");
+  await expect(page.getByTestId("item-Q05")).toContainText("отрицательная различающая способность");
   await page.getByTestId("item-Q05").getByRole("button").click();
   await expect(page.getByText(/Отрицательная различающая способность/)).toBeVisible();
 
@@ -92,4 +92,34 @@ test("quality → intervention → pilot → fidelity → follow-up → next dec
   await expect(page.getByRole("heading", { name: "Пилоттар портфелі" })).toBeVisible();
   await page.getByRole("button", { name: "RU" }).click();
   expect(errors).toEqual([]);
+});
+
+test("keyboard: list links are reachable with Tab and open with Enter; focus is visible", async ({ page }) => {
+  await login(page);
+  for (const [nav, table] of [["Качество проверок", "quality-list"], ["Интервенции", "interventions"], ["Портфель пилотов", "pilots"]] as const) {
+    await page.getByRole("link", { name: nav }).click();
+    const first = page.getByTestId(table).getByRole("link").first();
+    await expect(first).toBeVisible();
+    const href = await first.getAttribute("href");
+    let reached = false;
+    for (let i = 0; i < 80 && !reached; i++) {  // real keyboard navigation, not element.focus()
+      await page.keyboard.press("Tab");
+      reached = await first.evaluate((el) => el === document.activeElement);
+    }
+    expect(reached).toBe(true);
+    const outline = await first.evaluate((el) => getComputedStyle(el).boxShadow + getComputedStyle(el).outlineStyle);
+    expect(outline).not.toBe("nonenone"); // :focus-visible ring
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
+    await page.goBack();
+  }
+  // the decision created from a pilot conclusion shows the learning-loop block with a link back to the outcome
+  await page.getByRole("link", { name: "Портфель пилотов" }).click();
+  await page.getByTestId("pilots").getByRole("link", { name: /PIL-M01/ }).click();
+  await page.getByRole("button", { name: "Повторное измерение" }).click();
+  await page.getByTestId("conclusions").getByRole("link", { name: "Открыть новую версию решения" }).first().click();
+  await expect(page.getByTestId("learning-loop")).toContainText("PIL-M01");
+  await expect(page.getByTestId("learning-loop")).toContainText("INT-STRIPS");
+  await page.getByTestId("learning-loop").getByRole("link", { name: "Открыть результат пилота" }).press("Enter");
+  await expect(page.getByTestId("outcome")).toBeVisible();
 });

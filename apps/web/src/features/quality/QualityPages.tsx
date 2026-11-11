@@ -3,8 +3,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAppState } from "../../state/AppState";
 import { Badge, Button, Card, Field, Metric, Select, StaleBanner } from "../../ui";
 import { dateTime } from "../../ui/format";
-import { useAssessmentQuality, useItemQuality, useQualityList, type ItemQuality, type QualityRules } from "../measurement/api";
-import { KV, MQuery, Messages, Num, Share, Stat } from "../measurement/components";
+import { useAssessmentQuality, useAssignments, useItemQuality, useMAction, useQualityList, type ItemQuality, type QualityRules } from "../measurement/api";
+import { ActionError, CodeLabel, KV, MQuery, Messages, Num, Pager, Share, Stat, useRoles, useUrlState } from "../measurement/components";
 import { useMT } from "../measurement/i18n";
 
 function RulesBar({ rules, onChange }: { rules: QualityRules; onChange: (r: QualityRules) => void }) {
@@ -27,13 +27,16 @@ function RulesBar({ rules, onChange }: { rules: QualityRules; onChange: (r: Qual
   );
 }
 
+const PAGE = 25;
+
 export function QualityListPage() {
   const { t2, lang, pick } = useMT();
   const { datasetId } = useAppState();
-  const [scope, setScope] = useState<"current" | "all">(datasetId ? "current" : "all");
-  const [rules, setRules] = useState<QualityRules>({ attempt_rule: "first", omitted_policy: "as_incorrect" });
-  const q = useQualityList(scope === "current" ? datasetId : null, rules);
-  const nav = useNavigate();
+  const [u, setU] = useUrlState({ scope: datasetId ? "current" : "all", attempt_rule: "first", omitted_policy: "as_incorrect", offset: "0" });
+  const scope = u.scope as "current" | "all";
+  const rules: QualityRules = { attempt_rule: u.attempt_rule as QualityRules["attempt_rule"], omitted_policy: u.omitted_policy as QualityRules["omitted_policy"] };
+  const offset = Number(u.offset) || 0;
+  const q = useQualityList(scope === "current" ? datasetId : null, rules, PAGE, offset);
   return (
     <div className="page stack">
       <div className="page-header">
@@ -45,11 +48,11 @@ export function QualityListPage() {
       <div className="row">
         <Field label={t2("common.dataset")}>
           {(id) => (
-            <Select id={id} value={scope} onChange={(v) => setScope(v as "current" | "all")}
+            <Select id={id} value={scope} onChange={(v) => setU({ scope: v, offset: "0" })}
               options={[...(datasetId ? [{ value: "current", label: t2("common.current_dataset") }] : []), { value: "all", label: t2("common.all_datasets") }]} />
           )}
         </Field>
-        <RulesBar rules={rules} onChange={setRules} />
+        <RulesBar rules={rules} onChange={(r) => setU({ ...r, offset: "0" })} />
       </div>
       <MQuery q={q} empty={(d) => d.assessments.length === 0}>
         {(d) => (
@@ -70,11 +73,13 @@ export function QualityListPage() {
               </thead>
               <tbody>
                 {d.assessments.map((a) => (
-                  <tr key={a.assessment.assessment_id} className="clickable" onClick={() => nav(`/quality/${a.assessment.assessment_id}`)}>
-                    <td>
-                      <Link to={`/quality/${a.assessment.assessment_id}`} onClick={(e) => e.stopPropagation()} className="mono">{a.assessment.code}</Link>
+                  <tr key={a.assessment.assessment_id}>
+                    <th scope="row">
+                      <Link to={`/quality/${a.assessment.assessment_id}`} className="mono"
+                        aria-label={`${t2("quality.assessment")} ${a.assessment.code}: ${a.assessment.form_code}`}>{a.assessment.code}</Link>
                       <div className="xs muted">{a.assessment.stage} · {a.assessment.administered_on ?? "—"}</div>
-                    </td>
+                      {!a.denominators.assigned_is_exact && <div className="xs muted">{t2("quality.scope.inferred_from_sittings")}</div>}
+                    </th>
                     <td className="small">{pick(a.dataset, "name")}</td>
                     <td className="mono small">{a.assessment.form_code} / {a.assessment.scale_code}</td>
                     <td className="num"><Num v={a.denominators.present} /> / <Num v={a.denominators.assigned} /></td>
@@ -87,6 +92,7 @@ export function QualityListPage() {
               </tbody>
             </table>
             <p className="xs muted" style={{ padding: 8 }}>{d.method_version} · {dateTime(d.assessments[0]?.generated_at, lang)}</p>
+            <Pager total={d.total} limit={d.limit} offset={d.offset} onChange={(o) => setU({ offset: String(o) })} />
           </div>
         )}
       </MQuery>
@@ -129,7 +135,9 @@ function ItemRow({ it, open, onToggle }: { it: ItemQuality; open: boolean; onTog
         <td>
           <div className="row" style={{ gap: 4 }}>
             {it.flags.length === 0 ? <span className="muted">—</span> : it.flags.map((f) => (
-              <Badge key={f.code} tone={f.severity === "warn" ? "warn" : "info"} title={lang === "kz" ? f.message_kz : f.message_ru}>{f.code}</Badge>
+              <Badge key={f.code} tone={f.severity === "warn" ? "warn" : "info"} title={lang === "kz" ? f.message_kz : f.message_ru}>
+                <CodeLabel prefix="flag." code={f.code} />
+              </Badge>
             ))}
             {warn && <span className="sr-only">{t2("quality.flags")}</span>}
           </div>
@@ -148,7 +156,7 @@ function ItemRow({ it, open, onToggle }: { it: ItemQuality; open: boolean; onTog
                     <tr>
                       <th scope="col">{t2("quality.option")}</th><th scope="col" className="num">{t2("quality.chosen")}</th>
                       <th scope="col" className="num">{t2("quality.rest_mean")}</th><th scope="col" className="num">{t2("quality.pbis")}</th>
-                      <th scope="col">misconception</th>
+                      <th scope="col">{t2("quality.misconception")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -166,7 +174,7 @@ function ItemRow({ it, open, onToggle }: { it: ItemQuality; open: boolean; onTog
               </div>
               <KV rows={[
                 [t2("quality.links"), <span key="l" className="small">{it.objectives.map((o) => `${o.code} (${o.status})`).join(", ") || "—"} · {it.misconceptions.join(", ") || "—"}</span>],
-                [t2("quality.denominators"), <span key="d" className="small mono">present {it.denominators.present} · answered {it.denominators.answered} · omitted {it.denominators.omitted} · missing {it.denominators.missing}</span>],
+                [t2("quality.denominators"), <span key="d" className="small">{(["present", "answered", "omitted", "missing"] as const).map((k) => `${t2(`quality.den.${k}`)} ${it.denominators[k]}`).join(" · ")}</span>],
               ]} />
               <ItemAdmins id={it.item_id} />
             </div>
@@ -192,7 +200,7 @@ function ItemAdmins({ id }: { id: string }) {
               r = <Stat value={a.stats.item_rest_correlation.value} reason={a.stats.item_rest_correlation.unavailable_reason} />
             </li>
           ))}
-          <li className="muted">{d.pooled_unavailable_reason}</li>
+          <li className="muted" title={d.pooled_unavailable_reason}>{t2("quality.not_pooled")}</li>
         </ul>
       )}
     </MQuery>
@@ -247,7 +255,10 @@ export function QualityDetailPage() {
                     [t2("quality.completion"), <Share key="c" v={f.completion_rate} />],
                     [t2("quality.omission"), <Share key="o" v={f.omission_rate} />],
                     [t2("quality.missing"), <Share key="m" v={f.missing_rate} />],
+                    [t2("quality.outside"), <Num key="out" v={f.denominators.present_outside_assignment} />],
                   ]} />
+                  <p className="xs" style={{ marginTop: 8 }}><Badge tone={f.denominators.assigned_is_exact ? "ok" : "warn"}>
+                    {t2(`quality.scope.${f.denominators.assignment_scope}`)}</Badge></p>
                 </Card>
                 <Card title={t2("quality.distribution")}>
                   <Histogram bins={f.score_distribution.histogram as unknown as { from: number; to: number; count: number }[]} />
@@ -264,7 +275,7 @@ export function QualityDetailPage() {
                   <h3 style={{ fontSize: "var(--text-sm)" }}>{t2("quality.slices")}</h3>
                   {Object.entries(d.slices).map(([dim, rows]) => (
                     <p key={dim} className="small" style={{ margin: 0 }}>
-                      <span className="muted">{dim}:</span>{" "}
+                      <span className="muted"><CodeLabel prefix="quality.dim." code={dim} />:</span>{" "}
                       {rows.map((s) => (s.suppressed ? `${s.value} — ${t2("quality.suppressed")}` : `${s.value}: n=${s.n}, ${Math.round((s.mean ?? 0) * 1000) / 10}%`)).join("; ") || "—"}
                     </p>
                   ))}
@@ -292,16 +303,63 @@ export function QualityDetailPage() {
               </Card>
               <div className="grid grid-2">
                 <Card title={t2("common.exclusions")}>
-                  <KV rows={Object.entries(d.exclusions).map(([k, v]) => [k, <Num key={k} v={v as number} />])} />
+                  <KV rows={Object.entries(d.exclusions).map(([k, v]) => [<CodeLabel key={`l${k}`} prefix="excl." code={k} />, <Num key={k} v={v as number} />])} />
                 </Card>
                 <Card title={t2("common.limitations")}>
                   <Messages items={d.limitations} />
                 </Card>
               </div>
+              <AssignmentsCard assessmentId={d.assessment.assessment_id} />
             </>
           );
         }}
       </MQuery>
     </div>
+  );
+}
+
+function AssignmentsCard({ assessmentId }: { assessmentId: string }) {
+  const { t2 } = useMT();
+  const q = useAssignments(assessmentId);
+  const { canDraft } = useRoles();
+  const [edit, setEdit] = useState<Record<string, boolean> | null>(null);
+  const save = useMAction<{ cohort_ids: string[] }, unknown>("PUT", () => `/api/v1/quality/assessments/${assessmentId}/assignments`);
+  return (
+    <Card title={t2("quality.assignments")}>
+      <MQuery q={q}>
+        {(d) => (
+          <div className="stack">
+            <p className="small"><Badge tone={d.assignment_scope === "explicit" ? "ok" : "warn"}>{t2(`quality.scope.${d.assignment_scope}`)}</Badge></p>
+            {edit ? (
+              <form className="stack" aria-label={t2("quality.assignments_edit")}
+                onSubmit={(e) => { e.preventDefault(); save.mutate({ cohort_ids: Object.keys(edit).filter((k) => edit[k]) }, { onSuccess: () => setEdit(null) }); }}>
+                <p className="xs muted">{t2("quality.assignments_hint")}</p>
+                <fieldset className="row" style={{ border: 0, padding: 0 }}>
+                  <legend className="sr-only">{t2("quality.assignments")}</legend>
+                  {d.cohorts.map((c) => (
+                    <label key={c.cohort_id} className="row small" style={{ gap: 4 }}>
+                      <input type="checkbox" checked={!!edit[c.cohort_id]} onChange={(e) => setEdit({ ...edit, [c.cohort_id]: e.target.checked })} />
+                      <span className="mono">{c.code}</span> <span className="xs muted">({t2("quality.records", { n: c.sitting_records })})</span>
+                    </label>
+                  ))}
+                </fieldset>
+                <ActionError error={save.error} />
+                <div className="row">
+                  <Button type="submit" variant="primary" disabled={save.isPending}>{t2("common.save")}</Button>
+                  <Button onClick={() => setEdit(null)}>{t2("common.cancel")}</Button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <p className="small" style={{ margin: 0 }}>
+                  {d.cohorts.filter((c) => c.assigned).map((c) => `${c.code}${c.sitting_records === 0 ? " ⚠" : ""}`).join(", ") || "—"}
+                </p>
+                {canDraft && <Button size="sm" onClick={() => setEdit(Object.fromEntries(d.cohorts.map((c) => [c.cohort_id, c.assigned])))}>{t2("quality.assignments_edit")}</Button>}
+              </>
+            )}
+          </div>
+        )}
+      </MQuery>
+    </Card>
   );
 }

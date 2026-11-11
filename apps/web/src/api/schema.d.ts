@@ -1265,12 +1265,18 @@ export interface components {
         AssessmentQualityList: {
             /** Assessments */
             assessments: components["schemas"]["AssessmentQualitySummary"][];
+            /** Limit */
+            limit: number;
             /** Method Version */
             method_version: string;
+            /** Offset */
+            offset: number;
             /** Rules */
             rules: {
                 [key: string]: string;
             };
+            /** Total */
+            total: number;
         } & {
             [key: string]: unknown;
         };
@@ -2514,6 +2520,19 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** InterventionPage */
+        InterventionPage: {
+            /** Items */
+            items: components["schemas"]["InterventionListItem"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        } & {
+            [key: string]: unknown;
+        };
         /**
          * InterventionPatch
          * @description Partial update of a *draft* version (reviewed versions are immutable).
@@ -3345,6 +3364,19 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** PilotPage */
+        PilotPage: {
+            /** Items */
+            items: components["schemas"]["PilotListItem"][];
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Total */
+            total: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** PilotPatch */
         PilotPatch: {
             analysis_plan?: components["schemas"]["AnalysisPlan"] | null;
@@ -3541,6 +3573,10 @@ export interface components {
             interventions_with_repeated_signals: {
                 [key: string]: unknown;
             }[];
+            /** Learners By Outcome Status */
+            learners_by_outcome_status: {
+                [key: string]: unknown;
+            };
             /** Limitations */
             limitations: components["schemas"]["Message"][];
             /** Missing For Conclusions */
@@ -6641,6 +6677,8 @@ export interface operations {
                 grade?: number | null;
                 language?: string | null;
                 q?: string | null;
+                limit?: number;
+                offset?: number;
             };
             header?: {
                 authorization?: string | null;
@@ -6656,7 +6694,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InterventionListItem"][];
+                    "application/json": components["schemas"]["InterventionPage"];
                 };
             };
             /** @description Bad Request */
@@ -7933,6 +7971,8 @@ export interface operations {
                 dataset_id?: string | null;
                 status?: string | null;
                 intervention_id?: string | null;
+                limit?: number;
+                offset?: number;
             };
             header?: {
                 authorization?: string | null;
@@ -7948,7 +7988,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PilotListItem"][];
+                    "application/json": components["schemas"]["PilotPage"];
                 };
             };
             /** @description Bad Request */
@@ -9139,6 +9179,8 @@ export interface operations {
                 dataset_id?: string | null;
                 attempt_rule?: string;
                 omitted_policy?: string;
+                limit?: number;
+                offset?: number;
             };
             header?: {
                 authorization?: string | null;
