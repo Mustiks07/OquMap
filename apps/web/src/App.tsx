@@ -14,6 +14,12 @@ import { MaterialsPage } from "./features/MaterialsPage";
 import { OverviewPage } from "./features/OverviewPage";
 import { PlannerPage } from "./features/PlannerPage";
 import { TopicPage } from "./features/TopicPage";
+import { FidelityPage } from "./features/followup/FidelityPage";
+import { FollowUpPage } from "./features/followup/FollowUpPage";
+import { PortfolioPage } from "./features/followup/PortfolioPage";
+import { InterventionDetailPage, InterventionsPage } from "./features/interventions/InterventionPages";
+import { PilotDetailPage, PilotNewPage } from "./features/interventions/PilotPages";
+import { QualityDetailPage, QualityListPage } from "./features/quality/QualityPages";
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { user, setUser } = useAppState();
@@ -51,6 +57,15 @@ export function App() {
         <Route path="/planner" element={<PlannerPage />} />
         <Route path="/decisions" element={<DecisionsPage />} />
         <Route path="/decisions/:decisionId" element={<DecisionsPage />} />
+        <Route path="/quality" element={<QualityListPage />} />
+        <Route path="/quality/:assessmentId" element={<QualityDetailPage />} />
+        <Route path="/interventions" element={<InterventionsPage />} />
+        <Route path="/interventions/:id" element={<InterventionDetailPage />} />
+        <Route path="/pilots/new" element={<PilotNewPage />} />
+        <Route path="/pilots/:id" element={<PilotDetailPage />} />
+        <Route path="/pilots/:id/fidelity" element={<FidelityPage />} />
+        <Route path="/pilots/:id/follow-up" element={<FollowUpPage />} />
+        <Route path="/portfolio/interventions" element={<PortfolioPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/datasets" replace />} />
     </Routes>

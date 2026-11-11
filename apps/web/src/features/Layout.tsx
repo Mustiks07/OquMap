@@ -8,6 +8,7 @@ import { useAppState } from "../state/AppState";
 import { Badge, Button, SyntheticBadge } from "../ui";
 import { dateTime } from "../ui/format";
 import { Assistant } from "./Assistant";
+import { MeasurementNav } from "./measurement/MeasurementNav";
 
 const STEPS: { to: string; key: DictKey }[] = [
   { to: "/datasets", key: "nav.datasets" },
@@ -75,6 +76,7 @@ export function Layout() {
             </li>
           ))}
         </ol>
+        <MeasurementNav />
         {dataset?.is_synthetic && <p className="xs muted" style={{ marginTop: 16 }}>{t("synthetic.note")}</p>}
       </nav>
       <main className="app-main" id="main">
