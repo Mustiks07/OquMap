@@ -1,6 +1,11 @@
 {
   "name": "oqumap-e2e",
   "private": true,
-  "scripts": { "test": "playwright test --trace off" },
-  "devDependencies": { "@playwright/test": "1.63.0" }
+  "scripts": {
+    "test": "playwright test --trace off"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.63.0"
+  }
 }

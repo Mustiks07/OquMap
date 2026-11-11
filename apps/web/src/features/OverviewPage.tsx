@@ -94,7 +94,7 @@ export function OverviewPage() {
                 </Card>
               </div>
               <Card title={t("overview.topics")}>
-                <div className="table-wrap">
+                <div className="table-wrap" tabIndex={0}>
                   <table className="table" data-testid="topics-table">
                     <thead>
                       <tr>
@@ -123,7 +123,7 @@ export function OverviewPage() {
               <Card title={t("overview.heatmap")}>
                 {r.heatmap.cells.length === 0 ? <EmptyState /> : (
                   <>
-                    <div className="table-wrap">
+                    <div className="table-wrap" tabIndex={0}>
                       <table className="table" aria-label={t("overview.heatmap")}>
                         <thead>
                           <tr>

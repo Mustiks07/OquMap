@@ -105,7 +105,7 @@ export function SandboxPage({ readOnlyDemo }: { readOnlyDemo?: { text: string } 
       {res && run.data && (
         <Card title={t("sandbox.compare")}>
           <p className="xs muted">{res.note_ru} · {t("sandbox.saved")} <code>{run.data.context.analysis_id.slice(0, 8)}</code></p>
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0}>
             <table className="table" data-testid="sandbox-table">
               <thead>
                 <tr><th>{t("sandbox.topic")}</th><th className="num">{t("sandbox.before")}</th>

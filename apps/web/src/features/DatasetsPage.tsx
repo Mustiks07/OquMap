@@ -136,7 +136,7 @@ export function QualityPanel() {
             <div className="metric"><span className="metric-label">{t("datasets.level")}</span><span className="small">{t(`level.${r.data_level}` as DictKey)}</span></div>
           </div>
           <h3>{t("quality.assessments")}</h3>
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0}>
             <table className="table">
               <thead>
                 <tr>

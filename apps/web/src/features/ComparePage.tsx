@@ -107,7 +107,7 @@ export function ComparePage() {
               ]}
             />
             <div className="stack">
-              <div className="table-wrap">
+              <div className="table-wrap" tabIndex={0}>
                 <table className="table" data-testid="comparison-table">
                   <thead><tr><th /><th className="num">{ea.code}</th><th className="num">{eb.code}</th><th className="num">{t("compare.difference")}</th></tr></thead>
                   <tbody>
@@ -131,7 +131,7 @@ export function ComparePage() {
         </Card>
         <div className="grid grid-2">
           <Card title={t("compare.strata_table")}>
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0}>
               <table className="table">
                 <thead><tr><th /><th className="num">{t("compare.weight")}</th><th className="num">{ea.code} n</th><th className="num">{ea.code}</th><th className="num">{eb.code} n</th><th className="num">{eb.code}</th></tr></thead>
                 <tbody>
@@ -156,7 +156,7 @@ export function ComparePage() {
         {r.topic_table && (
           <Card title={t("compare.topic_table")}>
             <Alert tone="warn">{t("compare.topic_table_note")}</Alert>
-            <div className="table-wrap" style={{ marginTop: 8 }}>
+            <div className="table-wrap" tabIndex={0} style={{ marginTop: 8 }}>
               <table className="table">
                 <thead><tr><th>{t("compare.topic")}</th><th>{t("compare.status")}</th><th className="num">{t("compare.raw")}</th><th className="num">{t("compare.adjusted")}</th><th>{t("common.ci95")}</th></tr></thead>
                 <tbody>
@@ -212,7 +212,7 @@ function Illustration() {
       <Disclosure summary={t("common.details")}>
         {q.isLoading ? <Loading /> : q.isError ? <ErrorState error={q.error} onRetry={() => q.refetch()} /> : q.data && (
           <div className="stack">
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0}>
               <table className="table" data-testid="illustration-table">
                 <thead><tr><th /><th className="num">A</th><th className="num">B</th></tr></thead>
                 <tbody>

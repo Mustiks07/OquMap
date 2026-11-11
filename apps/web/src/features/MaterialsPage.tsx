@@ -200,7 +200,7 @@ function ItemLinks() {
           const rows = d.item_links.filter((l: ItemLink) => !onlyProposed || l.status === "proposed");
           if (!rows.length) return <EmptyState />;
           return (
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0}>
               <table className="table">
                 <thead><tr><th>Задание</th><th>Цель</th><th className="num">Вес</th><th>Источник</th><th>{t("common.status")}</th><th /></tr></thead>
                 <tbody>

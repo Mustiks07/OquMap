@@ -142,6 +142,8 @@ def test_full_methodist_path(fresh_client):
     fu = fu.json()
     res = fu["result"]
     assert res["interpretation_level"] == "observed_dynamics"
+    # the follow-up file is a new cohort (new learner IDs): no paired design, cohort comparison is used
+    assert res["design"] == "cohort" and res["paired"]["reason"] == "no_shared_learner_ids"
     assert res["target"]["adjusted_change"] > 0
     assert res["status"] in ("positive_signal", "not_confirmed")
     assert res["comparison_group"] is not None

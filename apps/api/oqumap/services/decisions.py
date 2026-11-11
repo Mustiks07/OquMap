@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from .. import models as m
 from ..analytics import scoring
 from ..analytics.comparison import compare_arms
+from ..analytics.paired import paired_change
 from ..db import new_id, utcnow
 from ..errors import ApiError, not_found
 from . import analysis as an
@@ -299,6 +300,12 @@ def follow_up(session: Session, p: Principal, decision_id: str, req: FollowUpReq
                 comparison_group = dynamics(others)
         diff = target["adjusted"]["difference"] if target["adjusted"]["difference"] is not None else None
         ci = target["uncertainty"]["adjusted_difference_ci"]
+        # paired design when the same learners (stable IDs) were measured before and after on common items
+        paired = paired_change(group_scores(before_as, target_eds), group_scores([after_a], target_eds)) if common else \
+            {"available": False, "reason": "forms_not_linked", "n_pairs": 0}
+        design = "paired" if paired["available"] else "cohort"
+        if design == "paired":
+            diff, ci = paired["mean_change"], paired["ci"]
         if any(r["severity"] == "fail" for r in reasons) or diff is None or ci is None:
             status = "needs_more_data"
         elif ci["low"] > 0:
@@ -313,13 +320,16 @@ def follow_up(session: Session, p: Principal, decision_id: str, req: FollowUpReq
         return {
             "decision_id": d.id, "topic": {"topic_id": topic.id, "code": topic.code, "title_ru": topic.title_ru},
             "before_assessments": [a.code for a in before_as], "after_assessment": after_a.code,
-            "comparability": render_reasons(reasons), "status": status,
+            "comparability": render_reasons(reasons), "status": status, "design": design, "paired": paired,
             "status_label_ru": FOLLOW_UP[status][0], "status_label_kz": FOLLOW_UP[status][1],
             "target": _dyn_summary(target), "comparison_group": _dyn_summary(comparison_group) if comparison_group else None,
             "difference_in_changes": did,
             "interpretation_level": "observed_dynamics",
-            "note_ru": ("Сравниваются когорты на общих заданиях одной шкалы со стандартизацией по входному уровню. "
-                        "Это наблюдаемая динамика, а не оценка воздействия решения: без протокола с контрольной "
+            "note_ru": (("Те же ученики (стабильные ID) до и после на общих заданиях одной шкалы: изменение внутри ученика, "
+                         "интервал — бутстрэп по классам. " if design == "paired" else
+                         "Сравниваются когорты на общих заданиях одной шкалы со стандартизацией по входному уровню "
+                         "(общих учеников с теми же ID нет). ")
+                        + "Это наблюдаемая динамика, а не оценка воздействия решения: без протокола с контрольной "
                         "группой причинный процент улучшения не выводится."),
             "criterion": d.follow_up_criterion,
         }

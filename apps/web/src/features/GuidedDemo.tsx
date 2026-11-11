@@ -20,7 +20,7 @@ export function GuidedDemo() {
         <strong id="guide-title" className="small">{t("guide.title")}</strong>
         <span className="xs muted" aria-label="progress">{done}/{GUIDE_STEPS.length}</span>
       </div>
-      <div className="bar-track" style={{ margin: "6px 0 8px" }} role="progressbar" aria-valuemin={0} aria-valuemax={GUIDE_STEPS.length} aria-valuenow={done}>
+      <div className="bar-track" style={{ margin: "6px 0 8px" }} role="progressbar" aria-label={t("guide.title")} aria-valuemin={0} aria-valuemax={GUIDE_STEPS.length} aria-valuenow={done}>
         <div className="bar-fill" style={{ width: `${(100 * done) / GUIDE_STEPS.length}%` }} />
       </div>
       <ol style={{ listStyle: "none", padding: 0, margin: 0 }} className="stack xs">

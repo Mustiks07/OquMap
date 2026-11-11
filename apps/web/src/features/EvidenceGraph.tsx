@@ -95,9 +95,9 @@ export function EvidenceGraph({ g, selected, onSelect, pathOnly }: { g: GraphRes
           const m = metricText(n, lang);
           return (
             <g key={n.id} transform={`translate(${p.x},${p.y})`} className={`graph-node tone-${tone(n)}${pathSet.has(n.id) ? " on-path" : ""}${selected === n.id ? " selected" : ""}`}
-              role="button" tabIndex={0} aria-label={`${t(`graph.kind.${n.kind}` as DictKey)}: ${label}${m ? `, ${m}` : ""}`} data-node={n.id} data-kind={n.kind}
+              role="button" tabIndex={0} data-node={n.id} data-kind={n.kind}
               onClick={() => onSelect(n.id)} onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onSelect(n.id); } }}>
-              <title>{label}</title>
+              <title>{`${t(`graph.kind.${n.kind}` as DictKey)}: ${label}${m ? `, ${m}` : ""}`}</title>
               {pathOnly && <text x={0} y={-5} className="graph-lane">{t(`graph.kind.${n.kind}` as DictKey)}</text>}
               <rect width={W} height={H} rx={6} />
               <text x={8} y={14} className="graph-label">{label.length > 26 ? label.slice(0, 25) + "…" : label}</text>
@@ -147,7 +147,7 @@ export function NodeDetail({ node }: { node: GraphNode }) {
             {a.data ? <> · {t("header.version")} v{a.data.context.dataset_version} · {a.data.context.method_version}</> : null}</span>
           {a.isLoading && <Loading />}
           {node.open.type === "item" && piece && typeof piece === "object" ? (
-            <div className="table-wrap"><table className="table xs" data-testid="item-rows">
+            <div className="table-wrap" tabIndex={0}><table className="table xs" data-testid="item-rows">
               <thead><tr><th>{t("graph.option")}</th><th>{t("graph.answer")}</th><th className="num">n</th><th className="num">%</th><th>{t("graph.kind.misconception")}</th></tr></thead>
               <tbody>
                 {((piece as { options: { key: string; text: string; correct: boolean; count: number; share: number | null; misconception: string | null }[] }).options).map((o) => (

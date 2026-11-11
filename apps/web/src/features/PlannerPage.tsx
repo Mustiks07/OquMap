@@ -66,7 +66,7 @@ export function PlannerPage() {
         {(c) => (
           <Card title={mode === "current" ? c.plan?.name ?? t("planner.load_current") : t("planner.illustration")}
             actions={mode === "current" && c.plan ? <span className="xs muted">{c.plan.scope} · {c.plan.horizon}</span> : null}>
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0}>
               <table className="table" data-testid="planner-table">
                 <thead>
                   <tr>
@@ -137,7 +137,7 @@ function ScenarioCard({ sc, analysisId, canUse }: { sc: PlanScenario; analysisId
         {sc.changes && (
           <>
             <HoursChart title={t("planner.result")} labels={[t("planner.before"), t("planner.after")]} rows={sc.changes.map((ch) => ({ code: ch.code, before: ch.before, after: ch.after }))} />
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0}>
               <table className="table">
                 <thead><tr><th>{t("planner.topic")}</th><th className="num">{t("planner.before")}</th><th className="num">{t("planner.after")}</th><th className="num">{t("planner.delta")}</th></tr></thead>
                 <tbody>

@@ -71,3 +71,26 @@ def test_cluster_robust_interval_uses_class_count_and_is_withheld_for_few_classe
 def test_empty_inputs_produce_null_not_zero():
     s = scoring.summarize_scores(pd.DataFrame(columns=["learner_id", "cohort_id", "school_id", "score"]))
     assert s.mean is None and s.ci_unavailable_reason == "no_data"
+
+
+def test_paired_change_uses_same_learners_and_cluster_bootstrap():
+    import numpy as np
+    import pandas as pd
+
+    from oqumap.analytics.paired import paired_change
+
+    rng = np.random.default_rng(1)
+    rows_b, rows_a = [], []
+    for c in range(6):
+        for i in range(10):
+            lid = f"L{c}-{i}"
+            b = float(rng.uniform(0.2, 0.6))
+            rows_b.append({"learner_id": lid, "cohort_id": f"C{c}", "score": b})
+            rows_a.append({"learner_id": lid, "cohort_id": f"C{c}", "score": b + 0.1})
+    before, after = pd.DataFrame(rows_b), pd.DataFrame(rows_a)
+    r = paired_change(before, after)
+    assert r["available"] and r["n_pairs"] == 60 and abs(r["mean_change"] - 0.1) < 1e-9
+    assert r["ci"]["low"] - 1e-9 <= 0.1 <= r["ci"]["high"] + 1e-9
+    other = after.assign(learner_id=after["learner_id"] + "-new")
+    assert paired_change(before, other)["reason"] == "no_shared_learner_ids"
+    assert paired_change(before.head(10), after.head(10))["reason"] == "too_few_pairs"

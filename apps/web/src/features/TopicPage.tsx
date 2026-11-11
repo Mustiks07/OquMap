@@ -122,7 +122,7 @@ export function TopicPage() {
                   )}
                 </Card>
                 <Card title={t("topic.classes")}>
-                  <div className="table-wrap" style={{ maxHeight: 360 }}>
+                  <div className="table-wrap" tabIndex={0} style={{ maxHeight: 360 }}>
                     <table className="table">
                       <thead><tr><th>Класс</th><th>Школа</th><th>Издание</th><th className="num">n</th><th>{t("overview.score")}</th></tr></thead>
                       <tbody>
@@ -161,7 +161,7 @@ function ItemRow({ it }: { it: ItemEvidence }) {
         <span>{t("topic.omit_rate")}: {pct(it.omit_rate, lang)} ({it.n_omitted})</span>
         <span className="muted">{t("topic.weight")}: {it.topic_weight.toFixed(2)}</span>
       </div>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0}>
         <table className="table">
           <tbody>
             {it.options.map((o) => (

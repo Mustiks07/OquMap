@@ -294,7 +294,7 @@ function SnapshotView({ s }: { s: Snapshot }) {
       </Card>
       {s.plan && (
         <Card title={t("decision.hours")}>
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0}>
             <table className="table">
               <thead><tr><th>{t("planner.topic")}</th><th className="num">{t("planner.before")}</th><th className="num">{t("planner.after")}</th><th className="num">{t("planner.delta")}</th></tr></thead>
               <tbody>{s.plan.changes.map((c) => <tr key={c.code}><td>{c.code}</td><td className="num">{c.before}</td><td className="num">{c.after}</td><td className="num">{c.delta > 0 ? `+${c.delta}` : c.delta}</td></tr>)}
@@ -331,6 +331,8 @@ interface Dyn {
 interface FollowUpResult {
   status: string; target: Dyn; comparison_group: Dyn | null; difference_in_changes: number | null; note_ru: string; after_assessment: string; before_assessments: string[];
   comparability: { code: string; severity: string; message_ru: string; message_kz: string }[];
+  design?: "paired" | "cohort";
+  paired?: { available: boolean; reason?: string; n_pairs: number; n_classes?: number; before?: number; after?: number; mean_change?: number; ci?: { low: number; high: number } };
 }
 
 function FollowUpView({ r }: { r: FollowUpResult | null | undefined }) {
@@ -348,7 +350,7 @@ function FollowUpView({ r }: { r: FollowUpResult | null | undefined }) {
   return (
     <div className="stack" data-testid="followup-result">
       <div className="row"><StatusBadge status={r.status} labelKey={`followup.${r.status}` as DictKey} /><span className="xs muted">{r.before_assessments.join(", ")} → {r.after_assessment}</span></div>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0}>
         <table className="table">
           <thead><tr><th /><th className="num">{t("decision.before")}</th><th className="num">{t("decision.after")}</th><th className="num">{t("decision.change")}</th><th>{t("common.ci95")}</th></tr></thead>
           <tbody>
@@ -357,6 +359,13 @@ function FollowUpView({ r }: { r: FollowUpResult | null | undefined }) {
           </tbody>
         </table>
       </div>
+      {r.design && (
+        <p className="small" data-testid="followup-design">
+          <strong>{t(`decision.design.${r.design}` as DictKey)}</strong>
+          {r.paired?.available && r.paired.ci ? <> · {t("decision.paired_change", { n: r.paired.n_pairs })}: <Diff value={r.paired.mean_change} /> ({pp(r.paired.ci.low, lang)} … {pp(r.paired.ci.high, lang)})</>
+            : r.paired?.reason ? <span className="xs muted"> · {t(`decision.paired_reason.${r.paired.reason}` as DictKey)}</span> : null}
+        </p>
+      )}
       {r.difference_in_changes != null && <p className="small">{t("decision.did")}: <Diff value={r.difference_in_changes} /></p>}
       <ReasonList reasons={r.comparability} />
       <Alert tone="info">{lang === "kz" ? t("decision.followup_note") : r.note_ru}</Alert>

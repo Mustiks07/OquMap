@@ -158,7 +158,7 @@ export function ImportWizard({ fixedTarget, onCommitted, kindProp }: { fixedTarg
                   {Object.entries(rep.errors_by_code).map(([c, n]) => <Badge key={c} tone="danger">{c}: {n}</Badge>)}
                 </div>
                 <h3>{t("import.rejected_rows")}</h3>
-                <div className="table-wrap" style={{ maxHeight: 280 }}>
+                <div className="table-wrap" tabIndex={0} style={{ maxHeight: 280 }}>
                   <table className="table">
                     <thead><tr><th>{t("import.row")}</th><th>Ошибки</th><th>Значения</th></tr></thead>
                     <tbody>
@@ -219,7 +219,7 @@ export function ImportWizard({ fixedTarget, onCommitted, kindProp }: { fixedTarg
               <Button onClick={() => validate(true)} disabled={busy !== ""}>{t("import.revalidate")}</Button>
             </div>
             <h3 style={{ marginTop: 16 }}>{t("import.preview")}</h3>
-            <div className="table-wrap" style={{ maxHeight: 260 }}>
+            <div className="table-wrap" tabIndex={0} style={{ maxHeight: 260 }}>
               <table className="table">
                 <thead><tr>{rep.headers.map((h) => <th key={h}>{h}</th>)}</tr></thead>
                 <tbody>{rep.preview.map((r, i) => <tr key={i}>{rep.headers.map((h) => <td key={h} className="xs">{r[h]}</td>)}</tr>)}</tbody>
@@ -290,7 +290,7 @@ export function ImportPage() {
             {(tp) => (
               <div className="stack">
                 <ul className="xs muted" style={{ margin: 0 }}>{tp.rules.map((r, i) => <li key={i}>{r}</li>)}</ul>
-                <div className="table-wrap">
+                <div className="table-wrap" tabIndex={0}>
                   <table className="table" data-testid="stages">
                     <thead><tr><th>{t("project.stage")}</th><th>{t("common.status")}</th><th>Шаблоны</th><th /></tr></thead>
                     <tbody>

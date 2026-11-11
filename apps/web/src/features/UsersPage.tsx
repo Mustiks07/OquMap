@@ -60,7 +60,7 @@ export function UsersPage() {
       <Card title={t("users.title")}>
         <QueryView q={q}>
           {(rows) => (
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0}>
               <table className="table">
                 <thead><tr><th>{t("users.username")}</th><th>{t("users.display_name")}</th><th>{t("users.roles")}</th><th>{t("users.active")}</th><th /></tr></thead>
                 <tbody>

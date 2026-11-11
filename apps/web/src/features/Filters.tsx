@@ -17,8 +17,23 @@ export function FilterBar({ compact = false }: { compact?: boolean }) {
       <div className="filters" data-testid="filters">
         <Field label={t("filters.schools")}>
           {(id) => (
-            <Select id={id} value={filters.school_ids?.[0] ?? ""} onChange={(v) => set({ school_ids: v ? [v] : [] })}
+            <Select id={id} value={filters.school_ids?.[0] ?? ""} onChange={(v) => set({ school_ids: v ? [v] : [], cohort_ids: [] })}
               options={[{ value: "", label: t("filters.all") }, ...(cur.data?.schools ?? []).map((s) => ({ value: s.id, label: s.code }))]} />
+          )}
+        </Field>
+        <Field label={t("filters.classes")}>
+          {(id) => (
+            <Select id={id} value={filters.cohort_ids?.[0] ?? ""} onChange={(v) => set({ cohort_ids: v ? [v] : [] })}
+              options={[{ value: "", label: t("filters.all") }, ...(cur.data?.cohorts ?? [])
+                .filter((c) => !filters.school_ids?.length || filters.school_ids.includes(c.school_id))
+                .map((c) => ({ value: c.id, label: c.code }))]} />
+          )}
+        </Field>
+        <Field label={t("filters.language")}>
+          {(id) => (
+            <Select id={id} value={filters.language ?? ""} onChange={(v) => set({ language: v || null })}
+              options={[{ value: "", label: t("filters.all") }, ...Array.from(new Set((cur.data?.cohorts ?? []).map((c) => c.language)))
+                .sort().map((l) => ({ value: l, label: t(`filters.lang.${l}` as DictKey) }))]} />
           )}
         </Field>
         <Field label={t("filters.editions")}>
