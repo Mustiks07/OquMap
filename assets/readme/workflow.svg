@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430"
+     role="img" aria-labelledby="title desc">
+  <title id="title">Как OquMap превращает данные проверок в измеримый цикл улучшения</title>
+  <desc id="desc">Шесть связанных этапов: данные, измерение, доказательства, консилиум с критиком, ограниченный план и пилот с повторной проверкой.</desc>
+
+  <rect width="1200" height="430" rx="24" fill="#FCFBF8"/>
+  <rect x="0.5" y="0.5" width="1199" height="429" rx="23.5" fill="none" stroke="#17181A" stroke-opacity="0.12"/>
+
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <text x="56" y="56" fill="#3157D5" font-size="18" font-weight="700" letter-spacing="1.6">ONE TRACEABLE LEARNING LOOP</text>
+    <text x="56" y="105" fill="#17181A" font-size="42" font-weight="730" letter-spacing="-1">От строки ответа — до повторного измерения</text>
+    <text x="56" y="139" fill="#686C73" font-size="19">ИИ помогает формулировать гипотезы; числа, ограничения и право утверждения остаются у системы и человека.</text>
+
+    <g id="flow" transform="translate(56 184)">
+      <path d="M160 92H184 M344 92H368 M528 92H552 M712 92H736 M896 92H920"
+            stroke="#3157D5" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M174 84L184 92L174 100 M358 84L368 92L358 100 M542 84L552 92L542 100 M726 84L736 92L726 100 M910 84L920 92L910 100"
+            fill="none" stroke="#3157D5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <g transform="translate(0 0)">
+        <rect width="160" height="184" rx="14" fill="#F7F6F2" stroke="#17181A" stroke-opacity="0.12"/>
+        <circle cx="24" cy="24" r="14" fill="#3157D5"/><text x="19" y="30" fill="#FFF" font-size="18" font-weight="720">1</text>
+        <text x="20" y="61" fill="#686C73" font-size="18" font-weight="650">ДАННЫЕ</text>
+        <text x="20" y="92" fill="#17181A" font-size="22" font-weight="700">Проверки</text>
+        <text x="20" y="119" fill="#17181A" font-size="22" font-weight="700">и ответы</text>
+        <text x="20" y="153" fill="#686C73" font-size="18">CSV · XLSX · PDF</text>
+      </g>
+
+      <g transform="translate(184 0)">
+        <rect width="160" height="184" rx="14" fill="#F7F6F2" stroke="#17181A" stroke-opacity="0.12"/>
+        <circle cx="24" cy="24" r="14" fill="#3157D5"/><text x="19" y="30" fill="#FFF" font-size="18" font-weight="720">2</text>
+        <text x="20" y="61" fill="#686C73" font-size="18" font-weight="650">ИЗМЕРЕНИЕ</text>
+        <text x="20" y="92" fill="#17181A" font-size="22" font-weight="700">Результат</text>
+        <text x="20" y="119" fill="#17181A" font-size="22" font-weight="700">+ интервал</text>
+        <text x="20" y="153" fill="#686C73" font-size="18">scoring-v1</text>
+      </g>
+
+      <g transform="translate(368 0)">
+        <rect width="160" height="184" rx="14" fill="#E8ECFA" stroke="#3157D5" stroke-opacity="0.36"/>
+        <circle cx="24" cy="24" r="14" fill="#3157D5"/><text x="19" y="30" fill="#FFF" font-size="18" font-weight="720">3</text>
+        <text x="20" y="61" fill="#3157D5" font-size="18" font-weight="650">ATLAS</text>
+        <text x="20" y="92" fill="#17181A" font-size="22" font-weight="700">Цель · ошибка</text>
+        <text x="20" y="119" fill="#17181A" font-size="22" font-weight="700">· источник</text>
+        <text x="20" y="153" fill="#686C73" font-size="18">всё открывается</text>
+      </g>
+
+      <g transform="translate(552 0)">
+        <rect width="160" height="184" rx="14" fill="#F7F6F2" stroke="#17181A" stroke-opacity="0.12"/>
+        <circle cx="24" cy="24" r="14" fill="#3157D5"/><text x="19" y="30" fill="#FFF" font-size="18" font-weight="720">4</text>
+        <text x="20" y="61" fill="#686C73" font-size="18" font-weight="650">КРИТИК</text>
+        <text x="20" y="92" fill="#17181A" font-size="22" font-weight="700">Проверка</text>
+        <text x="20" y="119" fill="#17181A" font-size="22" font-weight="700">чисел и ID</text>
+        <text x="20" y="148" fill="#80500F" font-size="18">≠ причинный</text>
+        <text x="20" y="171" fill="#80500F" font-size="18">эффект</text>
+      </g>
+
+      <g transform="translate(736 0)">
+        <rect width="160" height="184" rx="14" fill="#F7F6F2" stroke="#17181A" stroke-opacity="0.12"/>
+        <circle cx="24" cy="24" r="14" fill="#3157D5"/><text x="19" y="30" fill="#FFF" font-size="18" font-weight="720">5</text>
+        <text x="20" y="61" fill="#686C73" font-size="18" font-weight="650">РЕШЕНИЕ</text>
+        <text x="20" y="92" fill="#17181A" font-size="22" font-weight="700">Часы +</text>
+        <text x="20" y="119" fill="#17181A" font-size="22" font-weight="700">ограничения</text>
+        <text x="20" y="153" fill="#686C73" font-size="18">planner-v1</text>
+      </g>
+
+      <g transform="translate(920 0)">
+        <rect width="160" height="184" rx="14" fill="#F7F6F2" stroke="#17181A" stroke-opacity="0.12"/>
+        <circle cx="24" cy="24" r="14" fill="#3157D5"/><text x="19" y="30" fill="#FFF" font-size="18" font-weight="720">6</text>
+        <text x="20" y="61" fill="#686C73" font-size="18" font-weight="650">ЦИКЛ</text>
+        <text x="20" y="92" fill="#17181A" font-size="22" font-weight="700">Пилот +</text>
+        <text x="20" y="119" fill="#17181A" font-size="22" font-weight="700">повтор</text>
+        <text x="20" y="153" fill="#686C73" font-size="18">fidelity · follow-up</text>
+      </g>
+    </g>
+
+    <g transform="translate(56 395)">
+      <circle cx="7" cy="-6" r="6" fill="#3157D5"/>
+      <text x="24" y="0" fill="#17181A" font-size="18" font-weight="650">Методист утверждает решение и версию доказательств</text>
+      <text x="1040" y="0" text-anchor="end" fill="#686C73" font-size="18">RU / KZ · audit trail</text>
+    </g>
+  </g>
+</svg>
