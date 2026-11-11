@@ -32,6 +32,14 @@ for i in $(seq 1 "$REPEATS"); do
   docker run --rm --entrypoint oqumap-entrypoint "$(dc images -q api | head -1)" selfcheck
 done
 if [ "$E2E" = "--e2e" ]; then
-  cd tests/e2e && npm ci --no-audit --no-fund && OQUMAP_WEB_URL="http://localhost:${OQUMAP_WEB_PORT:-8080}" npx playwright test --trace off
+  cd tests/e2e
+  npm ci --no-audit --no-fund
+  export OQUMAP_WEB_URL="http://localhost:${OQUMAP_WEB_PORT:-8080}"
+  # When invoked from WSL without a Linux Node installation, `npx` resolves to
+  # npx.cmd. WSL forwards only variables named in WSLENV to Win32 processes.
+  if [ -n "${WSL_DISTRO_NAME:-}" ]; then
+    export WSLENV="${WSLENV:+${WSLENV}:}OQUMAP_WEB_URL"
+  fi
+  npx playwright test --trace off
 fi
 echo "cold start OK"
