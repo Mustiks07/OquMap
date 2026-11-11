@@ -26,3 +26,6 @@ data/demo/generated/
 .vscode/
 tests/e2e/node_modules/
 .ca-tmp.pem
+
+# Build artefacts
+*.tsbuildinfo

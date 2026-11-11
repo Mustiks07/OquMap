@@ -781,11 +781,11 @@ requires-dist = [
     { name = "pandas", specifier = "==2.3.3" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.2.13" },
     { name = "pydantic", specifier = "==2.13.5" },
-    { name = "pydantic-settings", specifier = "==2.12.0" },
-    { name = "pypdf", specifier = "==6.4.0" },
+    { name = "pydantic-settings", specifier = "==2.16.2" },
+    { name = "pypdf", specifier = "==7.0.1" },
     { name = "pypdfium2", specifier = "==5.0.0" },
     { name = "python-docx", specifier = "==1.2.0" },
-    { name = "python-multipart", specifier = "==0.0.20" },
+    { name = "python-multipart", specifier = "==0.0.33" },
     { name = "reportlab", specifier = "==4.4.5" },
     { name = "scipy", specifier = "==1.16.3" },
     { name = "sqlalchemy", specifier = "==2.0.44" },
@@ -1094,16 +1094,17 @@ wheels = [
 
 [[package]]
 name = "pydantic-settings"
-version = "2.12.0"
+version = "2.16.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "python-dotenv" },
+    { name = "typing-extensions" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/43/4b/ac7e0aae12027748076d72a8764ff1c9d82ca75a7a52622e67ed3f765c54/pydantic_settings-2.12.0.tar.gz", hash = "sha256:005538ef951e3c2a68e1c08b292b5f2e71490def8589d4221b95dab00dafcfd0", size = 194184, upload-time = "2025-11-10T14:25:47.013Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/31/21d21e0e38a8f5f7a7f0cde22820117b6d17d6bc36f348129527f915d7f4/pydantic_settings-2.16.2.tar.gz", hash = "sha256:3dc08ffabed2bbd5dc2dd55ead7b78b4e4c5cd776aecd04310db5f1224caaf46", size = 309225, upload-time = "2026-10-28T11:14:28.066Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c1/60/5d4751ba3f4a40a6891f24eec885f51afd78d208498268c734e256fb13c4/pydantic_settings-2.12.0-py3-none-any.whl", hash = "sha256:fddb9fd99a5b18da837b29710391e945b1e30c135477f484084ee513adb93809", size = 51880, upload-time = "2025-11-10T14:25:45.546Z" },
+    { url = "https://files.pythonhosted.org/packages/39/88/4131c51ff87b7cd7f82a1194d0c0a2b7ca68c72d9da04c3b7e69ab91a79f/pydantic_settings-2.16.2-py3-none-any.whl", hash = "sha256:8d523e5c129b097686bde019bd6109bff53f4c8c3f63f1ddf9933ffa42e5ab4f", size = 81994, upload-time = "2026-10-28T11:14:26.716Z" },
 ]
 
 [[package]]
@@ -1117,11 +1118,11 @@ wheels = [
 
 [[package]]
 name = "pypdf"
-version = "6.4.0"
+version = "7.0.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f3/01/f7510cc6124f494cfbec2e8d3c2e1a20d4f6c18622b0c03a3a70e968bacb/pypdf-6.4.0.tar.gz", hash = "sha256:4769d471f8ddc3341193ecc5d6560fa44cf8cd0abfabf21af4e195cc0c224072", size = 5276661, upload-time = "2025-11-23T14:04:43.185Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/00/c2/4c34b3229abae3e2fcc7809e6cf80fdea159771a37142f475fbf1009c809/pypdf-7.0.1.tar.gz", hash = "sha256:0a78bb99efb41e9088260e9a8e5da134a5cbb9a322014744177bf29b5267ea6d", size = 7206748, upload-time = "2026-11-10T11:47:22.582Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cd/f2/9c9429411c91ac1dd5cd66780f22b6df20c64c3646cdd1e6d67cf38579c4/pypdf-6.4.0-py3-none-any.whl", hash = "sha256:55ab9837ed97fd7fcc5c131d52fcc2223bc5c6b8a1488bbf7c0e27f1f0023a79", size = 329497, upload-time = "2025-11-23T14:04:41.448Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/a9/ae11deef21eaac5113f8c3848da1c42423b7abeca0abc349bfec7abf4c4e/pypdf-7.0.1-py3-none-any.whl", hash = "sha256:6131b764b046282357037309e7ef2a1b7679d4a5c53eed3db2bfbf7c673ddc2b", size = 416136, upload-time = "2026-11-10T11:47:20.716Z" },
 ]
 
 [[package]]
@@ -1210,11 +1211,11 @@ wheels = [
 
 [[package]]
 name = "python-multipart"
-version = "0.0.20"
+version = "0.0.33"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f3/87/f44d7c9f274c7ee665a29b885ec97089ec5dc034c7f3fafa03da9e39a09e/python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13", size = 37158, upload-time = "2024-12-16T19:45:46.972Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/b7/15b905f6142a9a8a68f66900788da1a32e4d4254452783b37ad1eccb0506/python_multipart-0.0.33.tar.gz", hash = "sha256:b8112424a6abd162ec08d390565dd113ad699f2fe6fef3c987b8bbcbfe9e390d", size = 50499, upload-time = "2026-10-31T14:23:47.461Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/58/38b5afbc1a800eeea951b9285d3912613f2603bdf897a4ab0f4bd7f405fc/python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104", size = 24546, upload-time = "2024-12-16T19:45:44.423Z" },
+    { url = "https://files.pythonhosted.org/packages/dd/1b/6b1b4164ec734cac911460ab599bfbe46afedd42c5c9627fe4235942c314/python_multipart-0.0.33-py3-none-any.whl", hash = "sha256:8f16c07b36add9da6b2ee87d3efcaf0a45a6de9c3d0a5dd94e9ccf7675a7bc45", size = 32253, upload-time = "2026-10-31T14:23:46.33Z" },
 ]
 
 [[package]]

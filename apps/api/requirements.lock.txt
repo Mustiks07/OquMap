@@ -679,13 +679,13 @@ pydantic-core==2.46.5 \
     --hash=sha256:f332f0e72a5a0400141f830744e141bf9f97917878dbe968669e8a7fefea78ff \
     --hash=sha256:f7b0ec93a2893de856652154d73b7ba622f26fa97726487dcac373de5f4c6084
     # via pydantic
-pydantic-settings==2.12.0 \
-    --hash=sha256:005538ef951e3c2a68e1c08b292b5f2e71490def8589d4221b95dab00dafcfd0 \
-    --hash=sha256:fddb9fd99a5b18da837b29710391e945b1e30c135477f484084ee513adb93809
+pydantic-settings==2.16.2 \
+    --hash=sha256:3dc08ffabed2bbd5dc2dd55ead7b78b4e4c5cd776aecd04310db5f1224caaf46 \
+    --hash=sha256:8d523e5c129b097686bde019bd6109bff53f4c8c3f63f1ddf9933ffa42e5ab4f
     # via oqumap-api
-pypdf==6.4.0 \
-    --hash=sha256:4769d471f8ddc3341193ecc5d6560fa44cf8cd0abfabf21af4e195cc0c224072 \
-    --hash=sha256:55ab9837ed97fd7fcc5c131d52fcc2223bc5c6b8a1488bbf7c0e27f1f0023a79
+pypdf==7.0.1 \
+    --hash=sha256:0a78bb99efb41e9088260e9a8e5da134a5cbb9a322014744177bf29b5267ea6d \
+    --hash=sha256:6131b764b046282357037309e7ef2a1b7679d4a5c53eed3db2bfbf7c673ddc2b
     # via oqumap-api
 pypdfium2==5.0.0 \
     --hash=sha256:0a2a473fe95802e7a5f4140f25e5cd036cf17f060f27ee2d28c3977206add763 \
@@ -716,9 +716,9 @@ python-dotenv==1.2.4 \
     # via
     #   pydantic-settings
     #   uvicorn
-python-multipart==0.0.20 \
-    --hash=sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104 \
-    --hash=sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13
+python-multipart==0.0.33 \
+    --hash=sha256:8f16c07b36add9da6b2ee87d3efcaf0a45a6de9c3d0a5dd94e9ccf7675a7bc45 \
+    --hash=sha256:b8112424a6abd162ec08d390565dd113ad699f2fe6fef3c987b8bbcbfe9e390d
     # via oqumap-api
 pytz==2026.6 \
     --hash=sha256:3b0fc2727707663d6e517936f444fd8a8b240f1fc32f4bf7ee03274245945284 \
@@ -861,6 +861,7 @@ typing-extensions==4.16.0 \
     #   psycopg
     #   pydantic
     #   pydantic-core
+    #   pydantic-settings
     #   python-docx
     #   sqlalchemy
     #   starlette
