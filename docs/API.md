@@ -65,11 +65,11 @@
 
 | Метод и путь | Назначение |
 |---|---|
-| `GET /quality/assessments?dataset_id=&attempt_rule=&omitted_policy=` | Сводка качества по проверкам (знаменатели, пропуски, α, число заданий с сигналами) |
+| `GET /quality/assessments?dataset_id=&attempt_rule=&omitted_policy=&limit=&offset=` | Сводка качества по проверкам (знаменатели, пропуски, α, сигналы); `total/limit/offset`, вычисляется только страница |
 | `GET /quality/assessments/{id}` | Форма: знаменатели, распределение, надёжность, разрезы со скрытием, задания, исключения, ограничения, происхождение |
 | `GET /quality/assessments/{id}/items?flag=` | Задания проверки (p, r, D, дистракторы, сигналы) |
 | `GET /quality/items/{id}?dataset_id=` | Задание во всех проверках, без объединения |
-| `GET /interventions?status=&evidence_level=&topic_id=&objective_id=&misconception=&grade=&language=&q=` | Библиотека |
+| `GET /interventions?status=&evidence_level=&topic_id=&objective_id=&misconception=&grade=&language=&q=&limit=&offset=` | Библиотека: страница `{items,total,limit,offset}`, порядок код → id |
 | `POST /interventions` | Новая интервенция (черновик v1) |
 | `GET /interventions/{id}`, `PATCH /interventions/{id}` | Карточка с версиями и доказательной базой; правка черновика (`expected_version`) |
 | `POST /interventions/{id}/versions` | Новая версия (если последняя рецензирована) |
@@ -79,7 +79,7 @@
 | `POST /interventions/{id}/targets` | Связь черновика с темой/целью/ошибкой |
 | `GET /interventions/suggest?topic_id=&objective_id=&misconception=&grade=&language=&dataset_id=` | Подбор с объяснённым баллом |
 | `GET /interventions/{id}/evidence`, `POST /intervention-evidence/{entry}/review {accept, note}` | Доказательная база; принятие записи (approver) |
-| `GET /pilots?dataset_id=&status=&intervention_id=`, `POST /pilots` | Пилоты, создание черновика протокола |
+| `GET /pilots?dataset_id=&status=&intervention_id=&limit=&offset=`, `POST /pilots` | Пилоты (страница `{items,total,limit,offset}`), создание черновика протокола |
 | `GET /pilots/{id}`, `PATCH /pilots/{id}` | Протокол с проверкой и допустимыми переходами; правка только в `draft` |
 | `POST /pilots/{id}/randomize {seed, cohort_ids}` | Серверная рандомизация кластеров/волн |
 | `POST /pilots/{id}/transition {to_status, note}` | Машина статусов |
@@ -89,10 +89,30 @@
 | `GET /learning/summary?dataset_id=` | Чему научилась организация |
 | `GET /portfolio/interventions?dataset_id=&as_of=` | Портфель без рейтингов |
 
+**Раунд 2**
+
+| Метод и путь | Назначение |
+|---|---|
+| `GET/PUT /quality/assessments/{id}/assignments` | Явное назначение проверки классам (`assignment_scope`) |
+| `GET /quality/assessments/{id}/dif?reference=ru&focal=kz` | Языковой DIF screening (Mantel–Haenszel) |
+| `POST /design-studio/evaluate` | Experiment Design Studio (детерминированный расчёт, без утверждения) |
+| `GET/POST /pilots/{id}/sessions`, `POST /pilots/{id}/sessions/generate`, `PATCH/DELETE /pilots/{id}/sessions/{sid}` | Календарь занятий пилота |
+
+Изменения контрактов раунда 2: `as_of` в результате повторного измерения и в запросе (`as_of` в будущем → 422);
+`TransitionRequest.override_future_end`; `AnalysisPlan.external_analysis_acknowledged`; `PilotOut.analysis_mode`;
+`ConclusionCreate.decision_basis / stop_reason_code / acknowledged_limitation_codes`; `EvidenceSummary` с
+`accepted_synthetic_entries`, `by_status_synthetic`, `synthetic_comparable_positive_signals`;
+`PortfolioOut.learners_by_outcome_status`, `synthetic_evidence`; `FidelityOut.expected_source`; поле `suppression` в
+результате повторного измерения; знаменатели качества с `assignment_scope`, `assigned_is_exact`,
+`present_outside_assignment`. Списки `/interventions` и `/pilots` теперь страницы.
+
 Коды ошибок модуля: `version_immutable`, `draft_exists`, `intervention_archived`, `version_in_use`, `version_conflict`,
 `incomplete_for_review`, `protocol_locked`, `protocol_invalid` (`details.errors` — список проверок), `invalid_transition`,
 `snapshot_mismatch`, `randomization_not_applicable`, `pilot_not_running`, `cohort_not_in_pilot`, `date_outside_pilot`,
-`date_in_future`, `already_corrected`, `outcome_before_start`, `conclusion_misreads_fidelity`, `invalid_state`.
+`date_in_future`, `already_corrected`, `outcome_before_start`, `invalid_state`; раунд 2: `as_of_in_future`,
+`outcome_after_as_of`, `end_date_in_future`, `protocol_only_external_analysis`, `stop_requires_operational_basis`,
+`stop_reason_required`, `basis_inconsistent_with_outcome`, `unknown_limitation_code`, `concurrent_modification`,
+`integrity_conflict`, `calendar_locked`, `session_exists` (`conclusion_misreads_fidelity` удалён).
 
 ## Отличия от исходного списка маршрутов задания
 Добавлены вспомогательные маршруты (auth, quality, overview, analyses, fixtures, documents/*, search, plans/context,

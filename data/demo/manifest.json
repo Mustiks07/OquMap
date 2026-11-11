@@ -116,6 +116,15 @@
           "6В (PIL-M02)": 0.15,
           "6Г": 0.0
         },
+        "language_dif": {
+          "kz_schools": [
+            "M05",
+            "M06"
+          ],
+          "item": "Q10",
+          "shift_logit": 1.5,
+          "control_item": "Q08"
+        },
         "problem_items": {
           "Q03": "two_defensible_answers",
           "Q05": "wrong_answer_key",

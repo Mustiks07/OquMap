@@ -142,3 +142,96 @@ Docker Compose в этой среде не запускался.
 * Переключение RU/KZ на всех девяти экранах; клавиатурная навигация по таблицам/формам.
 * Создание интервенции → рецензия → пилот → журнал → повторное измерение → вывод → новая версия решения открывается
   на странице решений и утверждается существующим процессом.
+
+
+---
+
+# Round 2 audit fixes (точка входа раунда: `07a35346c9e9418c7c7821e432d2baf6ec69d42c`)
+
+Ветка та же: `claude/measurement-learning-loop`; merge/rebase с веткой первого Claude и `main` не выполнялись, PR не
+создавался. Финальный дизайн и presentation mode не менялись (использованы существующие компоненты/токены).
+
+## R2.1 Коммиты раунда
+| Коммит | Содержание |
+|---|---|
+| `221903c` | Fix as-of consistency and outcome fingerprints |
+| `d236213` | Add explicit assessment assignments (Alembic `e1a4b7c9d2f0`) |
+| `b4735f5` | Harden snapshot integrity tenant scope and synthetic evidence |
+| `f29f211` | Strengthen protocol invariants and structured conclusions (Alembic `f3c5d8e2a7b1`) |
+| `69d9c7e` | Add privacy suppression concurrency constraints and pagination (Alembic `a4d6e9f1c3b5`) |
+| `86dea03` | Fix measurement accessibility localization and decision integration |
+| `64d1d85` | Add Experiment Design Studio |
+| `5ee300c` | Add planned pilot session calendar (Alembic `b5e7f0a2d4c6`) |
+| `caeabf3` | Add language DIF screening |
+| (этот и предыдущий) | Update contracts tests documentation and handoff |
+
+Цепочка миграций: `d964e255551f → c2a7e5f1b3d9 → e1a4b7c9d2f0 → f3c5d8e2a7b1 → a4d6e9f1c3b5 → b5e7f0a2d4c6` (голова).
+Проверено: чистая БД; БД на `d964e255551f` с данными; БД на голове раунда 1 `c2a7e5f1b3d9` с данными измерения;
+`downgrade`/`upgrade` каждой ревизии; `alembic check` без расхождений (PostgreSQL 16 и SQLite — `tests/test_migrations.py`).
+
+## R2.2 Пункты аудита → реализация → тест → коммит
+| # | Пункт | Что сделано | Тесты | Коммит |
+|---|---|---|---|---|
+| P1-1 | `effective_as_of` и отпечаток | `services/clock.py`; дата по умолчанию (окончание → дата итогового измерения; иначе сегодня) входит в отпечаток, расчёт и результат; будущая дата → 422; измерение после `as_of` → 422 | `test_asof.py::test_default_as_of_is_part_of_the_fingerprint`, `::test_explicit_as_of_reuses_and_future_as_of_is_rejected` | `221903c` |
+| P1-2 | Единый `as_of` портфеля | `as_of` передаётся в каждый расчёт реализации и в список пилотов | `test_asof.py::test_portfolio_uses_one_date_everywhere` | `221903c` |
+| P1-3 | Явное назначение проверок | `assessment_cohorts`, API GET/PUT, сид, `assignment_scope`/`assigned_is_exact`, класс без записей → `no_sitting_record`; UI бейдж и редактор | `test_assignments.py` (оба теста), `test_migrations.py::test_upgrade_from_round1_head_keeps_measurement_rows` | `d236213`, `86dea03` |
+| P1-4 | Полная проверка снимка | `snapshot_integrity()` (5 проверок), 409 + безопасный аудит | `test_integrity.py::test_tampered_snapshot_blocks_activation` (4 варианта подмены) | `b4735f5` |
+| P1-5 | Синтетические доказательства | разделение real/synthetic; баллы и повторные сигналы — только принятые реальные | `test_integrity.py::test_synthetic_evidence_never_boosts_but_real_evidence_does`, обновлённые `test_interventions`/`test_learning_loop` | `b4735f5` |
+| P1-6 | Tenant scope задания | задание видно только через проверку организации; строгий `dataset_id` | `test_integrity.py::test_item_from_shared_programme_is_visible_only_through_own_assessments` | `b4735f5` |
+| P1-7 | Хронология и инварианты | `follow_up_before_end`, `outcome_before_start`, предупреждение о длительности, согласование оценки и дизайна, override раннего завершения, ITS/SW как `protocol_only_external_analysis` с подтверждением и 409 на расчёт | `test_protocol.py` (3 теста + 2 параметра) | `f29f211`, UI `86dea03` |
+| P1-8 | Структурированный вывод | `decision_basis`, `stop_reason_code`, `acknowledged_limitation_codes`; текст не проверяется | `test_learning_loop.py::test_stop_after_low_fidelity_requires_structured_operational_basis` | `f29f211`, UI `86dea03` |
+| P2-9 | Ограничения и гонки | CHECK/UNIQUE/составные FK; гонки → 409; общий обработчик `IntegrityError` | `test_robustness.py::test_database_constraints`, `::test_races_become_conflicts_not_500` | `69d9c7e` |
+| P2-10 | Подавление малых групп | `privacy.py` (первичное + дополнительное), результаты и портфель для viewer/analyst | `test_robustness.py::test_primary_and_complementary_suppression`, `::test_outcome_filter_hides_small_arm_and_derived_estimate`, `::test_viewer_sees_suppressed_outcome_methodist_sees_values`, `::test_portfolio_learner_cells_are_suppressed_for_viewers` | `69d9c7e` |
+| P2-11 | Доступность и локализация | ссылки вместо `<tr onClick>`, row headers, видимый фокус, все новые строки в RU/KZ, коды в подсказках | vitest `list rows are real links…`, `pager moves…`; Playwright `keyboard: list links…` | `86dea03` |
+| P2-12 | Страница решения | `LearningLoopCard` (пилот, версия, результат, реализация, уровень вывода, вывод, основания, ограничения, ссылка назад); процесс утверждения не тронут | Playwright `keyboard…` (блок learning loop), `test_learning_loop` (снимок) | `69d9c7e`, `86dea03` |
+| P2-13 | Производительность | пагинация трёх списков, стабильный порядок, фильтры в URL, lazy routes (initial JS 481 kB вместо > 500 kB) | `test_robustness.py::test_pagination_is_stable_and_complete` (3 эндпоинта), vitest pager | `69d9c7e`, `86dea03` |
+| 14 | Experiment Design Studio | `analytics/design_studio.py`, API, карточка в конструкторе | `test_design_studio.py` (24 теста, монотонность), vitest DesignStudio | `64d1d85` |
+| 15 | Календарь занятий | `pilot_sessions`/`pilot_session_events`, API, UI, интеграция в реализацию | `test_calendar.py`, vitest calendar | `5ee300c` |
+| 16 | DIF screening | `analytics/dif.py`, API, UI, демо Q10/Q08 | `test_dif.py`, vitest DIF | `caeabf3` |
+
+## R2.3 Изменённые общие файлы (раунд 2)
+| Файл | Изменение |
+|---|---|
+| `apps/api/oqumap/main.py` | +обработчик `IntegrityError` → 409 (`integrity_conflict`) |
+| `apps/api/oqumap/measurement_models.py` | уникальный индекс `uq_decisions_group_version` на **общей** таблице `decisions` (объявлен здесь, миграция `a4d6e9f1c3b5`) — проверить, не добавил ли Claude №1 аналогичный |
+| `apps/web/src/App.tsx` | маршруты измерения переведены на `lazy()` + `Suspense` |
+| `apps/web/src/features/DecisionsPage.tsx` | +2 строки: импорт и `<LearningLoopCard …/>` после снимка |
+| `apps/api/oqumap/demo/measurement_seed.py` | класс M06-6Д, назначения, календари, казахские классы M05/M06, DIF Q10 (поток случайных чисел остальных данных не менялся) |
+| Контракты | `openapi.json` и `schema.d.ts` перегенерированы; **списки `/interventions` и `/pilots` стали страницами** `{items,total,limit,offset}` |
+`imports.py` не менялся: явные назначения задаются API/сидом (импорт активно меняется в ветке Claude №1). React Router
+и lock-файлы не обновлялись.
+
+## R2.4 Результаты проверок (этой сессии)
+| Проверка | Результат |
+|---|---|
+| `uv run ruff check .` | All checks passed |
+| `uv run pytest` (SQLite) | **228 passed** (≈4 мин 20 с) |
+| pytest на PostgreSQL 16 через Alembic | **PG2** |
+| Миграции от `c2a7e5f1b3d9` (с данными), чистая БД, downgrade/upgrade, `alembic check` | OK |
+| OpenAPI drift (`test_contract.py`, `export_openapi.py --check`) | актуален |
+| `npm test` | **19 passed** (3 файла) |
+| `npm run typecheck`, `npm run build` | без ошибок; initial chunk 490,7 kB, предупреждения Vite нет |
+| Playwright: `measurement.spec.ts` (сквозной + клавиатура/фокус) и `scenario.spec.ts` | **5 passed** (uvicorn + vite dev, свежий сид, SQLite) |
+| `git status` | чисто после финального коммита |
+Docker Compose не запускался (оставлено интегратору).
+
+## R2.5 Известные ограничения раунда 2
+* ITS и stepped wedge — только протокол: оценки эффекта в OquMap нет (честно помечено в API и UI).
+* Design Studio — аналитическое приближение (одинаковый R² на двух уровнях, сдвинутое центральное t, равное деление
+  кластеров); не заменяет симуляцию/консультацию статистика.
+* DIF: только дихотомические задания одной формы, Mantel–Haenszel без очистки matching-переменной (purification) и без
+  поправки на множественные сравнения; категории — screening.
+* Историческая дата портфеля влияет на сроки и реализацию; статусы и результаты — текущие записи.
+* Казахские строки нового словаря — черновик разработчика, носителем/специалистом **не проверены**.
+* Подавление малых групп применяется к ролям viewer/analyst; методист/утверждающий/учитель видят значения.
+* Импорт не создаёт явных назначений проверок (нужно решение интегратора после слияния с новым импортом).
+
+## R2.6 Что проверить после merge
+* `alembic heads` — одна голова; если у Claude №1 есть ревизии от `c2a7e5f1b3d9`/`d964e255551f`, переназначить
+  `down_revision`; повторить `upgrade head` + `alembic check`; обновить `HEAD` в `tests/test_migrations.py`.
+* Перегенерировать `openapi.json` и `schema.d.ts`; убедиться, что фронтенд Claude №1 не использует `/interventions`
+  и `/pilots` как массивы.
+* Если Claude №1 добавил свой обработчик `IntegrityError` или индекс на `decisions` — оставить один.
+* Пройти `/quality` → DIAG-END (назначение, класс 6Д), DIF на DIAG-BASE (Q10 — сигнал, Q08 — нет), конструктор пилота
+  с Design Studio, календарь PIL-M03 (перенос), решение из вывода PIL-M01 (блок learning loop), роль viewer (скрытые
+  малые группы, нет календаря), переключение RU/KZ.
