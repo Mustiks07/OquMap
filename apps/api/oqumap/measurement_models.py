@@ -261,3 +261,20 @@ class InterventionEvidenceEntry(IdMixin, TimestampMixin, Base):
     review_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     __table_args__ = (CheckConstraint(_in("review_status", ("proposed", "accepted", "rejected")),
                                       name="ck_intervention_evidence_review"),)
+
+
+class AssessmentCohort(IdMixin, TimestampMixin, Base):
+    """Explicit assignment of an assessment to a class. When an assessment has such rows, Quality Lab counts
+    ``assigned`` from them (a class with no sitting records at all is visible as ``no_sitting_record``); without
+    them the scope is only inferred from sittings and reported as such."""
+
+    __tablename__ = "assessment_cohorts"
+    org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), index=True)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("datasets.id"), index=True)
+    assessment_id: Mapped[str] = mapped_column(ForeignKey("assessments.id"), index=True)
+    cohort_id: Mapped[str] = mapped_column(ForeignKey("cohorts.id"), index=True)
+    source: Mapped[str] = mapped_column(String(20), default="manual")  # manual | seed | import
+    note: Mapped[str] = mapped_column(Text, default="")
+    created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    __table_args__ = (UniqueConstraint("assessment_id", "cohort_id", name="uq_assessment_cohorts_assessment_cohort"),
+                      CheckConstraint(_in("source", ("manual", "seed", "import")), name="ck_assessment_cohorts_source"))

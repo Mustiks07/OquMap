@@ -81,7 +81,7 @@ DIAG_ITEMS = [
 LETTERS = ["A", "B", "C", "D"]
 
 SCHOOLS = [("M01", 0.4), ("M02", -0.3), ("M03", 0.2), ("M04", -0.1), ("M05", 0.0), ("M06", 0.3)]
-CLASS_EFFECT_ON_END = {0: 0.8, 1: 0.0, 2: 0.15, 3: 0.0}  # class index: 6А pilot 1, 6Б comparison, 6В pilot 2, 6Г pilot 3
+CLASS_EFFECT_ON_END = {0: 0.8, 1: 0.0, 2: 0.15, 3: 0.0, 4: 0.0}  # 6А pilot 1, 6Б comparison, 6В pilot 2, 6Г pilot 3, 6Д none
 GROWTH = 0.35
 ASSESSMENTS = [("PRE-2026M", "F-PRE", "2026-09-07"), ("DIAG-BASE", FORM_CODE, "2026-09-14"), ("DIAG-END", FORM_CODE, "2026-10-30")]
 
@@ -96,7 +96,10 @@ def generate_rows(seed: int = SEED) -> list[dict]:
     rows: list[dict] = []
     n = 0
     for school, s_eff in SCHOOLS:
-        for ci in range(4):
+        # M06 has a 5th class (6Д) whose DIAG-END results were never submitted: it is explicitly assigned to that
+        # assessment but has no sitting record at all (shows as "no sitting record" in Quality Lab). Generated last,
+        # so it does not change the random stream of the other classes.
+        for ci in range(5 if school == "M06" else 4):
             cls = f"{school}-6{gen.LETTERS_RU[ci]}"
             size = int(rng.integers(22, 29))
             c_eff = float(rng.normal(0, 0.2))
@@ -106,6 +109,8 @@ def generate_rows(seed: int = SEED) -> list[dict]:
                 base = dict(school_code=school, class_code=cls, teacher_code=f"T-{school}-{ci + 1}", language="ru", grade=6,
                             academic_year="2026-2027", edition_code="EDA" if ci % 2 == 0 else "EDB", learner_code=f"ML{n:04d}")
                 for acode, form, day in ASSESSMENTS:
+                    if ci == 4 and acode == "DIAG-END":
+                        continue
                     common = dict(base, assessment_code=acode, form_code=form, date=day)
                     if rng.random() < 0.03:
                         rows.append(dict(common, item_code="", attempt=1, status="absent", score="", response=""))
@@ -198,6 +203,11 @@ def _seed_dataset(session: Session, org: m.Organization) -> m.Dataset:
         raise RuntimeError(f"measurement dataset has rejected rows: {batch.report.get('errors_by_code')}")
     imp.commit_batch(session, org.id, batch.id, None)
     session.refresh(ds)
+    # explicit assignment: every class of the dataset is assigned to every assessment (6Д included for DIAG-END)
+    for a in session.scalars(select(m.Assessment).where(m.Assessment.dataset_id == ds.id)):
+        for c in session.scalars(select(m.Cohort).where(m.Cohort.dataset_id == ds.id)):
+            session.add(mm.AssessmentCohort(org_id=org.id, dataset_id=ds.id, assessment_id=a.id, cohort_id=c.id, source="seed"))
+    session.commit()
     return ds
 
 

@@ -542,6 +542,106 @@
         "title": "AssessmentQualitySummary",
         "type": "object"
       },
+      "AssignmentRow": {
+        "additionalProperties": true,
+        "properties": {
+          "assigned": {
+            "title": "Assigned",
+            "type": "boolean"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "cohort_id": {
+            "title": "Cohort Id",
+            "type": "string"
+          },
+          "sitting_records": {
+            "title": "Sitting Records",
+            "type": "integer"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "required": [
+          "cohort_id",
+          "code",
+          "assigned",
+          "source",
+          "sitting_records"
+        ],
+        "title": "AssignmentRow",
+        "type": "object"
+      },
+      "AssignmentsIn": {
+        "properties": {
+          "cohort_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "title": "Cohort Ids",
+            "type": "array"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cohort_ids"
+        ],
+        "title": "AssignmentsIn",
+        "type": "object"
+      },
+      "AssignmentsOut": {
+        "additionalProperties": true,
+        "properties": {
+          "assessment_code": {
+            "title": "Assessment Code",
+            "type": "string"
+          },
+          "assessment_id": {
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "assignment_scope": {
+            "enum": [
+              "explicit",
+              "inferred_from_sittings"
+            ],
+            "title": "Assignment Scope",
+            "type": "string"
+          },
+          "cohorts": {
+            "items": {
+              "$ref": "#/components/schemas/AssignmentRow"
+            },
+            "title": "Cohorts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "assessment_id",
+          "assessment_code",
+          "assignment_scope",
+          "cohorts"
+        ],
+        "title": "AssignmentsOut",
+        "type": "object"
+      },
       "AssistantAnswer": {
         "additionalProperties": true,
         "properties": {
@@ -2555,9 +2655,36 @@
             "title": "Absent",
             "type": "integer"
           },
+          "absent_outside_assignment": {
+            "title": "Absent Outside Assignment",
+            "type": "integer"
+          },
           "assigned": {
             "title": "Assigned",
             "type": "integer"
+          },
+          "assigned_cohorts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned Cohorts"
+          },
+          "assigned_is_exact": {
+            "title": "Assigned Is Exact",
+            "type": "boolean"
+          },
+          "assignment_scope": {
+            "enum": [
+              "explicit",
+              "inferred_from_sittings"
+            ],
+            "title": "Assignment Scope",
+            "type": "string"
           },
           "expected_item_responses": {
             "title": "Expected Item Responses",
@@ -2574,6 +2701,10 @@
           "present": {
             "title": "Present",
             "type": "integer"
+          },
+          "present_outside_assignment": {
+            "title": "Present Outside Assignment",
+            "type": "integer"
           }
         },
         "required": [
@@ -2582,7 +2713,12 @@
           "absent",
           "no_sitting_record",
           "n_items",
-          "expected_item_responses"
+          "expected_item_responses",
+          "assignment_scope",
+          "assigned_is_exact",
+          "present_outside_assignment",
+          "absent_outside_assignment",
+          "assigned_cohorts"
         ],
         "title": "FormDenominators",
         "type": "object"
@@ -6975,12 +7111,20 @@
             "title": "Absent Learners",
             "type": "integer"
           },
+          "assigned_cohorts_without_records": {
+            "title": "Assigned Cohorts Without Records",
+            "type": "integer"
+          },
           "assigned_without_sitting_record": {
             "title": "Assigned Without Sitting Record",
             "type": "integer"
           },
           "learners_with_repeat_attempts": {
             "title": "Learners With Repeat Attempts",
+            "type": "integer"
+          },
+          "present_outside_assignment": {
+            "title": "Present Outside Assignment",
             "type": "integer"
           },
           "rejected_import_rows_in_dataset": {
@@ -6999,6 +7143,8 @@
         "required": [
           "absent_learners",
           "assigned_without_sitting_record",
+          "present_outside_assignment",
+          "assigned_cohorts_without_records",
           "rows_excluded_by_attempt_rule",
           "learners_with_repeat_attempts",
           "responses_outside_form",
@@ -15943,6 +16089,230 @@
           }
         },
         "summary": "Assessment Quality",
+        "tags": [
+          "quality"
+        ]
+      }
+    },
+    "/api/v1/quality/assessments/{assessment_id}/assignments": {
+      "get": {
+        "operationId": "get_assignments_api_v1_quality_assessments__assessment_id__assignments_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Get Assignments",
+        "tags": [
+          "quality"
+        ]
+      },
+      "put": {
+        "operationId": "put_assignments_api_v1_quality_assessments__assessment_id__assignments_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Put Assignments",
         "tags": [
           "quality"
         ]

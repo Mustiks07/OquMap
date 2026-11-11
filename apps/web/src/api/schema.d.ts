@@ -1000,6 +1000,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/quality/assessments/{assessment_id}/assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Assignments */
+        get: operations["get_assignments_api_v1_quality_assessments__assessment_id__assignments_get"];
+        /** Put Assignments */
+        put: operations["put_assignments_api_v1_quality_assessments__assessment_id__assignments_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quality/assessments/{assessment_id}/items": {
         parameters: {
             query?: never;
@@ -1325,6 +1343,47 @@ export interface components {
             /** Omission Rate */
             omission_rate: number | null;
             provenance: components["schemas"]["Provenance"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** AssignmentRow */
+        AssignmentRow: {
+            /** Assigned */
+            assigned: boolean;
+            /** Code */
+            code: string;
+            /** Cohort Id */
+            cohort_id: string;
+            /** Sitting Records */
+            sitting_records: number;
+            /** Source */
+            source: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AssignmentsIn */
+        AssignmentsIn: {
+            /** Cohort Ids */
+            cohort_ids: string[];
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** AssignmentsOut */
+        AssignmentsOut: {
+            /** Assessment Code */
+            assessment_code: string;
+            /** Assessment Id */
+            assessment_id: string;
+            /**
+             * Assignment Scope
+             * @enum {string}
+             */
+            assignment_scope: "explicit" | "inferred_from_sittings";
+            /** Cohorts */
+            cohorts: components["schemas"]["AssignmentRow"][];
         } & {
             [key: string]: unknown;
         };
@@ -2091,8 +2150,19 @@ export interface components {
         FormDenominators: {
             /** Absent */
             absent: number;
+            /** Absent Outside Assignment */
+            absent_outside_assignment: number;
             /** Assigned */
             assigned: number;
+            /** Assigned Cohorts */
+            assigned_cohorts: number | null;
+            /** Assigned Is Exact */
+            assigned_is_exact: boolean;
+            /**
+             * Assignment Scope
+             * @enum {string}
+             */
+            assignment_scope: "explicit" | "inferred_from_sittings";
             /** Expected Item Responses */
             expected_item_responses: number;
             /** N Items */
@@ -2101,6 +2171,8 @@ export interface components {
             no_sitting_record: number;
             /** Present */
             present: number;
+            /** Present Outside Assignment */
+            present_outside_assignment: number;
         } & {
             [key: string]: unknown;
         };
@@ -3499,10 +3571,14 @@ export interface components {
         QualityExclusions: {
             /** Absent Learners */
             absent_learners: number;
+            /** Assigned Cohorts Without Records */
+            assigned_cohorts_without_records: number;
             /** Assigned Without Sitting Record */
             assigned_without_sitting_record: number;
             /** Learners With Repeat Attempts */
             learners_with_repeat_attempts: number;
+            /** Present Outside Assignment */
+            present_outside_assignment: number;
             /** Rejected Import Rows In Dataset */
             rejected_import_rows_in_dataset: number;
             /** Responses Outside Form */
@@ -9112,6 +9188,166 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AssessmentQualityOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_assignments_api_v1_quality_assessments__assessment_id__assignments_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignmentsOut"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    put_assignments_api_v1_quality_assessments__assessment_id__assignments_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                assessment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignmentsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignmentsOut"];
                 };
             };
             /** @description Bad Request */

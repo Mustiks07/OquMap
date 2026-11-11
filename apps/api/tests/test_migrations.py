@@ -16,8 +16,9 @@ from oqumap.db import Base
 API = Path(__file__).resolve().parents[1]
 PREVIOUS = "d964e255551f"
 MEASUREMENT = "c2a7e5f1b3d9"
+HEAD = "e1a4b7c9d2f0"
 NEW_TABLES = {"interventions", "intervention_versions", "intervention_targets", "pilots", "pilot_cohorts", "pilot_events",
-              "fidelity_logs", "pilot_outcomes", "pilot_conclusions", "intervention_evidence"}
+              "fidelity_logs", "pilot_outcomes", "pilot_conclusions", "intervention_evidence", "assessment_cohorts"}
 
 
 def _url(name: str) -> str:
@@ -43,7 +44,7 @@ def test_head_is_the_measurement_revision():
     from alembic.script import ScriptDirectory
 
     heads = ScriptDirectory.from_config(_cfg("sqlite://")).get_heads()
-    assert heads == [MEASUREMENT]
+    assert heads == [HEAD]
 
 
 def test_upgrade_clean_database_and_no_model_drift():
@@ -71,4 +72,21 @@ def test_upgrade_from_previous_schema_keeps_existing_rows():
         assert conn.execute(text("SELECT name FROM organizations WHERE id = 'o1'")).scalar() == "Existing org"
     command.downgrade(cfg, PREVIOUS)
     assert not NEW_TABLES & set(inspect(create_engine(url)).get_table_names())
+    eng.dispose()
+
+
+def test_upgrade_from_round1_head_keeps_measurement_rows():
+    """Round 2: migrate a database at the round-1 head (c2a7e5f1b3d9) with measurement data to the current head."""
+    url = _url("mig_round1")
+    cfg = _cfg(url)
+    command.upgrade(cfg, MEASUREMENT)
+    eng = create_engine(url)
+    with eng.begin() as conn:
+        conn.execute(text("INSERT INTO organizations (id, name, is_demo, created_at) VALUES ('o1', 'Org', false, CURRENT_TIMESTAMP)"))
+        conn.execute(text("INSERT INTO interventions (id, org_id, code, status, is_synthetic, created_at) "
+                          "VALUES ('i1', 'o1', 'IV-1', 'active', false, CURRENT_TIMESTAMP)"))
+    command.upgrade(cfg, "head")
+    with eng.connect() as conn:
+        assert conn.execute(text("SELECT code FROM interventions WHERE id = 'i1'")).scalar() == "IV-1"
+    assert "assessment_cohorts" in set(inspect(create_engine(url)).get_table_names())
     eng.dispose()

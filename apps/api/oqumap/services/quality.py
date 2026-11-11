@@ -9,9 +9,10 @@ from __future__ import annotations
 
 import pandas as pd
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from .. import measurement_models as mm
 from .. import models as m
 from ..analytics import assessment_quality as aq
 from ..analytics import scoring
@@ -44,17 +45,30 @@ def _assessment(session: Session, org_id: str, assessment_id: str, dataset_id: s
 
 
 def _sittings(session: Session, meta: an.DatasetFrame, assessment: m.Assessment) -> tuple[list[str], dict]:
+    """Present learners and denominators. With explicit assignments (``assessment_cohorts``) ``assigned`` = learners
+    of the assigned classes, so a class without a single sitting record counts as ``no_sitting_record``. Without them
+    the scope is *inferred* from classes that have at least one sitting (``assignment_scope = inferred_from_sittings``)."""
     rows = session.execute(select(m.Sitting.learner_id, m.Sitting.status, m.Learner.cohort_id)
                            .join(m.Learner, m.Learner.id == m.Sitting.learner_id)
                            .where(m.Sitting.assessment_id == assessment.id, m.Sitting.org_id == meta.dataset.org_id)).all()
     present = [r[0] for r in rows if r[1] == "present"]
-    absent = sum(1 for r in rows if r[1] == "absent")
-    cohorts = {r[2] for r in rows}
-    assigned = 0
-    if cohorts:
-        assigned = session.query(m.Learner).filter(m.Learner.cohort_id.in_(cohorts), m.Learner.dataset_id == meta.dataset.id).count()
-    return present, {"assigned": assigned, "present": len(present), "absent": absent,
-                     "no_record": max(0, assigned - len(present) - absent), "cohorts": sorted(cohorts)}
+    explicit = set(session.scalars(select(mm.AssessmentCohort.cohort_id).where(
+        mm.AssessmentCohort.assessment_id == assessment.id, mm.AssessmentCohort.org_id == meta.dataset.org_id)))
+    scope = "explicit" if explicit else "inferred_from_sittings"
+    cohorts = explicit or {r[2] for r in rows}
+    in_scope = [r for r in rows if r[2] in cohorts]
+    learners = set(session.scalars(select(m.Learner.id).where(m.Learner.cohort_id.in_(cohorts),
+                                                               m.Learner.dataset_id == meta.dataset.id))) if cohorts else set()
+    with_record = {r[0] for r in in_scope}
+    cohorts_with_records = {r[2] for r in rows}
+    return present, {
+        "assigned": len(learners), "present": len(present), "absent": sum(1 for r in rows if r[1] == "absent"),
+        "no_record": len(learners - with_record), "assignment_scope": scope,
+        "present_outside_assignment": sum(1 for r in rows if r[1] == "present" and r[2] not in cohorts),
+        "absent_outside_assignment": sum(1 for r in rows if r[1] == "absent" and r[2] not in cohorts),
+        "assigned_cohorts": len(cohorts),
+        "assigned_cohorts_without_records": len(cohorts - cohorts_with_records),
+    }
 
 
 def _items_meta(meta: an.DatasetFrame, item_ids: list[str]) -> dict[str, aq.ItemMeta]:
@@ -122,6 +136,10 @@ def compute_assessment_quality(session: Session, meta: an.DatasetFrame, a: m.Ass
     alpha = form_q["reliability"]["cronbach_alpha"]
     limitations = [render("quality_single_administration"), render("quality_flags_are_signals"),
                    render("quality_absent_excluded")]
+    if counts["assignment_scope"] != "explicit":
+        limitations.append(render("assignment_inferred", {}, "warn"))
+    if counts["assigned_cohorts_without_records"]:
+        limitations.append(render("assigned_cohorts_without_records", {"n": counts["assigned_cohorts_without_records"]}, "warn"))
     if alpha["value"] is None:
         limitations.append(render("alpha_not_available", {"reason": alpha["unavailable_reason"]}, "warn"))
     if meta.dataset.is_synthetic:
@@ -147,6 +165,8 @@ def compute_assessment_quality(session: Session, meta: an.DatasetFrame, a: m.Ass
         "exclusions": {
             "absent_learners": counts["absent"],
             "assigned_without_sitting_record": counts["no_record"],
+            "present_outside_assignment": counts["present_outside_assignment"],
+            "assigned_cohorts_without_records": counts["assigned_cohorts_without_records"],
             "rows_excluded_by_attempt_rule": retake_rows,
             "learners_with_repeat_attempts": int(raw.loc[raw["attempt"] > 1, "learner_id"].nunique()) if not raw.empty else 0,
             "responses_outside_form": int((~raw["item_id"].isin(item_ids)).sum()) if not raw.empty else 0,
@@ -182,7 +202,9 @@ def assessment_quality(session: Session, org_id: str, assessment_id: str, params
     params.validate_values()
     a = _assessment(session, org_id, assessment_id, dataset_id)
     meta = an.load_meta(session, org_id, a.dataset_id)
-    res = an.persist_or_reuse(session, org_id, meta.dataset, KIND, params.model_dump(), {"assessment_id": a.id},
+    scope = sorted(session.scalars(select(mm.AssessmentCohort.cohort_id).where(mm.AssessmentCohort.assessment_id == a.id)))
+    res = an.persist_or_reuse(session, org_id, meta.dataset, KIND, params.model_dump(),
+                              {"assessment_id": a.id, "assignment_set": an.fingerprint(scope) if scope else None},
                               aq.METHOD_VERSION_QUALITY, lambda: compute_assessment_quality(session, meta, a, params), user_id)
     return _envelope(res, meta)
 
@@ -254,3 +276,47 @@ def item_detail(session: Session, org_id: str, item_id: str, params: QualityPara
         "pooled_unavailable_reason": "administrations_not_pooled",
         "limitations": [render("quality_single_administration"), render("quality_flags_are_signals")],
     }
+
+
+# ---------------------------------------------------------------------------
+# Explicit assignments
+# ---------------------------------------------------------------------------
+
+
+def assignments(session: Session, org_id: str, assessment_id: str) -> dict:
+    a = _assessment(session, org_id, assessment_id)
+    rows = {r.cohort_id: r for r in session.scalars(select(mm.AssessmentCohort).where(
+        mm.AssessmentCohort.assessment_id == a.id, mm.AssessmentCohort.org_id == org_id))}
+    with_sittings = dict(session.execute(
+        select(m.Learner.cohort_id, func.count()).join(m.Sitting, m.Sitting.learner_id == m.Learner.id)
+        .where(m.Sitting.assessment_id == a.id).group_by(m.Learner.cohort_id)).all())
+    out = []
+    for c in session.scalars(select(m.Cohort).where(m.Cohort.dataset_id == a.dataset_id, m.Cohort.org_id == org_id).order_by(m.Cohort.code)):
+        r = rows.get(c.id)
+        out.append({"cohort_id": c.id, "code": c.code, "assigned": r is not None, "source": r.source if r else None,
+                    "sitting_records": int(with_sittings.get(c.id, 0))})
+    return {"assessment_id": a.id, "assessment_code": a.code, "assignment_scope": "explicit" if rows else "inferred_from_sittings",
+            "cohorts": out}
+
+
+def set_assignments(session: Session, p, assessment_id: str, cohort_ids: list[str], note: str = "") -> dict:
+    """Replace the explicit assignment set (methodist). Cohorts must belong to the assessment's dataset."""
+    p.require("methodist")
+    a = _assessment(session, p.org_id, assessment_id)
+    valid = set(session.scalars(select(m.Cohort.id).where(m.Cohort.dataset_id == a.dataset_id, m.Cohort.org_id == p.org_id)))
+    wanted = set(cohort_ids)
+    if wanted - valid:
+        raise not_found("cohort", sorted(wanted - valid)[0])
+    existing = {r.cohort_id: r for r in session.scalars(select(mm.AssessmentCohort).where(mm.AssessmentCohort.assessment_id == a.id))}
+    for cid, r in existing.items():
+        if cid not in wanted:
+            session.delete(r)
+    for cid in wanted - set(existing):
+        session.add(mm.AssessmentCohort(org_id=p.org_id, dataset_id=a.dataset_id, assessment_id=a.id, cohort_id=cid, source="manual",
+                                        note=(note or "")[:500], created_by=p.user_id))
+    from .common import audit
+
+    audit(session, p.org_id, p.user_id, "assessment.assignments", "assessment", a.id, n_cohorts=len(wanted),
+          added=len(wanted - set(existing)), removed=len(set(existing) - wanted))
+    session.commit()
+    return assignments(session, p.org_id, a.id)

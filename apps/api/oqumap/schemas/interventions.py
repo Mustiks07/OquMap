@@ -70,6 +70,31 @@ class FormDenominators(Model):
     no_sitting_record: int
     n_items: int
     expected_item_responses: int
+    assignment_scope: Literal["explicit", "inferred_from_sittings"]
+    assigned_is_exact: bool
+    present_outside_assignment: int
+    absent_outside_assignment: int
+    assigned_cohorts: int | None
+
+
+class AssignmentRow(Model):
+    cohort_id: str
+    code: str
+    assigned: bool
+    source: str | None
+    sitting_records: int
+
+
+class AssignmentsOut(Model):
+    assessment_id: str
+    assessment_code: str
+    assignment_scope: Literal["explicit", "inferred_from_sittings"]
+    cohorts: list[AssignmentRow]
+
+
+class AssignmentsIn(BaseModel):
+    cohort_ids: list[str] = Field(max_length=500)
+    note: str = Field(default="", max_length=500)
 
 
 class HistogramBin(Model):
@@ -171,6 +196,8 @@ class ItemQuality(Model):
 class QualityExclusions(Model):
     absent_learners: int
     assigned_without_sitting_record: int
+    present_outside_assignment: int
+    assigned_cohorts_without_records: int
     rows_excluded_by_attempt_rule: int
     learners_with_repeat_attempts: int
     responses_outside_form: int

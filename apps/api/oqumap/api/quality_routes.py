@@ -37,3 +37,13 @@ def assessment_items(assessment_id: str, p: P, session: DB, dataset_id: str | No
 def item_quality(item_id: str, p: P, session: DB, dataset_id: str | None = None, attempt_rule: str = "first",
                  omitted_policy: str = "as_incorrect"):
     return svc.item_detail(session, p.org_id, item_id, _params(attempt_rule, omitted_policy), p.user_id, dataset_id)
+
+
+@router.get("/assessments/{assessment_id}/assignments", response_model=S.AssignmentsOut)
+def get_assignments(assessment_id: str, p: P, session: DB):
+    return svc.assignments(session, p.org_id, assessment_id)
+
+
+@router.put("/assessments/{assessment_id}/assignments", response_model=S.AssignmentsOut)
+def put_assignments(assessment_id: str, body: S.AssignmentsIn, p: P, session: DB):
+    return svc.set_assignments(session, p, assessment_id, body.cohort_ids, body.note)

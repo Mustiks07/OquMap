@@ -200,8 +200,14 @@ def form_quality(share: pd.DataFrame, status: pd.DataFrame, items: dict[str, Ite
         "denominators": {
             "assigned": assigned, "present": counts.get("present", n_present), "absent": counts.get("absent", 0),
             "no_sitting_record": counts.get("no_record", 0), "n_items": k, "expected_item_responses": expected,
+            "assignment_scope": counts.get("assignment_scope", "inferred_from_sittings"),
+            "assigned_is_exact": counts.get("assignment_scope") == "explicit",
+            "present_outside_assignment": counts.get("present_outside_assignment", 0),
+            "absent_outside_assignment": counts.get("absent_outside_assignment", 0),
+            "assigned_cohorts": counts.get("assigned_cohorts"),
         },
-        "participation_rate": (counts.get("present", n_present) / assigned) if assigned else None,
+        "participation_rate": ((counts.get("present", n_present) - counts.get("present_outside_assignment", 0)) / assigned)
+        if assigned else None,
         "completion_rate": (answered / expected) if expected else None,
         "omission_rate": (omitted / expected) if expected else None,
         "missing_rate": (missing / expected) if expected else None,
