@@ -356,33 +356,54 @@ def version_payload(session: Session, v: mm.InterventionVersion, users: dict | N
 COMPARABLE_DESIGNS = {"matched_comparison", "cluster_randomized", "stepped_wedge", "interrupted_time_series"}
 
 
+def _entry_is_synthetic(session: Session, r: mm.InterventionEvidenceEntry) -> bool:
+    pl = session.get(mm.Pilot, r.pilot_id)
+    return bool(pl.is_synthetic) if pl is not None else bool((r.summary or {}).get("is_synthetic"))
+
+
 def evidence_summary(session: Session, iv: mm.Intervention) -> dict:
+    """Evidence from pilots, split into real observed vs synthetic/demo. Only *accepted real* entries count for
+    repeated signals and recommendation scores; synthetic entries are shown separately and labelled as demo."""
     rows = list(session.scalars(select(mm.InterventionEvidenceEntry).where(
         mm.InterventionEvidenceEntry.intervention_id == iv.id, mm.InterventionEvidenceEntry.org_id == iv.org_id)
         .order_by(mm.InterventionEvidenceEntry.created_at)))
-    accepted = [r for r in rows if r.review_status == "accepted"]
-    by_status: dict[str, int] = {}
-    for r in accepted:
-        by_status[r.outcome_status] = by_status.get(r.outcome_status, 0) + 1
-    comparable_pos = sum(1 for r in accepted if r.outcome_status == "positive_signal" and r.design in COMPARABLE_DESIGNS
-                         and r.fidelity_class == "high")
+    synth = {r.id: _entry_is_synthetic(session, r) for r in rows}
+
+    def tally(entries):
+        out: dict[str, int] = {}
+        for r in entries:
+            out[r.outcome_status] = out.get(r.outcome_status, 0) + 1
+        return out
+
+    def comparable(entries):
+        return sum(1 for r in entries if r.outcome_status == "positive_signal" and r.design in COMPARABLE_DESIGNS
+                   and r.fidelity_class == "high")
+
+    accepted_real = [r for r in rows if r.review_status == "accepted" and not synth[r.id]]
+    accepted_syn = [r for r in rows if r.review_status == "accepted" and synth[r.id]]
     versions = {v.id: v.version for v in versions_of(session, iv)}
     return {
-        "accepted_entries": len(accepted),
-        "proposed_entries": sum(1 for r in rows if r.review_status == "proposed"),
-        "by_status": by_status,
-        "repeated_positive_signal": comparable_pos >= 2,
-        "comparable_positive_signals": comparable_pos,
+        "accepted_entries": len(accepted_real),
+        "accepted_synthetic_entries": len(accepted_syn),
+        "proposed_entries": sum(1 for r in rows if r.review_status == "proposed" and not synth[r.id]),
+        "proposed_synthetic_entries": sum(1 for r in rows if r.review_status == "proposed" and synth[r.id]),
+        "observed_real_entries": sum(1 for r in rows if not synth[r.id]),
+        "by_status": tally(accepted_real),
+        "by_status_synthetic": tally(accepted_syn),
+        "repeated_positive_signal": comparable(accepted_real) >= 2,
+        "comparable_positive_signals": comparable(accepted_real),
+        "synthetic_comparable_positive_signals": comparable(accepted_syn),
         "entries": [{"id": r.id, "pilot_id": r.pilot_id, "conclusion_id": r.conclusion_id, "outcome_id": r.outcome_id,
                      "intervention_version": versions.get(r.intervention_version_id), "outcome_status": r.outcome_status,
                      "causal_level": r.causal_level, "fidelity_class": r.fidelity_class, "design": r.design,
-                     "review_status": r.review_status, "summary": r.summary,
+                     "review_status": r.review_status, "summary": r.summary, "is_synthetic": synth[r.id],
                      "reviewed_at": r.reviewed_at.isoformat() if r.reviewed_at else None,
                      "created_at": r.created_at.isoformat()} for r in rows],
         "note_ru": ("Сводка строится только из записей, принятых человеком. Версии интервенции при этом не изменяются; "
-                    "один положительный сигнал не доказывает эффективность."),
+                    "один положительный сигнал не доказывает эффективность. Синтетические (демо) записи показаны отдельно и "
+                    "не усиливают рекомендации."),
         "note_kz": ("Жиынтық тек адам қабылдаған жазбалардан құрылады. Интервенция нұсқалары өзгермейді; "
-                    "бір оң сигнал тиімділікті дәлелдемейді."),
+                    "бір оң сигнал тиімділікті дәлелдемейді. Синтетикалық (демо) жазбалар бөлек көрсетіледі."),
     }
 
 
@@ -441,6 +462,7 @@ def list_interventions(session: Session, org_id: str, dataset_id: str | None = N
             "total_minutes": cur.minutes_per_session * cur.sessions_per_week * cur.duration_weeks,
             "n_pilots": int(session.scalar(select(func.count()).select_from(mm.Pilot).where(mm.Pilot.intervention_id == iv.id)) or 0),
             "accepted_evidence": ev["accepted_entries"],
+            "accepted_synthetic_evidence": ev["accepted_synthetic_entries"],
         })
     return out
 
@@ -456,7 +478,7 @@ def _objective_topic(session: Session, objective_id: str | None) -> str | None:
 
 SCORING_RULE = {"misconception_match": 3.0, "objective_match": 2.0, "topic_match": 1.0, "grade_applicable": 0.5,
                 "language_applicable": 0.5, "evidence_experimental": 1.0, "evidence_observational": 0.5,
-                "accepted_positive_signal_each": 0.5, "accepted_positive_signal_cap": 1.0}
+                "accepted_positive_signal_each": 0.5, "accepted_positive_signal_cap": 1.0, "synthetic_demo_signal": 0.0}
 
 
 def suggest(session: Session, org_id: str, dataset_id: str | None, topic_id: str | None, objective_id: str | None,
@@ -508,7 +530,11 @@ def suggest(session: Session, org_id: str, dataset_id: str | None, topic_id: str
         if v.evidence_level in ("experimental", "observational"):
             comps.append((f"evidence_{v.evidence_level}", SCORING_RULE[f"evidence_{v.evidence_level}"], v.evidence_level))
         ev = evidence_summary(session, iv)
-        pos = ev["by_status"].get("positive_signal", 0)
+        pos = ev["by_status"].get("positive_signal", 0)  # accepted REAL evidence only
+        syn = ev["by_status_synthetic"].get("positive_signal", 0)
+        if syn:
+            # synthetic/demo evidence never adds points; shown as a labelled 0-point component
+            comps.append(("synthetic_demo_signals", 0.0, str(syn)))
         if pos:
             comps.append(("accepted_positive_signals", min(SCORING_RULE["accepted_positive_signal_cap"],
                                                            pos * SCORING_RULE["accepted_positive_signal_each"]), str(pos)))

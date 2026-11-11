@@ -70,6 +70,37 @@ def _snapshot(session: Session, v: mm.InterventionVersion) -> dict:
     return snap
 
 
+def canonical_content(snapshot: dict) -> dict:
+    """Content fields of a snapshot in the form used by ``content_hash`` (targets without display labels)."""
+    out = {f: snapshot.get(f) for f in ivs.CONTENT_FIELDS if f != "targets"}
+    out["targets"] = [{"target_type": t.get("target_type"), "target_id": t.get("target_id"),
+                       "misconception_code": t.get("misconception_code")} for t in snapshot.get("targets") or []]
+    return out
+
+
+def snapshot_integrity(session: Session, pl: mm.Pilot) -> list[str]:
+    """All checks must pass before activation; returns the codes of failed checks (never content)."""
+    failed = []
+    snap = pl.intervention_snapshot or {}
+    v = session.get(mm.InterventionVersion, pl.intervention_version_id)
+    if _sha(snap) != pl.snapshot_sha256:
+        failed.append("stored_snapshot_hash")
+    if v is None or v.intervention_id != pl.intervention_id or v.org_id != pl.org_id:
+        return failed + ["version_reference"]
+    if snap.get("id") != v.id or snap.get("version") != v.version or snap.get("intervention_id") != v.intervention_id:
+        failed.append("snapshot_version_reference")
+    if v.status != "reviewed":
+        failed.append("version_not_reviewed")
+    current = ivs.content_hash({f: getattr(v, f) for f in ivs.CONTENT_FIELDS})
+    if current != v.content_sha256:
+        failed.append("reviewed_version_modified")
+    if snap.get("content_sha256") != v.content_sha256:
+        failed.append("snapshot_content_sha")
+    if ivs.content_hash(canonical_content(snap)) != v.content_sha256:
+        failed.append("snapshot_canonical_content")
+    return failed
+
+
 def get_pilot(session: Session, org_id: str, pilot_id: str) -> mm.Pilot:
     pl = session.scalar(select(mm.Pilot).where(mm.Pilot.id == pilot_id, mm.Pilot.org_id == org_id))
     if pl is None:
@@ -348,10 +379,14 @@ def transition(session: Session, p: Principal, pilot_id: str, body: S.Transition
         if not val["ok"]:
             raise ApiError("protocol_invalid", "Протокол не готов", 422, {"errors": val["errors"]})
     if body.to_status == "active":
-        v = session.get(mm.InterventionVersion, pl.intervention_version_id)
-        snap = _snapshot(session, v)
-        if pl.intervention_snapshot.get("content_sha256") != v.content_sha256 or snap["content_sha256"] != v.content_sha256:
-            raise ApiError("snapshot_mismatch", "Снимок интервенции не совпадает с рецензированной версией", 409)
+        failed = snapshot_integrity(session, pl)
+        if failed:
+            session.rollback()
+            # safe audit: check codes only, never the intervention content
+            audit(session, p.org_id, p.user_id, "pilot.snapshot_mismatch", "pilot", pl.id, failed_checks=failed)
+            session.commit()
+            raise ApiError("snapshot_mismatch", "Снимок интервенции не совпадает с рецензированной версией", 409,
+                           {"failed_checks": failed})
         pl.activated_by, pl.activated_at = p.user_id, utcnow()
     if body.to_status == "stopped":
         if len(note) < 3:

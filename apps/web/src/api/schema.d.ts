@@ -1891,8 +1891,14 @@ export interface components {
         EvidenceSummary: {
             /** Accepted Entries */
             accepted_entries: number;
+            /** Accepted Synthetic Entries */
+            accepted_synthetic_entries: number;
             /** By Status */
             by_status: {
+                [key: string]: number;
+            };
+            /** By Status Synthetic */
+            by_status_synthetic: {
                 [key: string]: number;
             };
             /** Comparable Positive Signals */
@@ -1905,10 +1911,16 @@ export interface components {
             note_kz: string;
             /** Note Ru */
             note_ru: string;
+            /** Observed Real Entries */
+            observed_real_entries: number;
             /** Proposed Entries */
             proposed_entries: number;
+            /** Proposed Synthetic Entries */
+            proposed_synthetic_entries: number;
             /** Repeated Positive Signal */
             repeated_positive_signal: boolean;
+            /** Synthetic Comparable Positive Signals */
+            synthetic_comparable_positive_signals: number;
         } & {
             [key: string]: unknown;
         };
@@ -2412,6 +2424,8 @@ export interface components {
         InterventionListItem: {
             /** Accepted Evidence */
             accepted_evidence: number;
+            /** Accepted Synthetic Evidence */
+            accepted_synthetic_evidence: number;
             /** Code */
             code: string;
             /** Current Status */
@@ -3513,6 +3527,10 @@ export interface components {
             };
             /** Pilots */
             pilots: components["schemas"]["PilotListItem"][];
+            /** Synthetic Evidence */
+            synthetic_evidence: {
+                [key: string]: unknown;
+            };
         } & {
             [key: string]: unknown;
         };

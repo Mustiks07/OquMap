@@ -266,6 +266,9 @@ def item_detail(session: Session, org_id: str, item_id: str, params: QualityPara
         if row is not None:
             admins.append({"assessment": full["assessment"], "dataset_version": full["dataset_version"],
                            "provenance": full["provenance"], "generated_at": full["generated_at"], "stats": row})
+    if not admins:
+        # an item is visible only through an administration of the caller's organisation (shared programmes too)
+        raise not_found("item", item_id)
     return {
         "method_version": aq.METHOD_VERSION_QUALITY,
         "item": {"item_id": item.id, "code": item.code, "version": item.version, "item_type": item.item_type,

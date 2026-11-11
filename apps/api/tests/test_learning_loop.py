@@ -211,18 +211,21 @@ def test_end_to_end_from_quality_signal_to_next_decision_version(flow):
     assert [h["status"] for h in nd["history"]] == ["superseded", "draft"]
     # 8. evidence enters the library only after human approval, without touching the version
     before = c.get(f"/api/v1/interventions/{iv['id']}/evidence", headers=H).json()
-    assert before["accepted_entries"] == 0 and before["proposed_entries"] == 1
+    assert before["accepted_entries"] == 0 and before["proposed_synthetic_entries"] == 1  # synthetic dataset
     sug0 = c.get("/api/v1/interventions/suggest", params={"objective_id": objective(cur, "DEMO-M6-3.1")}, headers=H).json()
     assert not any(x["code"] == "accepted_positive_signals" for s in sug0["suggestions"] if s["code"] == "FLOW-1" for x in s["components"])
     assert c.post(f"/api/v1/intervention-evidence/{con['evidence_entry']['id']}/review", json={"accept": True},
                   headers=user_headers(["methodist"])).status_code == 403
     after = c.post(f"/api/v1/intervention-evidence/{con['evidence_entry']['id']}/review", json={"accept": True, "note": "ok"}, headers=H).json()
-    assert after["accepted_entries"] == 1 and after["by_status"] == {"positive_signal": 1} and not after["repeated_positive_signal"]
+    assert after["accepted_synthetic_entries"] == 1 and after["by_status_synthetic"] == {"positive_signal": 1}
+    assert after["accepted_entries"] == 0 and after["by_status"] == {} and not after["repeated_positive_signal"]
     assert c.post(f"/api/v1/intervention-evidence/{con['evidence_entry']['id']}/review", json={"accept": True}, headers=H).status_code == 409
     assert c.get(f"/api/v1/interventions/{iv['id']}", headers=H).json()["current"]["content_sha256"] == sha_v1
     sug = c.get("/api/v1/interventions/suggest", params={"objective_id": objective(cur, "DEMO-M6-3.1")}, headers=H).json()
     flow_s = next(s for s in sug["suggestions"] if s["code"] == "FLOW-1")
-    assert any(x["code"] == "accepted_positive_signals" for x in flow_s["components"])
+    # synthetic evidence is shown (0 points) and never boosts the score; real evidence: tests/test_integrity.py
+    assert {x["code"]: x["points"] for x in flow_s["components"]}.get("synthetic_demo_signals") == 0
+    assert not any(x["code"] == "accepted_positive_signals" for x in flow_s["components"])
     # 9. the organisation sees what it learned
     summ = c.get("/api/v1/learning/summary", params={"dataset_id": ds["id"]}, headers=H).json()
     assert any(q["question"] == "Сохранится ли эффект через месяц?" for q in summ["open_questions"])

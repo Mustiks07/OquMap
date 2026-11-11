@@ -1946,11 +1946,22 @@
             "title": "Accepted Entries",
             "type": "integer"
           },
+          "accepted_synthetic_entries": {
+            "title": "Accepted Synthetic Entries",
+            "type": "integer"
+          },
           "by_status": {
             "additionalProperties": {
               "type": "integer"
             },
             "title": "By Status",
+            "type": "object"
+          },
+          "by_status_synthetic": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Status Synthetic",
             "type": "object"
           },
           "comparable_positive_signals": {
@@ -1973,21 +1984,38 @@
             "title": "Note Ru",
             "type": "string"
           },
+          "observed_real_entries": {
+            "title": "Observed Real Entries",
+            "type": "integer"
+          },
           "proposed_entries": {
             "title": "Proposed Entries",
+            "type": "integer"
+          },
+          "proposed_synthetic_entries": {
+            "title": "Proposed Synthetic Entries",
             "type": "integer"
           },
           "repeated_positive_signal": {
             "title": "Repeated Positive Signal",
             "type": "boolean"
+          },
+          "synthetic_comparable_positive_signals": {
+            "title": "Synthetic Comparable Positive Signals",
+            "type": "integer"
           }
         },
         "required": [
           "accepted_entries",
+          "accepted_synthetic_entries",
           "proposed_entries",
+          "proposed_synthetic_entries",
+          "observed_real_entries",
           "by_status",
+          "by_status_synthetic",
           "repeated_positive_signal",
           "comparable_positive_signals",
+          "synthetic_comparable_positive_signals",
           "entries",
           "note_ru",
           "note_kz"
@@ -3310,6 +3338,10 @@
             "title": "Accepted Evidence",
             "type": "integer"
           },
+          "accepted_synthetic_evidence": {
+            "title": "Accepted Synthetic Evidence",
+            "type": "integer"
+          },
           "code": {
             "title": "Code",
             "type": "string"
@@ -3410,7 +3442,8 @@
           "targets",
           "total_minutes",
           "n_pilots",
-          "accepted_evidence"
+          "accepted_evidence",
+          "accepted_synthetic_evidence"
         ],
         "title": "InterventionListItem",
         "type": "object"
@@ -6958,6 +6991,11 @@
             },
             "title": "Pilots",
             "type": "array"
+          },
+          "synthetic_evidence": {
+            "additionalProperties": true,
+            "title": "Synthetic Evidence",
+            "type": "object"
           }
         },
         "required": [
@@ -6969,6 +7007,7 @@
           "fidelity_distribution",
           "outcome_distribution",
           "interventions_with_repeated_signals",
+          "synthetic_evidence",
           "coverage",
           "missing_for_conclusions",
           "action_queue",

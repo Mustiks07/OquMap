@@ -418,10 +418,15 @@ class InterventionVersionOut(Model):
 
 class EvidenceSummary(Model):
     accepted_entries: int
+    accepted_synthetic_entries: int
     proposed_entries: int
+    proposed_synthetic_entries: int
+    observed_real_entries: int
     by_status: dict[str, int]
+    by_status_synthetic: dict[str, int]
     repeated_positive_signal: bool
     comparable_positive_signals: int
+    synthetic_comparable_positive_signals: int
     entries: list[dict[str, Any]]
     note_ru: str
     note_kz: str
@@ -461,6 +466,7 @@ class InterventionListItem(Model):
     total_minutes: int
     n_pilots: int
     accepted_evidence: int
+    accepted_synthetic_evidence: int
 
 
 class SuggestionComponent(Model):
@@ -826,6 +832,7 @@ class PortfolioOut(Model):
     fidelity_distribution: dict[str, int]
     outcome_distribution: dict[str, int]
     interventions_with_repeated_signals: list[dict[str, Any]]
+    synthetic_evidence: dict[str, Any]
     coverage: dict[str, Any]
     missing_for_conclusions: list[dict[str, Any]]
     action_queue: list[dict[str, Any]]

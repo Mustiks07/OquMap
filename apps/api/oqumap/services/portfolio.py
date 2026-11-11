@@ -98,12 +98,16 @@ def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_
     queue.sort(key=lambda r: (r["priority"], r["code"]))
     # interventions with repeated, comparable, accepted positive signals (≥ 2) — listed, not ranked
     ivq = select(mm.Intervention).where(mm.Intervention.org_id == p.org_id)
-    repeated = []
+    repeated, repeated_synthetic, synthetic_evidence = [], [], 0
     for iv in session.scalars(ivq.order_by(mm.Intervention.code)):
         ev = ivs.evidence_summary(session, iv)
-        if ev["comparable_positive_signals"] >= 2:
+        synthetic_evidence += ev["accepted_synthetic_entries"]
+        if ev["comparable_positive_signals"] >= 2:  # accepted real evidence only
             repeated.append({"intervention_id": iv.id, "code": iv.code, "comparable_positive_signals": ev["comparable_positive_signals"],
                              "by_status": ev["by_status"]})
+        if ev["synthetic_comparable_positive_signals"] >= 2:
+            repeated_synthetic.append({"intervention_id": iv.id, "code": iv.code, "is_synthetic": True,
+                                       "comparable_positive_signals": ev["synthetic_comparable_positive_signals"]})
     # coverage: topics/objectives targeted by reviewed interventions vs piloted
     cur_ds = an.get_dataset(session, p.org_id, dataset_id) if dataset_id else None
     targeted_topics: set[str] = set()
@@ -130,6 +134,8 @@ def portfolio(session: Session, p: Principal, dataset_id: str | None = None, as_
         "fidelity_distribution": fid_dist,
         "outcome_distribution": out_dist,
         "interventions_with_repeated_signals": repeated,
+        "synthetic_evidence": {"accepted_entries": synthetic_evidence, "repeated_signals_demo_only": repeated_synthetic,
+                               "counts_toward_recommendations": False},
         "coverage": {"topics": topic_rows, "topics_with_pilots": sum(1 for r in topic_rows if r["pilots"]),
                      "topics_total": len(topic_rows)},
         "missing_for_conclusions": missing,

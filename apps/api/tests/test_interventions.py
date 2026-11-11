@@ -15,7 +15,8 @@ def test_seeded_library_has_levels_statuses_and_versions(fresh_client):
     assert rows["INT-ERRDIAG"]["current_status"] == "draft" and rows["INT-ERRDIAG"]["reviewed_version"] is None
     strips = c.get(f"/api/v1/interventions/{rows['INT-STRIPS']['id']}", headers=H).json()
     assert [v["version"] for v in strips["versions"]] == [2, 1] and strips["reviewed_version"] == 2
-    assert strips["evidence_summary"]["accepted_entries"] == 1
+    # the seeded pilot is synthetic: its accepted entry is demo evidence, not real evidence
+    assert strips["evidence_summary"]["accepted_entries"] == 0 and strips["evidence_summary"]["accepted_synthetic_entries"] == 1
     # filters
     assert {r["code"] for r in c.get("/api/v1/interventions", params={"evidence_level": "experimental"}, headers=H).json()} == {"INT-NUMLINE"}
     assert "INT-STRIPS" in {r["code"] for r in c.get("/api/v1/interventions", params={"misconception": "add_across"}, headers=H).json()}
@@ -97,7 +98,9 @@ def test_suggestions_are_explainable_and_exclude_drafts_and_archived(fresh_clien
     assert top["code"] == "INT-STRIPS"
     assert top["score"] == sum(x["points"] for x in top["components"])
     assert {x["code"] for x in top["components"]} >= {"misconception_match", "topic_match", "evidence_observational",
-                                                        "accepted_positive_signals"}
+                                                        "synthetic_demo_signals"}
+    assert next(x for x in top["components"] if x["code"] == "synthetic_demo_signals")["points"] == 0
+    assert "accepted_positive_signals" not in {x["code"] for x in top["components"]}
     excluded = {e["code"]: e["reason"] for e in d["excluded"]}
     assert excluded["INT-OLDDRILL"] == "archived" and excluded["INT-ERRDIAG"] == "no_reviewed_version"
     assert excluded["INT-WORKED"] == "no_target_match"
