@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field, SecretStr
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -42,22 +42,41 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 15 * 1024 * 1024
     max_import_rows: int = 200_000
 
-    # Model provider. "none" keeps the app fully functional via template / recorded_demo modes.
-    llm_provider: str = "none"  # none | anthropic
-    # Default: current Sonnet (latency/cost balance for the demo). Any Claude API model ID can be configured.
-    llm_model: str = "claude-sonnet-5-5"
-    llm_base_url: str | None = None
-    llm_api_key: SecretStr | None = Field(default=None)
+    # Model provider (provider-agnostic). "none" keeps the app fully functional via template / recorded_demo modes.
+    # none | recorded | gemini | openrouter | openai | anthropic
+    llm_provider: str = "none"
+    # Model ID of the selected provider (no default: choose it with scripts/eval_llm_provider.py), e.g.
+    # gemini: gemini-2.5-flash · openrouter: google/gemini-2.5-flash · openai: gpt-5-mini · anthropic: claude-sonnet-5-5
+    llm_model: str = ""
+    # Provider-specific keys / endpoints (never one shared key)
+    gemini_api_key: SecretStr | None = None
+    gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
+    gemini_paid_tier: bool = False  # free tier: Google may use prompts to improve products
+    openrouter_api_key: SecretStr | None = None
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openai_api_key: SecretStr | None = None
+    openai_base_url: str = "https://api.openai.com/v1"
+    anthropic_api_key: SecretStr | None = None
+    anthropic_base_url: str = "https://api.anthropic.com"
+    llm_refusal_fallback: bool = True  # Anthropic server-side refusal fallback (beta)
+    # Data protection: live calls for non-synthetic datasets are blocked unless explicitly allowed for a provider
+    # whose data policy permits it (never for "may_train" policies such as the Gemini free tier).
+    llm_real_data_allowed: bool = False
+    llm_data_policy: str | None = None  # override: no_training | may_train | api_default
+    # Explicit fallback chain "provider:model" (different provider = different privacy policy → opt-in + audit)
+    llm_fallbacks: list[str] = []
+    llm_allow_cross_provider_fallback: bool = False
     llm_timeout_seconds: float = 30.0
     llm_max_retries: int = 2
     llm_max_input_chars: int = 24_000
     llm_max_output_tokens: int = 1_500
-    # Server-side refusal fallback (beta "server-side-fallback-2026-07-01", fallbacks="default").
-    llm_refusal_fallback: bool = True
     # Who may trigger live model calls and how many (demo tenants never use live AI).
     llm_live_roles: list[str] = ["methodist", "approver"]
     llm_live_per_org_per_day: int = 200
     llm_live_per_user_per_hour: int = 40
+    llm_max_tokens_per_org_per_day: int = 300_000
+    llm_circuit_failures: int = 5
+    llm_circuit_window_seconds: int = 120
 
     # OCR adapter: "none" or "tesseract" (requires the tesseract binary on PATH).
     ocr_engine: str = "none"

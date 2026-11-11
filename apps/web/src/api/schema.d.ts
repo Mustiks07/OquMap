@@ -2591,7 +2591,9 @@ export interface operations {
     };
     ai_status_api_v1_ai_status_get: {
         parameters: {
-            query?: never;
+            query?: {
+                probe?: boolean;
+            };
             header?: {
                 authorization?: string | null;
             };

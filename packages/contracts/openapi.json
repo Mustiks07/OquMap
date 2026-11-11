@@ -4021,6 +4021,16 @@
         "operationId": "ai_status_api_v1_ai_status_get",
         "parameters": [
           {
+            "in": "query",
+            "name": "probe",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Probe",
+              "type": "boolean"
+            }
+          },
+          {
             "in": "header",
             "name": "authorization",
             "required": false,

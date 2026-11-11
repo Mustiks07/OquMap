@@ -1,0 +1,80 @@
+{
+ "_note": "Response bodies written from the public API documentation of each provider (not captured from live traffic); used as recorded HTTP fixtures for adapter contract tests.",
+ "structured": {
+  "id": "resp_1",
+  "status": "completed",
+  "output": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "content": [
+     {
+      "type": "output_text",
+      "text": "{\"text\": \"Разница не определена.\", \"limitations\": [\"Наблюдательные данные.\"]}"
+     }
+    ]
+   }
+  ],
+  "usage": {
+   "input_tokens": 120,
+   "output_tokens": 30
+  }
+ },
+ "tool_1": {
+  "id": "resp_2",
+  "status": "completed",
+  "output": [
+   {
+    "type": "function_call",
+    "id": "fc_1",
+    "call_id": "call_1",
+    "name": "get_overview",
+    "arguments": "{}"
+   }
+  ],
+  "usage": {
+   "input_tokens": 100,
+   "output_tokens": 10
+  }
+ },
+ "tool_2": {
+  "id": "resp_3",
+  "status": "completed",
+  "output": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "content": [
+     {
+      "type": "output_text",
+      "text": "Приоритетная тема — T3."
+     }
+    ]
+   }
+  ],
+  "usage": {
+   "input_tokens": 150,
+   "output_tokens": 12
+  }
+ },
+ "refusal": {
+  "id": "resp_4",
+  "status": "completed",
+  "output": [
+   {
+    "type": "message",
+    "role": "assistant",
+    "content": [
+     {
+      "type": "refusal",
+      "refusal": "no"
+     }
+    ]
+   }
+  ]
+ },
+ "model": {
+  "id": "gpt-5-mini",
+  "object": "model"
+ }
+}

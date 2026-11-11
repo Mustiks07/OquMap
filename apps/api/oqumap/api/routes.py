@@ -99,7 +99,8 @@ def public_config() -> dict[str, Any]:
     return {"deployment_mode": s.deployment_mode, "demo_login_enabled": s.deployment_mode != "production",
             "qa_personas_enabled": s.deployment_mode == "dev", "password_login_enabled": True,
             "demo_tenant_ttl_hours": s.demo_tenant_ttl_hours if s.deployment_mode == "public_demo" else None,
-            "live_ai_configured": prov.available, "llm_config_error": prov.config_error,
+            "live_ai_configured": prov.available and not prov.is_recorded, "llm_provider": prov.name,
+            "llm_model": prov.model, "llm_config_error": prov.config_error, "llm_data_policy": prov.data_policy,
             "lab_scenarios": demo_tenants.LAB_DATASETS, "recommended_dataset_code": demo_tenants.RECOMMENDED_DATASET}
 
 
@@ -636,18 +637,46 @@ def decision_report(decision_id: str, p: P, session: DB, format: str = "pdf"):
 # ---------------------------------------------------------------------------
 
 
+POLICY_NOTES = {
+    "may_train": "Бесплатный тариф провайдера может использовать переданные данные для улучшения продуктов: "
+                 "используйте только синтетические данные; реальные данные учеников туда не отправляются.",
+    "depends_on_route": "Политика обработки данных зависит от выбранного маршрута OpenRouter; реальные данные "
+                        "не отправляются без явного разрешения.",
+    "api_default": "Реальные данные отправляются только при OQUMAP_LLM_REAL_DATA_ALLOWED=true и подходящем договоре.",
+    "no_training": "Провайдер настроен как платный/договорный профиль без обучения на данных.",
+}
+
+
 @router.get("/ai/status", tags=["ai"])
-def ai_status(p: P, session: DB) -> dict[str, Any]:
+def ai_status(p: P, session: DB, probe: bool = False) -> dict[str, Any]:
     prov = get_provider()
     s = get_settings()
     from ..services.documents import OcrAdapter
 
     ocr = OcrAdapter()
+    probe_error = None
+    if probe and prov.available and hasattr(prov, "probe"):
+        p.require("methodist", "admin")
+        ratelimit.check(session, "ai", p.user_id, "rate_ai")
+        try:
+            prov.probe()
+        except Exception as exc:  # classified; never includes the key
+            probe_error = getattr(exc, "reason", type(exc).__name__)
     gate_reason = LiveGate.for_principal(session, p).acquire_dry_run() if prov.available else None
-    return {"provider": prov.name, "model": prov.model, "live_available": prov.available and gate_reason is None,
-            "config_error": prov.config_error, "live_blocked_reason": gate_reason,
-            "fallback_modes": ["recorded_demo", "template"], "ocr_engine": s.ocr_engine, "ocr_available": ocr.available,
-            "note_ru": None if (prov.available and gate_reason is None) else
+    if not prov.available:
+        mode = "template"
+    elif prov.is_recorded:
+        mode = "recorded_demo"
+    else:
+        mode = "live_model" if gate_reason is None else "template"
+    return {"provider": prov.name, "model": prov.model, "mode": mode,
+            "live_available": prov.available and not prov.is_recorded and gate_reason is None,
+            "config_error": prov.config_error, "live_blocked_reason": gate_reason, "probe_error": probe_error,
+            "capabilities": prov.capabilities.as_dict(), "data_policy": prov.data_policy,
+            "data_policy_note_ru": POLICY_NOTES.get(prov.data_policy), "real_data_allowed": s.llm_real_data_allowed,
+            "fallback_chain": s.llm_fallbacks, "fallback_modes": ["recorded_demo", "template"],
+            "ocr_engine": s.ocr_engine, "ocr_available": ocr.available,
+            "note_ru": None if mode == "live_model" else
             "Живая модель недоступна для этой сессии: используются шаблоны и записанные демо-примеры."}
 
 

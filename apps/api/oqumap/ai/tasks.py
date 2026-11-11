@@ -80,16 +80,20 @@ def _pp(x: float | None, digits: int = 1) -> str:
     return f"{s} п.п."
 
 
-def _live_or_none(task: str, system: str, user: dict, schema: dict) -> tuple[dict | None, dict]:
-    from .gate import live_block_reason
+def _live_or_none(task: str, system: str, user: dict, schema: dict, synthetic: bool = True) -> tuple[dict | None, dict]:
+    """Ask the configured provider; returns (data, meta). meta["mode"] is live_model or recorded_demo."""
+    from .gate import live_block_reason, record_usage
 
     provider = get_provider()
-    reason = live_block_reason(provider)
+    reason = live_block_reason(provider, synthetic=synthetic)
     if reason:
         return None, {"fallback_reason": reason, "provider": provider.name, "model": None}
     try:
-        data, meta = provider.complete_json(system, json.dumps(user, ensure_ascii=False), schema)
-        return data, {"provider": meta.provider, "model": meta.model, "latency_ms": meta.latency_ms}
+        data, meta = provider.complete_json(system, json.dumps(user, ensure_ascii=False), schema, name=task)
+        record_usage(getattr(meta, "tokens", 0))
+        return data, {"provider": meta.provider, "model": meta.model, "latency_ms": meta.latency_ms,
+                      "mode": "recorded_demo" if provider.is_recorded else "live_model",
+                      "structured_mode": getattr(meta, "structured_mode", "native")}
     except ModelUnavailable as exc:
         return None, {"fallback_reason": exc.reason, "provider": provider.name, "model": provider.model}
 
@@ -117,11 +121,11 @@ def explain_comparison(session: Session, org_id: str, analysis_id: str, lang: st
         "explain_comparison",
         SYSTEM_BASE + " Объясни методисту результат сравнения двух изданий простым языком (4–6 предложений) на "
         + ("русском" if lang == "ru" else "казахском") + " языке и перечисли ограничения вывода.",
-        ctx, TEXT_SCHEMA)
+        ctx, TEXT_SCHEMA, synthetic=bool(run["context"]["is_synthetic"]))
     if data is not None:
         check = verify.check_numbers(data["text"] + " " + " ".join(data["limitations"]), metrics)
         if check["status"] == "passed":
-            g = _record(session, org_id, "explain_comparison", "live_model", ctx, data, [], {"numbers": check},
+            g = _record(session, org_id, "explain_comparison", meta["mode"], ctx, data, [], {"numbers": check},
                         meta["model"], meta["provider"], latency_ms=meta.get("latency_ms"))
             return generation_payload(g, lang)
         meta = {**meta, "fallback_reason": "numeric_check_failed", "rejected_output": data, "check": check}
@@ -223,13 +227,13 @@ def interpret_misconception(session: Session, org_id: str, analysis_id: str, cod
         "interpret_misconception",
         SYSTEM_BASE + " Предложи педагогическую интерпретацию выбранного дистрактора как гипотезу, альтернативные "
         "объяснения и диагностическое задание для проверки. Одна ошибка не доказывает устойчивого заблуждения.",
-        ctx, MISC_SCHEMA)
+        ctx, MISC_SCHEMA, synthetic=bool(run["context"]["is_synthetic"]))
     context_text = " ".join(e["stem"] + " " + " ".join(o["text"] for o in e["options"]) for e in examples)
     if data is not None:
         text = data["interpretation"] + " " + data["diagnostic_check"] + " " + " ".join(data["alternative_explanations"])
         check = verify.check_numbers(text, metrics, context_text)
         if check["status"] == "passed":
-            g = _record(session, org_id, "interpret_misconception", "live_model", ctx, data, [], {"numbers": check},
+            g = _record(session, org_id, "interpret_misconception", meta["mode"], ctx, data, [], {"numbers": check},
                         meta["model"], meta["provider"], latency_ms=meta.get("latency_ms"))
             return generation_payload(g, lang)
         meta["fallback_reason"] = "numeric_check_failed"
@@ -309,7 +313,7 @@ def recommend(session: Session, org_id: str, topic_analysis_id: str, comparison_
         "recommend",
         SYSTEM_BASE + " Сформулируй методическую рекомендацию: проблема, гипотеза, действие, способ проверки, "
         "ограничения. В citations укажи source_id только из переданных источников.",
-        ctx, REC_SCHEMA)
+        ctx, REC_SCHEMA, synthetic=bool(topic_run["context"]["is_synthetic"]))
     ctx_text = " ".join(s["excerpt"] for s in src_payload)
     if data is not None:
         text = " ".join([data["problem"], data["hypothesis"], data["action"], data["check"], *data["limitations"]])
@@ -319,7 +323,7 @@ def recommend(session: Session, org_id: str, topic_analysis_id: str, comparison_
         if any(c not in allowed for c in data["citations"]):
             cit = {"status": "failed", "missing": [c for c in data["citations"] if c not in allowed], "checked": len(data["citations"])}
         if num["status"] == "passed" and cit["status"] == "passed":
-            g = _record(session, org_id, "recommend", "live_model", ctx, data, data["citations"],
+            g = _record(session, org_id, "recommend", meta["mode"], ctx, data, data["citations"],
                         {"numbers": num, "citations": cit}, meta["model"], meta["provider"], latency_ms=meta.get("latency_ms"))
             return generation_payload(g, lang)
         meta["fallback_reason"] = "verification_failed"
@@ -412,8 +416,8 @@ def propose_fragment_links_for_document(session: Session, org_id: str, user_id: 
         data, meta = _live_or_none(
             "map_fragments", SYSTEM_BASE + " Для каждого фрагмента укажи 0–2 кода целей, которые фрагмент объясняет или "
             "тренирует. Используй только перечисленные коды. Если фрагмент не относится к целям — пустой список.",
-            ctx, LINK_SCHEMA)
-        mode = "live_model" if data is not None else "template"
+            ctx, LINK_SCHEMA, synthetic=bool(doc.is_demo))
+        mode = meta.get("mode", "live_model") if data is not None else "template"
         if data is None:
             links = [{"ref": f.anchor, "objective_codes": [p["objective_code"] for p in mapper.propose(f.text)],
                       "rationale": "; ".join(p["rationale_ru"] for p in mapper.propose(f.text))} for f in batch]
@@ -449,8 +453,10 @@ def propose_item_links(session: Session, org_id: str, item_id: str) -> dict:
     objs = {o.code: o for o in _objectives(session, item.program_version_id)}
     text = item.stem_ru + " " + " ".join(o["text"] for o in item.options)
     ctx = {"item": item.code, "text": text, "objectives": [{"code": c, "text": o.text_ru} for c, o in objs.items()]}
-    data, meta = _live_or_none("map_item", SYSTEM_BASE + " Укажи 1–2 цели, которые проверяет задание.", ctx, LINK_SCHEMA)
-    mode = "live_model" if data is not None else "template"
+    org = session.get(m.Organization, org_id)
+    data, meta = _live_or_none("map_item", SYSTEM_BASE + " Укажи 1–2 цели, которые проверяет задание.", ctx, LINK_SCHEMA,
+                               synthetic=bool(org and org.is_demo))
+    mode = meta.get("mode", "live_model") if data is not None else "template"
     if data is None:
         props = mapper.propose(text)
         data = {"links": [{"ref": item.code, "objective_codes": [p["objective_code"] for p in props],

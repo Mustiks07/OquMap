@@ -1,0 +1,82 @@
+{
+ "_note": "Response bodies written from the public API documentation of each provider (not captured from live traffic); used as recorded HTTP fixtures for adapter contract tests.",
+ "structured": {
+  "candidates": [
+   {
+    "content": {
+     "role": "model",
+     "parts": [
+      {
+       "text": "{\"text\": \"Разница не определена.\", \"limitations\": [\"Наблюдательные данные.\"]}"
+      }
+     ]
+    },
+    "finishReason": "STOP"
+   }
+  ],
+  "usageMetadata": {
+   "promptTokenCount": 120,
+   "candidatesTokenCount": 30
+  }
+ },
+ "tool_1": {
+  "candidates": [
+   {
+    "content": {
+     "role": "model",
+     "parts": [
+      {
+       "functionCall": {
+        "name": "get_overview",
+        "args": {}
+       }
+      }
+     ]
+    },
+    "finishReason": "STOP"
+   }
+  ],
+  "usageMetadata": {
+   "promptTokenCount": 100,
+   "candidatesTokenCount": 10
+  }
+ },
+ "tool_2": {
+  "candidates": [
+   {
+    "content": {
+     "role": "model",
+     "parts": [
+      {
+       "text": "Приоритетная тема — T3."
+      }
+     ]
+    },
+    "finishReason": "STOP"
+   }
+  ],
+  "usageMetadata": {
+   "promptTokenCount": 150,
+   "candidatesTokenCount": 12
+  }
+ },
+ "refusal": {
+  "candidates": [
+   {
+    "finishReason": "SAFETY",
+    "content": {
+     "parts": []
+    }
+   }
+  ]
+ },
+ "model": {
+  "name": "models/gemini-2.5-flash",
+  "inputTokenLimit": 1048576,
+  "outputTokenLimit": 65536,
+  "supportedGenerationMethods": [
+   "generateContent",
+   "countTokens"
+  ]
+ }
+}

@@ -20,6 +20,7 @@ from ..services import analysis as an
 from ..services import search as srch
 from ..services.auth import Principal
 from . import tasks, verify
+from .llm.base import ToolSpec
 from .provider import ModelUnavailable, get_provider
 
 
@@ -39,22 +40,20 @@ class AssistantQuery(BaseModel):
 
 
 TOOLS = [
-    {"name": "get_overview", "description": "Сводка по темам набора с текущими фильтрами: доли баллов, статусы, покрытие.",
-     "input_schema": {"type": "object", "properties": {}, "additionalProperties": False}},
-    {"name": "get_topic_evidence", "description": "Доказательства по теме: показатели, цели, задания, ошибки, источники.",
-     "input_schema": {"type": "object", "properties": {"topic_code": {"type": "string"}}, "required": ["topic_code"],
-                      "additionalProperties": False}},
-    {"name": "compare_editions", "description": "Сравнение двух изданий по теме на сопоставимых группах (стандартизация).",
-     "input_schema": {"type": "object", "properties": {"topic_code": {"type": "string"}}, "required": ["topic_code"],
-                      "additionalProperties": False}},
-    {"name": "search_sources", "description": "Поиск фрагментов учебных материалов организации.",
-     "input_schema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"],
-                      "additionalProperties": False}},
-    {"name": "get_data_quality", "description": "Качество и уровень данных набора: проверки, пропуски, импорты.",
-     "input_schema": {"type": "object", "properties": {}, "additionalProperties": False}},
+    ToolSpec("get_overview", "Сводка по темам набора с текущими фильтрами: доли баллов, статусы, покрытие.",
+             {"type": "object", "properties": {}, "required": [], "additionalProperties": False}),
+    ToolSpec("get_topic_evidence", "Доказательства по теме: показатели, цели, задания, ошибки, источники.",
+             {"type": "object", "properties": {"topic_code": {"type": "string"}}, "required": ["topic_code"],
+              "additionalProperties": False}),
+    ToolSpec("compare_editions", "Сравнение двух изданий по теме на сопоставимых группах (стандартизация).",
+             {"type": "object", "properties": {"topic_code": {"type": "string"}}, "required": ["topic_code"],
+              "additionalProperties": False}),
+    ToolSpec("search_sources", "Поиск фрагментов учебных материалов организации.",
+             {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"],
+              "additionalProperties": False}),
+    ToolSpec("get_data_quality", "Качество и уровень данных набора: проверки, пропуски, импорты.",
+             {"type": "object", "properties": {}, "required": [], "additionalProperties": False}),
 ]
-for _t in TOOLS:
-    _t["strict"] = True
 
 
 class _Executor:
@@ -142,15 +141,18 @@ def answer(session: Session, p: Principal, q: AssistantQuery) -> dict:
         topic_code = t.code if t else None
     ctx_desc = {"dataset": ex.meta.dataset.name_ru, "dataset_version": ex.meta.dataset.version, "topic": topic_code,
                 "filters": q.context.filters.model_dump(), "is_synthetic": ex.meta.dataset.is_synthetic}
-    from .gate import live_block_reason
+    from .gate import live_block_reason, record_usage
 
     provider = get_provider()
     mode, text, trace, fallback, model = "template", None, [], None, None
-    blocked = live_block_reason(provider)
+    blocked = live_block_reason(provider, synthetic=bool(ex.meta.dataset.is_synthetic))
+    if not blocked and provider.is_recorded:
+        blocked = "recorded_provider_has_no_tool_loop"
     if not blocked:
         try:
             text, trace, meta = provider.run_tools(SYSTEM.format(lang=q.lang, ctx=json.dumps(ctx_desc, ensure_ascii=False)),
-                                                   [{"role": "user", "content": q.question}], TOOLS, ex)
+                                                   q.question, TOOLS, ex)
+            record_usage(getattr(meta, "tokens", 0))
             model = meta.model
             check = verify.check_numbers(text, ex.metrics, json.dumps(ex.metrics, ensure_ascii=False))
             if check["status"] == "passed":

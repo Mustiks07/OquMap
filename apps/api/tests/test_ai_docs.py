@@ -3,13 +3,12 @@
 import io
 import json
 import zipfile
-from types import SimpleNamespace
 
 import pytest
 from conftest import login
 
 from oqumap.ai import provider as prov
-from oqumap.ai.provider import AnthropicProvider, CallMeta, ModelUnavailable, Provider
+from oqumap.ai.provider import CallMeta, Provider
 
 
 class FakeProvider(Provider):
@@ -23,7 +22,7 @@ class FakeProvider(Provider):
     def available(self):
         return True
 
-    def complete_json(self, system, user, schema, max_tokens=None):
+    def complete_json(self, system, user, schema, name="result", **kw):
         assert "данные" in system  # documents are declared as data
         return (self.payload(json.loads(user)) if callable(self.payload) else self.payload), CallMeta("fake", "fake-model", 5)
 
@@ -97,32 +96,6 @@ def test_assistant_template_answer_uses_current_filters(client, H, datasets, cur
     r2 = client.post("/api/v1/assistant/query", json={"question": "Сравни пособия по теме", "context": {
         "dataset_id": datasets["base"]["id"], "topic_id": t3}}, headers=H).json()
     assert "не доказательство" in r2["output"]["text"]
-
-
-def test_anthropic_adapter_structured_output_and_refusal(monkeypatch):
-    calls = {}
-
-    class Msgs:
-        def __init__(self, stop="end_turn", text='{"text": "ok", "limitations": []}'):
-            self.stop, self.text = stop, text
-
-        def create(self, **kw):
-            calls.update(kw)
-            return SimpleNamespace(stop_reason=self.stop, model="claude-opus-5-5",
-                                   content=[SimpleNamespace(type="text", text=self.text)])
-
-    p = AnthropicProvider(client=SimpleNamespace(messages=Msgs()))
-    data, meta = p.complete_json("sys", "user", {"type": "object"})
-    assert data == {"text": "ok", "limitations": []}
-    assert calls["output_config"]["format"]["type"] == "json_schema" and calls["model"] == p.model
-    p2 = AnthropicProvider(client=SimpleNamespace(messages=Msgs(stop="refusal")))
-    with pytest.raises(ModelUnavailable) as e:
-        p2.complete_json("s", "u", {})
-    assert e.value.reason == "model_refusal"
-    with pytest.raises(ModelUnavailable) as e:
-        p.complete_json("s", "x" * 100_000, {})
-    assert e.value.reason == "input_too_large"
-    assert not AnthropicProvider().available or True  # no key in the test env => template mode elsewhere
 
 
 def test_ai_status_reports_unconfigured_model_and_ocr(client, H):

@@ -81,7 +81,7 @@ class CountingProvider(Provider):
     def available(self):
         return True
 
-    def complete_json(self, system, user, schema, max_tokens=None):
+    def complete_json(self, system, user, schema, name="result", **kw):
         CountingProvider.calls += 1
         return {"text": "x", "limitations": []}, CallMeta("fake", "fake-model", 1)
 

@@ -1,0 +1,65 @@
+{
+ "_note": "Response bodies written from the public API documentation of each provider (not captured from live traffic); used as recorded HTTP fixtures for adapter contract tests.",
+ "structured": {
+  "id": "msg_1",
+  "type": "message",
+  "model": "claude-sonnet-5-5",
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "{\"text\": \"Разница не определена.\", \"limitations\": [\"Наблюдательные данные.\"]}"
+   }
+  ],
+  "usage": {
+   "input_tokens": 120,
+   "output_tokens": 30
+  }
+ },
+ "tool_1": {
+  "id": "msg_2",
+  "type": "message",
+  "model": "claude-sonnet-5-5",
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_1",
+    "name": "get_overview",
+    "input": {}
+   }
+  ],
+  "usage": {
+   "input_tokens": 100,
+   "output_tokens": 10
+  }
+ },
+ "tool_2": {
+  "id": "msg_3",
+  "type": "message",
+  "model": "claude-sonnet-5-5",
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Приоритетная тема — T3."
+   }
+  ],
+  "usage": {
+   "input_tokens": 150,
+   "output_tokens": 12
+  }
+ },
+ "refusal": {
+  "id": "msg_4",
+  "type": "message",
+  "model": "claude-sonnet-5-5",
+  "stop_reason": "refusal",
+  "content": []
+ },
+ "model": {
+  "id": "claude-sonnet-5-5",
+  "max_input_tokens": 1000000,
+  "max_tokens": 128000
+ }
+}

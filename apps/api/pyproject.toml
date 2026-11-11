@@ -22,7 +22,6 @@ dependencies = [
   "scipy==1.16.3",
   "pypdfium2==5.0.0",
   "python-multipart==0.0.33",
-  "anthropic==2.8.0",
 ]
 
 [dependency-groups]

@@ -1,0 +1,110 @@
+{
+ "_note": "Response bodies written from the public API documentation of each provider (not captured from live traffic); used as recorded HTTP fixtures for adapter contract tests.",
+ "structured": {
+  "choices": [
+   {
+    "message": {
+     "role": "assistant",
+     "content": "{\"text\": \"Разница не определена.\", \"limitations\": [\"Наблюдательные данные.\"]}"
+    },
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 120,
+   "completion_tokens": 30
+  }
+ },
+ "tool_1": {
+  "choices": [
+   {
+    "message": {
+     "role": "assistant",
+     "content": null,
+     "tool_calls": [
+      {
+       "id": "call_1",
+       "type": "function",
+       "function": {
+        "name": "get_overview",
+        "arguments": "{}"
+       }
+      }
+     ]
+    },
+    "finish_reason": "tool_calls"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 100,
+   "completion_tokens": 10
+  }
+ },
+ "tool_2": {
+  "choices": [
+   {
+    "message": {
+     "role": "assistant",
+     "content": "Приоритетная тема — T3."
+    },
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 150,
+   "completion_tokens": 12
+  }
+ },
+ "refusal": {
+  "choices": [
+   {
+    "message": {
+     "role": "assistant",
+     "content": ""
+    },
+    "finish_reason": "content_filter"
+   }
+  ]
+ },
+ "models": {
+  "data": [
+   {
+    "id": "google/gemini-2.5-flash",
+    "context_length": 1048576,
+    "supported_parameters": [
+     "tools",
+     "tool_choice",
+     "response_format",
+     "structured_outputs",
+     "max_tokens"
+    ],
+    "architecture": {
+     "input_modalities": [
+      "text",
+      "image",
+      "file"
+     ]
+    },
+    "top_provider": {
+     "max_completion_tokens": 65535
+    }
+   },
+   {
+    "id": "vendor/plain-model",
+    "context_length": 8192,
+    "supported_parameters": [
+     "max_tokens",
+     "temperature"
+    ],
+    "architecture": {
+     "input_modalities": [
+      "text"
+     ]
+    },
+    "top_provider": {
+     "max_completion_tokens": 4096
+    }
+   }
+  ]
+ }
+}
