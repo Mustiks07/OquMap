@@ -163,7 +163,9 @@ Docker Compose в этой среде не запускался.
 | `64d1d85` | Add Experiment Design Studio |
 | `5ee300c` | Add planned pilot session calendar (Alembic `b5e7f0a2d4c6`) |
 | `caeabf3` | Add language DIF screening |
-| (этот и предыдущий) | Update contracts tests documentation and handoff |
+| `282942e` | Update contracts tests documentation and handoff |
+| `35ae74a` | Deterministic composite-FK test on PostgreSQL |
+| (этот) | Final check results in the handoff |
 
 Цепочка миграций: `d964e255551f → c2a7e5f1b3d9 → e1a4b7c9d2f0 → f3c5d8e2a7b1 → a4d6e9f1c3b5 → b5e7f0a2d4c6` (голова).
 Проверено: чистая БД; БД на `d964e255551f` с данными; БД на голове раунда 1 `c2a7e5f1b3d9` с данными измерения;
@@ -206,7 +208,7 @@ Docker Compose в этой среде не запускался.
 |---|---|
 | `uv run ruff check .` | All checks passed |
 | `uv run pytest` (SQLite) | **228 passed** (≈4 мин 20 с) |
-| pytest на PostgreSQL 16 через Alembic | **PG2** |
+| pytest на PostgreSQL 16 через Alembic | **228 passed** (≈7 мин); первый прогон выявил недетерминированный выбор в `test_database_constraints` — исправлено в `35ae74a`, повторный прогон зелёный |
 | Миграции от `c2a7e5f1b3d9` (с данными), чистая БД, downgrade/upgrade, `alembic check` | OK |
 | OpenAPI drift (`test_contract.py`, `export_openapi.py --check`) | актуален |
 | `npm test` | **19 passed** (3 файла) |
