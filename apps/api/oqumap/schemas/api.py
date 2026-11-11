@@ -35,11 +35,14 @@ class UserOut(Model):
     org_id: str
     org_name: str
     org_is_demo: bool
+    org_is_ephemeral: bool = False
+    org_expires_at: str | None = None
 
 
 class LoginResponse(Model):
     token: str
     user: UserOut
+    recommended_dataset_id: str | None = None
 
 
 class DatasetSummary(Model):

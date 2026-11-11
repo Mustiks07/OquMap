@@ -142,9 +142,12 @@ def answer(session: Session, p: Principal, q: AssistantQuery) -> dict:
         topic_code = t.code if t else None
     ctx_desc = {"dataset": ex.meta.dataset.name_ru, "dataset_version": ex.meta.dataset.version, "topic": topic_code,
                 "filters": q.context.filters.model_dump(), "is_synthetic": ex.meta.dataset.is_synthetic}
+    from .gate import live_block_reason
+
     provider = get_provider()
     mode, text, trace, fallback, model = "template", None, [], None, None
-    if provider.available:
+    blocked = live_block_reason(provider)
+    if not blocked:
         try:
             text, trace, meta = provider.run_tools(SYSTEM.format(lang=q.lang, ctx=json.dumps(ctx_desc, ensure_ascii=False)),
                                                    [{"role": "user", "content": q.question}], TOOLS, ex)
@@ -157,7 +160,7 @@ def answer(session: Session, p: Principal, q: AssistantQuery) -> dict:
         except ModelUnavailable as exc:
             fallback = exc.reason
     else:
-        fallback = "model_not_configured"
+        fallback = blocked
     if text is None:
         text, trace = _template_answer(ex, q, topic_code)
     check = verify.check_numbers(text, ex.metrics, json.dumps(ex.metrics, ensure_ascii=False))

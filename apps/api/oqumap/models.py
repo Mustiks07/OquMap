@@ -33,6 +33,10 @@ class Organization(IdMixin, TimestampMixin, Base):
     __tablename__ = "organizations"
     name: Mapped[str] = mapped_column(String(200))
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Disposable public-demo tenant (cloned from the demo template, deleted after expires_at).
+    is_ephemeral: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    expires_at: Mapped[datetime | None] = mapped_column(TZDateTime(), nullable=True, index=True)
+    storage_quota_bytes: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
 
 class User(IdMixin, TimestampMixin, Base):
@@ -44,13 +48,24 @@ class User(IdMixin, TimestampMixin, Base):
     roles: Mapped[list] = mapped_column(JSON, default=list)
     password_hash: Mapped[str | None] = mapped_column(String(300), nullable=True)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_login_at: Mapped[datetime | None] = mapped_column(TZDateTime(), nullable=True)
 
 
 class ApiSession(IdMixin, TimestampMixin, Base):
     __tablename__ = "api_sessions"
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     token_hash: Mapped[str] = mapped_column(String(128), unique=True)
-    expires_at: Mapped[datetime] = mapped_column(TZDateTime())
+    expires_at: Mapped[datetime] = mapped_column(TZDateTime(), index=True)
+
+
+class RateLimitCounter(Base):
+    """Fixed-window counters shared by all API/worker processes (stored in the database)."""
+
+    __tablename__ = "rate_limits"
+    key: Mapped[str] = mapped_column(String(250), primary_key=True)
+    count: Mapped[int] = mapped_column(Integer, default=0)
+    expires_at: Mapped[datetime] = mapped_column(TZDateTime(), index=True)
 
 
 class AuditLog(IdMixin, TimestampMixin, Base):
@@ -115,11 +130,14 @@ class ObjectiveRelation(IdMixin, Base):
 
 class Scale(IdMixin, Base):
     __tablename__ = "scales"
-    code: Mapped[str] = mapped_column(String(60), unique=True)
+    # NULL org_id = shared definition used by the demo programme; imported projects get their own scales.
+    org_id: Mapped[str | None] = mapped_column(ForeignKey("organizations.id"), nullable=True, index=True)
+    code: Mapped[str] = mapped_column(String(60))
     name: Mapped[str] = mapped_column(String(200))
     # identical_form | common_anchor_equated | none
     linking_method: Mapped[str] = mapped_column(String(40))
     description: Mapped[str] = mapped_column(Text, default="")
+    __table_args__ = (UniqueConstraint("org_id", "code"),)
 
 
 class Item(IdMixin, Base):
@@ -180,7 +198,7 @@ class FormItem(IdMixin, Base):
 class Dataset(IdMixin, TimestampMixin, Base):
     __tablename__ = "datasets"
     org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), index=True)
-    program_version_id: Mapped[str] = mapped_column(ForeignKey("program_versions.id"))
+    program_version_id: Mapped[str | None] = mapped_column(ForeignKey("program_versions.id"), nullable=True)
     code: Mapped[str] = mapped_column(String(80))
     name_ru: Mapped[str] = mapped_column(String(300))
     name_kz: Mapped[str] = mapped_column(String(300))
@@ -348,6 +366,7 @@ class ImportBatch(IdMixin, TimestampMixin, Base):
     filename: Mapped[str] = mapped_column(String(300))
     file_sha256: Mapped[str] = mapped_column(String(64), index=True)
     storage_path: Mapped[str] = mapped_column(String(500))
+    size_bytes: Mapped[int] = mapped_column(Integer, default=0)
     sheet: Mapped[str | None] = mapped_column(String(120), nullable=True)
     column_mapping: Mapped[dict] = mapped_column(JSON, default=dict)
     options: Mapped[dict] = mapped_column(JSON, default=dict)
@@ -375,6 +394,9 @@ class Document(IdMixin, TimestampMixin, Base):
     media_type: Mapped[str] = mapped_column(String(100))
     sha256: Mapped[str] = mapped_column(String(64))
     storage_path: Mapped[str] = mapped_column(String(500))
+    size_bytes: Mapped[int] = mapped_column(Integer, default=0)
+    # Documents of the same edition form a lineage; version increments on every new upload.
+    lineage_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     version: Mapped[int] = mapped_column(Integer, default=1)
     status: Mapped[str] = mapped_column(String(20))  # queued|processing|ready|failed
     page_count: Mapped[int | None] = mapped_column(Integer, nullable=True)

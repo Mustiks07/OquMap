@@ -177,7 +177,7 @@ def _seed_program(session: Session, org_id: str) -> None:
 
 def _seed_scales_forms(session: Session) -> None:
     for code, name, method, desc in SCALES:
-        if session.scalar(select(m.Scale).where(m.Scale.code == code)) is None:
+        if session.scalar(select(m.Scale).where(m.Scale.code == code, m.Scale.org_id.is_(None))) is None:
             session.add(m.Scale(id=stable_id("scale", code), code=code, name=name, linking_method=method, description=desc))
     session.flush()
     for org_id in (DEMO_ORG_ID, OTHER_ORG_ID):

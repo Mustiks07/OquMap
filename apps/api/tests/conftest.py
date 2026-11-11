@@ -14,6 +14,11 @@ TMP = Path(tempfile.mkdtemp(prefix="oqumap-tests-"))
 os.environ.setdefault("OQUMAP_STORAGE_DIR", str(TMP / "storage"))
 os.environ["OQUMAP_JOB_MODE"] = "inline"
 os.environ["OQUMAP_LLM_PROVIDER"] = "none"
+os.environ["OQUMAP_DEPLOYMENT_MODE"] = "dev"
+# generous limits for the suite; dedicated tests lower them explicitly
+for _k in ("LOGIN", "IMPORT", "DOCUMENT", "AI", "ASSISTANT", "COMPUTE"):
+    os.environ[f"OQUMAP_RATE_{_k}"] = "100000/60"
+os.environ["OQUMAP_DEMO_TENANTS_PER_IP_PER_HOUR"] = "100000"
 
 from oqumap import db  # noqa: E402
 from oqumap.config import get_settings  # noqa: E402
@@ -52,7 +57,15 @@ def build_seeded(name: str):
         cfg.set_main_option("sqlalchemy.url", url)
         command.upgrade(cfg, "head")
     else:
+        from alembic.config import Config
+
+        from alembic import command
+
         Base.metadata.create_all(db.engine())
+        cfg = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
+        cfg.set_main_option("script_location", str(Path(__file__).resolve().parents[1] / "alembic"))
+        cfg.set_main_option("sqlalchemy.url", url)
+        command.stamp(cfg, "head")
     with db.session_factory()() as s:
         seed(s)
     return TestClient(create_app(url))

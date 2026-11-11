@@ -537,7 +537,7 @@ def validate_upload(
     })
     batch = m.ImportBatch(
         org_id=org.id, dataset_id=dataset.id if dataset else None, created_by=user_id, kind=kind,
-        filename=Path(filename).name[:300], file_sha256=digest, storage_path=path, sheet=table.sheet,
+        filename=Path(filename).name[:300], file_sha256=digest, storage_path=path, size_bytes=len(data), sheet=table.sheet,
         column_mapping=mapping, options=options, transform_version=TRANSFORM_VERSION, status="validated",
         report=summary, rows_total=summary.get("rows_total", 0), rows_accepted=summary.get("rows_accepted", 0),
         rows_rejected=summary.get("rows_rejected", 0), is_synthetic=is_synthetic,

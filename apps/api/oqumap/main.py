@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from . import db
 from .api.routes import router
@@ -16,6 +17,15 @@ from .config import CODE_VERSION, get_settings
 from .errors import ApiError
 from .schemas.api import ErrorResponse
 from .services.common import request_id_var
+from .services.ratelimit import client_ip_var, resolve_client_ip
+
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "same-origin",
+    "Cross-Origin-Resource-Policy": "same-origin",
+    "Cache-Control": "no-store",
+}
 
 log = logging.getLogger("oqumap")
 
@@ -29,8 +39,18 @@ def create_app(database_url: str | None = None) -> FastAPI:
                   responses={400: {"model": ErrorResponse}, 401: {"model": ErrorResponse}, 403: {"model": ErrorResponse},
                              404: {"model": ErrorResponse}, 409: {"model": ErrorResponse}, 422: {"model": ErrorResponse}})
     app.state.sessionmaker = db.make_sessionmaker(database_url) if database_url else None
-    app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_credentials=False,
-                       allow_methods=["*"], allow_headers=["*"], expose_headers=["X-Request-ID", "Content-Disposition"])
+    app.add_middleware(CORSMiddleware, allow_origins=[o for o in settings.cors_origins if o != "*"],
+                       allow_credentials=False, allow_methods=["GET", "POST"],
+                       allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+                       expose_headers=["X-Request-ID", "Content-Disposition", "Retry-After"])
+    if settings.allowed_hosts and settings.allowed_hosts != ["*"]:
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
+    from .ai.provider import llm_config_problem
+
+    problem = llm_config_problem()
+    if problem:
+        log.error("LLM provider %s misconfigured: %s (AI falls back to template/recorded modes)",
+                  settings.llm_provider, problem)
 
     @app.middleware("http")
     async def request_id(request: Request, call_next):
@@ -38,11 +58,16 @@ def create_app(database_url: str | None = None) -> FastAPI:
         if len(rid) > 64 or not rid.replace("-", "").isalnum():
             rid = uuid.uuid4().hex[:16]
         token = request_id_var.set(rid)
+        ip_token = client_ip_var.set(resolve_client_ip(request.client.host if request.client else None,
+                                                       request.headers.get("x-forwarded-for")))
         try:
             response = await call_next(request)
         finally:
             request_id_var.reset(token)
+            client_ip_var.reset(ip_token)
         response.headers["X-Request-ID"] = rid
+        for k, v in SECURITY_HEADERS.items():
+            response.headers.setdefault(k, v)
         return response
 
     def err(status: int, code: str, message: str, details: dict | None = None) -> JSONResponse:
@@ -52,7 +77,10 @@ def create_app(database_url: str | None = None) -> FastAPI:
 
     @app.exception_handler(ApiError)
     async def api_error(_: Request, exc: ApiError):
-        return err(exc.status, exc.code, exc.message, exc.details)
+        resp = err(exc.status, exc.code, exc.message, exc.details)
+        if exc.status == 429 and "retry_after" in exc.details:
+            resp.headers["Retry-After"] = str(exc.details["retry_after"])
+        return resp
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(_: Request, exc: RequestValidationError):
@@ -68,19 +96,70 @@ def create_app(database_url: str | None = None) -> FastAPI:
         log.exception("unhandled error request_id=%s", request_id_var.get())
         return err(500, "internal_error", "Внутренняя ошибка сервера", {"type": type(exc).__name__})
 
-    @app.get("/health", tags=["system"])
-    def health() -> dict:
-        status = "ok"
+    def _bind():
+        return app.state.sessionmaker.kw["bind"] if app.state.sessionmaker else db.engine()
+
+    @app.get("/health/live", tags=["system"])
+    def live() -> dict:
+        """Process is up (no dependency checks)."""
+        return {"status": "ok", "version": CODE_VERSION}
+
+    def readiness() -> tuple[bool, dict]:
+        checks: dict = {}
         try:
-            bind = app.state.sessionmaker.kw["bind"] if app.state.sessionmaker else db.engine()
-            with bind.connect() as conn:
+            with _bind().connect() as conn:
                 conn.execute(text("select 1"))
-        except Exception:  # pragma: no cover
-            status = "degraded"
-        return {"status": status, "version": CODE_VERSION, "job_mode": settings.job_mode, "llm_provider": settings.llm_provider}
+                checks["database"] = "ok"
+                try:
+                    current = conn.execute(text("select version_num from alembic_version")).scalar()
+                except Exception:
+                    current = None
+                    conn.rollback()
+                head = _alembic_head()
+                checks["migrations"] = "ok" if (current == head or (current is None and head is None)) else \
+                    f"pending:{current}->{head}"
+                if settings.deployment_mode != "production" and checks["migrations"] == "ok":
+                    from .demo.seed import DEMO_ORG_ID
+
+                    present = conn.execute(text("select count(*) from organizations where id = :i"), {"i": DEMO_ORG_ID}).scalar()
+                    checks["demo_template"] = "ok" if present else "missing"
+        except Exception as exc:  # pragma: no cover - depends on infrastructure
+            checks["database"] = f"error:{type(exc).__name__}"
+        problem = llm_config_problem()
+        checks["llm"] = "disabled" if settings.llm_provider == "none" else (f"misconfigured:{problem}" if problem else "configured")
+        ok = checks.get("database") == "ok" and checks.get("migrations") == "ok" and checks.get("demo_template", "ok") == "ok"
+        return ok, checks
+
+    @app.get("/health/ready", tags=["system"])
+    def ready():
+        ok, checks = readiness()
+        body = {"status": "ok" if ok else "not_ready", "version": CODE_VERSION, "deployment_mode": settings.deployment_mode,
+                "job_mode": settings.job_mode, "checks": checks}
+        return JSONResponse(body, status_code=200 if ok else 503)
+
+    @app.get("/health", tags=["system"])
+    def health():
+        return ready()
 
     app.include_router(router)
     return app
+
+
+_HEAD_CACHE: dict = {}
+
+
+def _alembic_head() -> str | None:
+    if "head" not in _HEAD_CACHE:
+        from pathlib import Path
+
+        from alembic.config import Config
+        from alembic.script import ScriptDirectory
+
+        root = Path(__file__).resolve().parents[1]
+        cfg = Config(str(root / "alembic.ini"))
+        cfg.set_main_option("script_location", str(root / "alembic"))
+        _HEAD_CACHE["head"] = ScriptDirectory.from_config(cfg).get_current_head()
+    return _HEAD_CACHE["head"]
 
 
 app = create_app()

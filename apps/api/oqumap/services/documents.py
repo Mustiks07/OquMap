@@ -74,13 +74,20 @@ def store_document(session: Session, org_id: str, user_id: str | None, data: byt
     ext = ".pdf" if media == PDF_MEDIA else ".docx"
     path = root / f"{digest}{ext}"
     path.write_bytes(data)
+    version, lineage = 1, None
+    if edition_id:
+        prev = session.scalar(select(m.Document).where(m.Document.org_id == org_id, m.Document.edition_id == edition_id)
+                              .order_by(m.Document.version.desc(), m.Document.created_at.desc()))
+        if prev is not None:
+            version, lineage = prev.version + 1, prev.lineage_id or prev.id
     doc = m.Document(org_id=org_id, edition_id=edition_id, filename=Path(filename).name[:300], media_type=media,
-                     sha256=digest, storage_path=str(path), version=1, status="queued", is_demo=is_demo,
-                     uploaded_by=user_id)
+                     sha256=digest, storage_path=str(path), size_bytes=len(data), version=version, status="queued",
+                     is_demo=is_demo, uploaded_by=user_id)
     session.add(doc)
     session.flush()
+    doc.lineage_id = lineage or doc.id
     if edition_id:
-        ed.document_id = doc.id
+        ed.document_id = doc.id  # the edition now points to its latest document version
     audit(session, org_id, user_id, "document.upload", "document", doc.id, sha256=digest, filename=doc.filename)
     session.commit()
     return doc, True

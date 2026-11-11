@@ -81,9 +81,12 @@ def _pp(x: float | None, digits: int = 1) -> str:
 
 
 def _live_or_none(task: str, system: str, user: dict, schema: dict) -> tuple[dict | None, dict]:
+    from .gate import live_block_reason
+
     provider = get_provider()
-    if not provider.available:
-        return None, {"fallback_reason": "model_not_configured", "provider": provider.name, "model": None}
+    reason = live_block_reason(provider)
+    if reason:
+        return None, {"fallback_reason": reason, "provider": provider.name, "model": None}
     try:
         data, meta = provider.complete_json(system, json.dumps(user, ensure_ascii=False), schema)
         return data, {"provider": meta.provider, "model": meta.model, "latency_ms": meta.latency_ms}

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from .. import models as m
 from ..ai import assistant as asst
 from ..ai import tasks as ai
+from ..ai.gate import LiveGate, use_gate
 from ..ai.provider import get_provider
 from ..analytics.comparison import compare_arms
 from ..analytics.fixtures import fixture_learners, load_fixture
@@ -20,8 +21,21 @@ from ..db import get_session
 from ..errors import ApiError, not_found
 from ..schemas import api as S
 from ..services import analysis as an
-from ..services import auth, decisions, documents, imports, jobs, mappings, planning, reports, search
+from ..services import (
+    auth,
+    decisions,
+    demo_tenants,
+    documents,
+    imports,
+    jobs,
+    mappings,
+    planning,
+    ratelimit,
+    reports,
+    search,
+)
 from ..services.auth import Principal
+from ..services.ratelimit import client_ip_var
 
 router = APIRouter(prefix="/api/v1")
 DB = Annotated[Session, Depends(get_session)]
@@ -33,6 +47,18 @@ def principal(session: DB, authorization: Annotated[str | None, Header()] = None
 
 
 P = Annotated[Principal, Depends(principal)]
+
+
+def check_storage_quota(session: Session, org: m.Organization, add_bytes: int) -> None:
+    from sqlalchemy import func
+
+    s = get_settings()
+    quota = org.storage_quota_bytes or s.org_storage_quota_mb * 1024 * 1024
+    used = (session.scalar(select(func.coalesce(func.sum(m.Document.size_bytes), 0)).where(m.Document.org_id == org.id)) or 0) \
+        + (session.scalar(select(func.coalesce(func.sum(m.ImportBatch.size_bytes), 0)).where(m.ImportBatch.org_id == org.id)) or 0)
+    if used + add_bytes > quota:
+        raise ApiError("storage_quota_exceeded", "Превышена квота хранения файлов организации", 413,
+                       {"quota_bytes": quota, "used_bytes": int(used)})
 
 
 def parse_filters(filters: str | None) -> an.Filters:
@@ -50,7 +76,7 @@ def parse_filters(filters: str | None) -> an.Filters:
 
 
 class DemoLogin(BaseModel):
-    persona: str = "methodist"
+    persona: str | None = None
 
 
 class PasswordLogin(BaseModel):
@@ -61,19 +87,47 @@ class PasswordLogin(BaseModel):
 def _user_out(session: Session, user: m.User) -> S.UserOut:
     org = session.get(m.Organization, user.org_id)
     return S.UserOut(id=user.id, username=user.username, display_name=user.display_name, roles=user.roles,
-                     org_id=org.id, org_name=org.name, org_is_demo=org.is_demo)
+                     org_id=org.id, org_name=org.name, org_is_demo=org.is_demo, org_is_ephemeral=org.is_ephemeral,
+                     org_expires_at=org.expires_at.isoformat() if org.expires_at else None)
+
+
+@router.get("/config", tags=["system"])
+def public_config() -> dict[str, Any]:
+    """Non-secret runtime flags for the web client."""
+    s = get_settings()
+    prov = get_provider()
+    return {"deployment_mode": s.deployment_mode, "demo_login_enabled": s.deployment_mode != "production",
+            "qa_personas_enabled": s.deployment_mode == "dev", "password_login_enabled": True,
+            "demo_tenant_ttl_hours": s.demo_tenant_ttl_hours if s.deployment_mode == "public_demo" else None,
+            "live_ai_configured": prov.available, "llm_config_error": prov.config_error,
+            "lab_scenarios": demo_tenants.LAB_DATASETS, "recommended_dataset_code": demo_tenants.RECOMMENDED_DATASET}
 
 
 @router.post("/auth/demo-login", response_model=S.LoginResponse, tags=["auth"])
 def demo_login(body: DemoLogin, session: DB):
-    token, user = auth.demo_login(session, body.persona)
-    return S.LoginResponse(token=token, user=_user_out(session, user))
+    token, user, recommended = auth.demo_login(session, body.persona, client_ip_var.get())
+    return S.LoginResponse(token=token, user=_user_out(session, user), recommended_dataset_id=recommended)
 
 
 @router.post("/auth/login", response_model=S.LoginResponse, tags=["auth"])
 def login(body: PasswordLogin, session: DB):
-    token, user = auth.password_login(session, body.username, body.password)
+    token, user = auth.password_login(session, body.username, body.password, client_ip_var.get())
     return S.LoginResponse(token=token, user=_user_out(session, user))
+
+
+@router.post("/auth/logout", tags=["auth"])
+def logout(session: DB, authorization: Annotated[str | None, Header()] = None) -> dict[str, Any]:
+    token = authorization[7:] if authorization and authorization.lower().startswith("bearer ") else None
+    auth.logout(session, token)
+    return {"status": "ok"}
+
+
+@router.post("/demo/scenarios/{code}", tags=["datasets"])
+def load_lab_scenario(code: str, p: P, session: DB) -> dict[str, Any]:
+    """Load a laboratory scenario dataset into the visitor's demo tenant (cloned on first use)."""
+    ratelimit.check(session, "lab", p.org_id, "rate_import")
+    ds_id = demo_tenants.load_lab_dataset(session, p.org, code)
+    return an.dataset_summary(an.get_dataset(session, p.org_id, ds_id))
 
 
 @router.get("/auth/me", response_model=S.UserOut, tags=["auth"])
@@ -144,6 +198,7 @@ def topic_evidence(topic_id: str, dataset_id: str, p: P, session: DB, filters: s
 
 @router.post("/comparisons", response_model=S.Envelope[S.ComparisonResult], tags=["analyses"])
 def comparison(body: an.ComparisonRequest, p: P, session: DB):
+    ratelimit.check(session, "compute", p.user_id, "rate_compute")
     return an.comparison(session, p.org_id, body, p.user_id)
 
 
@@ -183,7 +238,9 @@ async def import_validate(
     column_mapping: Annotated[str | None, Form()] = None, options: Annotated[str | None, Form()] = None,
 ):
     p.require("methodist")
+    ratelimit.check(session, "import", p.org_id, "rate_import")
     data = await file.read(get_settings().max_upload_bytes + 1)
+    check_storage_quota(session, p.org, len(data))
     try:
         mapping = json.loads(column_mapping) if column_mapping else None
         opts = json.loads(options) if options else None
@@ -277,7 +334,9 @@ def list_documents(p: P, session: DB) -> list[dict[str, Any]]:
 async def upload_document(p: P, session: DB, file: Annotated[UploadFile, File()],
                           edition_id: Annotated[str | None, Form()] = None) -> dict[str, Any]:
     p.require("methodist")
+    ratelimit.check(session, "document", p.org_id, "rate_document")
     data = await file.read(get_settings().max_upload_bytes + 1)
+    check_storage_quota(session, p.org, len(data))
     doc, created = documents.store_document(session, p.org_id, p.user_id, data, file.filename or "document",
                                             edition_id=edition_id, is_demo=p.org.is_demo)
     job = documents.enqueue_extraction(session, doc, p.user_id)
@@ -314,7 +373,9 @@ def document_file(document_id: str, p: P, session: DB):
 @router.post("/documents/{document_id}/propose-links", tags=["documents", "ai"])
 def propose_links(document_id: str, p: P, session: DB) -> dict[str, Any]:
     p.require("methodist")
-    return ai.propose_fragment_links_for_document(session, p.org_id, p.user_id, document_id)
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    with use_gate(LiveGate.for_principal(session, p)):
+        return ai.propose_fragment_links_for_document(session, p.org_id, p.user_id, document_id)
 
 
 @router.get("/sources/search", tags=["sources"])
@@ -340,7 +401,9 @@ def review_mapping(link_id: str, body: mappings.ReviewRequest, p: P, session: DB
 @router.post("/items/{item_id}/suggest-links", tags=["mappings", "ai"])
 def suggest_item_links(item_id: str, p: P, session: DB) -> dict[str, Any]:
     p.require("methodist", "teacher")
-    return ai.propose_item_links(session, p.org_id, item_id)
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    with use_gate(LiveGate.for_principal(session, p)):
+        return ai.propose_item_links(session, p.org_id, item_id)
 
 
 # ---------------------------------------------------------------------------
@@ -355,6 +418,7 @@ def plan_context(dataset_id: str, p: P, session: DB, filters: str | None = None)
 
 @router.post("/plans/solve", response_model=S.Envelope[S.PlanResult], tags=["plans"])
 def solve_plan(body: planning.PlanSolveRequest, p: P, session: DB):
+    ratelimit.check(session, "compute", p.user_id, "rate_compute")
     return planning.solve(session, p.org_id, body, p.user_id)
 
 
@@ -414,15 +478,18 @@ def decision_report(decision_id: str, p: P, session: DB, format: str = "pdf"):
 
 
 @router.get("/ai/status", tags=["ai"])
-def ai_status(p: P) -> dict[str, Any]:
+def ai_status(p: P, session: DB) -> dict[str, Any]:
     prov = get_provider()
     s = get_settings()
     from ..services.documents import OcrAdapter
 
     ocr = OcrAdapter()
-    return {"provider": prov.name, "model": prov.model, "live_available": prov.available,
+    gate_reason = LiveGate.for_principal(session, p).acquire_dry_run() if prov.available else None
+    return {"provider": prov.name, "model": prov.model, "live_available": prov.available and gate_reason is None,
+            "config_error": prov.config_error, "live_blocked_reason": gate_reason,
             "fallback_modes": ["recorded_demo", "template"], "ocr_engine": s.ocr_engine, "ocr_available": ocr.available,
-            "note_ru": None if prov.available else "Модель не настроена: используются шаблоны и записанные демо-примеры."}
+            "note_ru": None if (prov.available and gate_reason is None) else
+            "Живая модель недоступна для этой сессии: используются шаблоны и записанные демо-примеры."}
 
 
 class AnalysisLang(BaseModel):
@@ -442,19 +509,27 @@ class RecommendReq(BaseModel):
 
 @router.post("/ai/explain-comparison", response_model=S.GenerationOut, tags=["ai"])
 def explain_comparison(body: AnalysisLang, p: P, session: DB):
-    return ai.explain_comparison(session, p.org_id, body.analysis_id, body.lang)
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    with use_gate(LiveGate.for_principal(session, p)):
+        return ai.explain_comparison(session, p.org_id, body.analysis_id, body.lang)
 
 
 @router.post("/ai/interpret-misconception", response_model=S.GenerationOut, tags=["ai"])
 def interpret_misconception(body: MisconceptionReq, p: P, session: DB):
-    return ai.interpret_misconception(session, p.org_id, body.analysis_id, body.code, body.lang)
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    with use_gate(LiveGate.for_principal(session, p)):
+        return ai.interpret_misconception(session, p.org_id, body.analysis_id, body.code, body.lang)
 
 
 @router.post("/ai/recommend", response_model=S.GenerationOut, tags=["ai"])
 def recommend(body: RecommendReq, p: P, session: DB):
-    return ai.recommend(session, p.org_id, body.topic_analysis_id, body.comparison_analysis_id, body.lang)
+    ratelimit.check(session, "ai", p.user_id, "rate_ai")
+    with use_gate(LiveGate.for_principal(session, p)):
+        return ai.recommend(session, p.org_id, body.topic_analysis_id, body.comparison_analysis_id, body.lang)
 
 
 @router.post("/assistant/query", response_model=S.AssistantAnswer, tags=["ai"])
 def assistant_query(body: asst.AssistantQuery, p: P, session: DB):
-    return asst.answer(session, p, body)
+    ratelimit.check(session, "assistant", p.user_id, "rate_assistant")
+    with use_gate(LiveGate.for_principal(session, p)):
+        return asst.answer(session, p, body)

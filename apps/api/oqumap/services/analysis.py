@@ -103,7 +103,7 @@ def load_meta(session: Session, org_id: str, dataset_id: str) -> DatasetFrame:
     cohort_edition = {k: next(iter(v)) if len(v) == 1 else "__mixed__" for k, v in ce.items()}
     assessments = {a.id: a for a in session.scalars(select(m.Assessment).where(m.Assessment.dataset_id == ds.id))}
     forms = {f.id: f for f in session.scalars(select(m.AssessmentForm).where(m.AssessmentForm.program_version_id == pv))}
-    scales = {s.id: s for s in session.scalars(select(m.Scale))}
+    scales = {s.id: s for s in session.scalars(select(m.Scale).where((m.Scale.org_id == org_id) | m.Scale.org_id.is_(None)))}
     form_items: dict[str, list[str]] = defaultdict(list)
     for fi in session.scalars(select(m.FormItem).where(m.FormItem.form_id.in_(list(forms))).order_by(m.FormItem.position)):
         form_items[fi.form_id].append(fi.item_id)
